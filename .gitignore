@@ -2,3 +2,20 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Claude
+.claude/
+CLAUDE.md
+
+# qrtdown
+_quarto.yml
+_qrtdown.yml
+/.quarto/
+**/*.quarto_ipynb
+_freeze/
+docs/
+articles.qmd
+citation.qmd
+index.qmd
+reference.qmd
+reference/

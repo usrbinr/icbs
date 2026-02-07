@@ -1,0 +1,254 @@
+---
+title: "IBCS Scenario Notation"
+vignette: >
+  %\VignetteIndexEntry{IBCS Scenario Notation}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+format:
+  html:
+    toc: true
+    code-fold: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(icbs)
+library(ggplot2)
+```
+
+## Understanding Scenario Notation
+
+IBCS defines a standardized visual language for distinguishing different types
+of business data scenarios. The notation uses fill patterns and borders to
+instantly communicate what kind of data is being shown.
+
+### The Four Scenarios
+
+| Scenario | Abbreviation | Visual Style | Description |
+|----------|--------------|--------------|-------------|
+| Actual | AC | Solid dark fill | Measured data from current period |
+| Plan/Budget | PL | Outlined (hollow) | Target or budgeted values |
+| Previous Year | PY | Lighter solid fill | Historical comparison data |
+| Forecast | FC | Hatched pattern* | Projected future values |
+\* In this package, forecast is approximated with a lighter fill and border
+
+```{r}
+#| label: notation-reference
+#| fig-width: 8
+#| fig-height: 3
+# Visual reference for scenario notation
+scenarios <- data.frame(
+    scenario = factor(c("AC\n(Actual)", "PL\n(Plan)", "PY\n(Previous)", "FC\n(Forecast)"),
+                      levels = c("AC\n(Actual)", "PL\n(Plan)", "PY\n(Previous)", "FC\n(Forecast)")),
+    value = c(100, 100, 100, 100)
+)
+
+cols <- ibcs_colors()
+
+ggplot(scenarios, aes(x = scenario, y = value)) +
+    geom_col(
+        fill = c(cols$actual, NA, cols$previous, cols$actual_light),
+        color = cols$actual,
+        linewidth = c(0.3, 1.5, 0.3, 0.5),
+        width = 0.6
+    ) +
+    labs(title = "IBCS Scenario Notation Reference", x = NULL, y = NULL) +
+    theme_ibcs() +
+    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+```
+
+## Using Scenario Scales
+
+### scale_fill_ibcs_scenario()
+
+Use this scale when mapping scenario types to fill aesthetics:
+```{r}
+#| label: fill-scale
+#| fig-width: 7
+#| fig-height: 4
+quarterly <- data.frame(
+    quarter = rep(c("Q1", "Q2", "Q3", "Q4"), 2),
+    scenario = rep(c("AC", "PY"), each = 4),
+    revenue = c(120, 135, 125, 140, 110, 120, 115, 130)
+)
+
+ggplot(quarterly, aes(x = quarter, y = revenue, fill = scenario)) +
+    geom_col(position = "dodge", width = 0.7, color = ibcs_colors()$actual) +
+    scale_fill_ibcs_scenario() +
+    labs(
+        title = "Quarterly Revenue: Actual vs Previous Year",
+        x = NULL, y = "Revenue ($M)"
+    ) +
+    theme_ibcs()
+```
+
+### scale_color_ibcs_scenario()
+
+Use for border colors, especially important for Plan (outlined bars):
+
+```{r}
+#| label: color-scale
+#| fig-width: 7
+#| fig-height: 4
+monthly <- data.frame(
+    month = rep(c("Jan", "Feb", "Mar"), 2),
+    scenario = rep(c("AC", "PL"), each = 3),
+    sales = c(100, 110, 105, 95, 100, 100)
+)
+
+ggplot(monthly, aes(x = month, y = sales, fill = scenario, color = scenario)) +
+    geom_col(position = "dodge", width = 0.7, linewidth = 1) +
+    scale_fill_ibcs_scenario() +
+    scale_color_ibcs_scenario() +
+    labs(
+        title = "Monthly Sales: Actual vs Plan",
+        x = NULL, y = "Sales (units)"
+    ) +
+    theme_ibcs()
+```
+
+## The ibcs_bar_chart() Function
+For convenience, use `ibcs_bar_chart()` which handles all the notation automatically:
+
+```{r}
+#| label: bar-chart
+#| fig-width: 8
+#| fig-height: 4
+performance <- data.frame(
+    region = rep(c("North", "South", "East", "West"), each = 2),
+    scenario = rep(c("AC", "PL"), 4),
+    value = c(150, 140, 120, 130, 180, 170, 95, 100)
+)
+
+ibcs_bar_chart(performance, x = region, y = value, scenario = scenario)
+```
+
+## Variance Visualization
+
+When showing variances (differences between scenarios), use the dedicated
+variance colors:
+
+### scale_fill_ibcs_variance()
+
+```{r}
+#| label: variance-scale
+#| fig-width: 7
+#| fig-height: 4
+variance_data <- data.frame(
+    category = c("Product A", "Product B", "Product C", "Product D"),
+    variance = c(15, -10, 5, -3),
+    direction = c("positive", "negative", "positive", "negative")
+)
+
+ggplot(variance_data, aes(x = reorder(category, variance), y = variance, fill = direction)) +
+    geom_col(width = 0.6) +
+    scale_fill_ibcs_variance() +
+    coord_flip() +
+    labs(
+        title = "Variance to Plan by Product",
+        x = NULL, y = "Variance (%)"
+    ) +
+    theme_ibcs() +
+    theme(legend.position = "none")
+```
+
+## Multi-Scenario Comparisons
+
+### Actual vs Plan vs Previous Year
+
+```{r}
+#| label: multi-scenario
+#| fig-width: 9
+#| fig-height: 5
+multi <- data.frame(
+    month = rep(c("Jan", "Feb", "Mar", "Apr"), 3),
+    scenario = rep(c("AC", "PL", "PY"), each = 4),
+    value = c(
+        100, 110, 115, 120,  # Actual
+        95, 105, 110, 115,   # Plan
+        90, 95, 100, 105     # Previous Year
+    )
+)
+
+ibcs_bar_chart(multi, x = month, y = value, scenario = scenario) +
+    labs(title = "Monthly Performance: Three Scenario Comparison")
+```
+
+## Time Series with Forecast
+
+When showing time series that transition from actual to forecast:
+
+```{r}
+#| label: time-series
+#| fig-width: 9
+#| fig-height: 4
+cols <- ibcs_colors()
+
+timeline <- data.frame(
+    month = factor(month.abb, levels = month.abb),
+    value = c(100, 105, 98, 110, 115, 108, 120, 125, 130, 128, 135, 140),
+    scenario = c(rep("AC", 6), rep("FC", 6))
+)
+
+ggplot(timeline, aes(x = month, y = value, fill = scenario, color = scenario)) +
+    geom_col(width = 0.7, linewidth = 0.5) +
+    geom_vline(xintercept = 6.5, linetype = "dashed", color = cols$previous) +
+    annotate("text", x = 3.5, y = 145, label = "Actual", color = cols$actual) +
+    annotate("text", x = 9.5, y = 145, label = "Forecast", color = cols$actual_light) +
+    scale_fill_ibcs_scenario() +
+    scale_color_ibcs_scenario() +
+    labs(
+        title = "Annual Sales Projection",
+        x = NULL, y = "Sales ($K)"
+    ) +
+    theme_ibcs() +
+    theme(legend.position = "none")
+```
+
+## Best Practices
+
+### Consistent Application
+
+Always use the same notation across all visualizations in a report:
+
+- AC (Actual) = solid dark
+- PL (Plan) = outlined
+- PY (Previous) = lighter solid
+- FC (Forecast) = hatched/lighter with border
+
+### Integrated Legends
+
+IBCS recommends integrating legends into the visualization rather than using
+separate legend boxes. Label scenarios directly on or near the data:
+
+```{r}
+#| label: integrated-legend
+#| fig-width: 8
+#| fig-height: 4
+cols <- ibcs_colors()
+
+comparison <- data.frame(
+    period = c("2023", "2024"),
+    actual = c(100, 120),
+    plan = c(95, 115)
+)
+
+ggplot(comparison) +
+    # Plan bars (outlined)
+    geom_col(
+        aes(x = period, y = plan),
+        fill = NA, color = cols$plan, linewidth = 1.2, width = 0.5
+    ) +
+    # Actual bars (solid, narrower, overlaid)
+    geom_col(
+        aes(x = period, y = actual),
+        fill = cols$actual, width = 0.3
+    ) +
+    # Integrated labels
+    annotate("text", x = 2.3, y = 120, label = "AC", hjust = 0, fontface = "bold", size = 3) +
+    annotate("text", x = 2.3, y = 115, label = "PL", hjust = 0, size = 3) +
+    labs(title = "Year-over-Year Comparison", x = NULL, y = "Revenue ($M)") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    theme_ibcs()
+```

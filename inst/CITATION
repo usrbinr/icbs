@@ -1,0 +1,10 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "icbs: IBCS-Compliant Business Visualizations for ggplot2",
+  author   = c(
+    person("Alejandro", "Hagan", email = "alejandro.hagan@outlook.com", role = c("aut", "cre"))
+  ),
+  year     = "2026",
+  note     = "R package version 0.0.0.9000",
+  url      = "https://codeberg.org/usrbinr/icbs"
+)

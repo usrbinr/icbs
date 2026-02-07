@@ -1,11 +1,28 @@
 Package: icbs
-Title: What the Package Does (One Line, Title Case)
+Title: IBCS-Compliant Business Visualizations for ggplot2
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Authors@R:
+    person("Alejandro", "Hagan", , "alejandro.hagan@outlook.com", role = c("aut", "cre"))
+Description: Create business visualizations following International Business
+    Communication Standards (IBCS). Provides themes, color scales, variance
+    charts, waterfall charts, scenario notation, and multi-panel layouts with
+    connectors. Integrates with the marquee package for colored text labels.
+License: MIT + file LICENSE
 Encoding: UTF-8
+Imports:
+    ggplot2,
+    grid,
+    patchwork,
+    rlang,
+    stats
+Suggests:
+    knitr,
+    marquee,
+    quarto,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: quarto
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Config/testthat/edition: 3
+URL: https://codeberg.org/usrbinr/icbs

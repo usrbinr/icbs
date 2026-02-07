@@ -1,2 +1,20 @@
 ^icbs\.Rproj$
 ^\.Rproj\.user$
+
+# qrtdown
+^docs$
+^\.quarto$
+^_quarto\.yml$
+^_qrtdown\.yml$
+^reference$
+^reference\.qmd$
+^articles\.qmd$
+^citation\.qmd$
+^index\.qmd$
+^vignettes/articles$
+^llms\.txt$
+^LICENSE\.md$
+^\.claude$
+^CLAUDE\.md$
+^_freeze$
+^Rplots\.pdf$

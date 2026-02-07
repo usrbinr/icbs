@@ -1,0 +1,299 @@
+---
+title: "IBCS Waterfall Charts"
+vignette: >
+  %\VignetteIndexEntry{IBCS Waterfall Charts}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+format:
+  html:
+    toc: true
+    code-fold: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(icbs)
+library(ggplot2)
+```
+
+## What are Waterfall Charts?
+
+Waterfall charts show how an initial value is affected by a series of
+intermediate positive or negative values to arrive at a final value.
+They're commonly used for:
+
+- **Income statements**: Revenue → Costs → Profit
+- **Variance analysis**: Budget → Changes → Actual
+- **Bridge charts**: Year 1 → Drivers → Year 2
+
+## Basic Waterfall Chart
+
+```{r}
+#| label: basic-waterfall
+#| fig-width: 8
+#| fig-height: 5
+income_statement <- data.frame(
+    item = c("Revenue", "COGS", "Gross Profit", "SG&A", "R&D", "Operating Income"),
+    value = c(1000, -400, NA, -250, -100, NA),
+    type = c("start", "negative", "subtotal", "negative", "negative", "end")
+)
+
+ibcs_waterfall(income_statement, x = item, y = value, type = type)
+```
+
+## Function Parameters
+
+```{r}
+#| eval: false
+ibcs_waterfall(
+    data,                      # Data frame
+    x,                         # Category column (in order)
+    y,                         # Value column
+    type = NULL,               # Type column: start/end/positive/negative/subtotal
+    fill_positive = NULL,      # Color for positive changes
+    fill_negative = NULL,      # Color for negative changes
+    fill_total = NULL,         # Color for totals
+    show_connectors = TRUE,    # Show connecting lines
+    show_values = TRUE         # Show value labels
+)
+```
+
+## Type Column Values
+
+The `type` column controls how each bar is rendered:
+
+| Type | Behavior |
+|------|----------|
+| `start` | Begins from zero, sets initial running total |
+| `positive` | Adds to running total, floats from previous level |
+| `negative` | Subtracts from running total, floats from previous level |
+| `subtotal` | Shows current running total, resets baseline to zero |
+| `end` | Shows final running total from zero |
+
+## Automatic Type Inference
+
+If no `type` column is provided, the function infers types:
+- First row = start
+- Last row = end
+- Other rows = positive/negative based on sign
+
+```{r}
+#| label: auto-infer
+#| fig-width: 8
+#| fig-height: 4
+simple_data <- data.frame(
+    step = c("Start", "Add Sales", "Subtract Costs", "Add Other", "End"),
+    value = c(100, 50, -30, 10, 130)
+)
+
+ibcs_waterfall(simple_data, x = step, y = value) +
+    labs(title = "Waterfall with Automatic Type Inference")
+```
+
+## Income Statement Example
+
+```{r}
+#| label: income-statement
+#| fig-width: 10
+#| fig-height: 5
+pnl <- data.frame(
+    line_item = c(
+        "Net Revenue",
+        "Cost of Sales",
+        "Gross Profit",
+        "R&D Expense",
+        "Sales & Marketing",
+        "G&A Expense",
+        "Operating Income",
+        "Interest Expense",
+        "Tax Expense",
+        "Net Income"
+    ),
+    value = c(500, -200, NA, -50, -80, -40, NA, -10, -30, NA),
+    type = c(
+        "start",
+        "negative",
+        "subtotal",
+        "negative",
+        "negative",
+        "negative",
+        "subtotal",
+        "negative",
+        "negative",
+        "end"
+    )
+)
+
+ibcs_waterfall(pnl, x = line_item, y = value, type = type) +
+    labs(
+        title = "Income Statement Waterfall",
+        subtitle = "FY 2024 | Values in $M"
+    )
+```
+
+## Variance Bridge Example
+
+Show what drove the change from one period to another:
+
+```{r}
+#| label: variance-bridge
+#| fig-width: 9
+#| fig-height: 5
+bridge <- data.frame(
+    driver = c("2023 Revenue", "Volume", "Price", "Mix", "FX Impact", "2024 Revenue"),
+    value = c(800, 50, 30, -20, -10, NA),
+    type = c("start", "positive", "positive", "negative", "negative", "end")
+)
+
+ibcs_waterfall(bridge, x = driver, y = value, type = type) +
+    labs(
+        title = "Revenue Bridge: 2023 to 2024",
+        subtitle = "Key drivers of revenue change"
+    )
+```
+
+## Customizing Appearance
+
+### Custom Colors
+
+By default, IBCS waterfall charts use gray tones (not red/green) for the
+bars themselves. You can customize if needed:
+
+```{r}
+#| label: custom-colors
+#| fig-width: 8
+#| fig-height: 5
+cols <- ibcs_colors()
+
+ibcs_waterfall(
+    bridge,
+    x = driver,
+    y = value,
+    type = type,
+    fill_positive = cols$variance_positive,
+    fill_negative = cols$variance_negative,
+    fill_total = cols$actual
+) +
+    labs(title = "Revenue Bridge with Variance Colors")
+```
+
+### Without Connectors
+
+```{r}
+#| label: no-connectors
+#| fig-width: 8
+#| fig-height: 4
+ibcs_waterfall(
+    simple_data,
+    x = step,
+    y = value,
+    show_connectors = FALSE
+) +
+    labs(title = "Waterfall Without Connector Lines")
+```
+
+### Without Value Labels
+
+```{r}
+#| label: no-labels
+#| fig-width: 8
+#| fig-height: 4
+ibcs_waterfall(
+    simple_data,
+    x = step,
+    y = value,
+    show_values = FALSE
+) +
+    labs(title = "Waterfall Without Value Labels")
+```
+
+## Budget Variance Analysis
+
+```{r}
+#| label: budget-variance
+#| fig-width: 10
+#| fig-height: 5
+budget_analysis <- data.frame(
+    category = c(
+        "Budget",
+        "Sales Overperformance",
+        "Cost Savings",
+        "Unexpected Expenses",
+        "Currency Loss",
+        "Actual"
+    ),
+    value = c(1000, 80, 45, -60, -15, NA),
+    type = c("start", "positive", "positive", "negative", "negative", "end")
+)
+
+ibcs_waterfall(budget_analysis, x = category, y = value, type = type) +
+    labs(
+        title = "Budget to Actual Variance Analysis",
+        subtitle = "Q4 2024 | Values in $K"
+    )
+```
+
+## Multiple Subtotals
+
+Use subtotals to show intermediate sums:
+
+```{r}
+#| label: subtotals
+#| fig-width: 11
+#| fig-height: 5
+detailed_pnl <- data.frame(
+    item = c(
+        "Product Revenue", "Service Revenue", "Total Revenue",
+        "Direct Costs", "Indirect Costs", "Gross Profit",
+        "Operating Expenses", "Net Profit"
+    ),
+    value = c(600, 200, NA, -300, -100, NA, -200, NA),
+    type = c(
+        "start", "positive", "subtotal",
+        "negative", "negative", "subtotal",
+        "negative", "end"
+    )
+)
+
+ibcs_waterfall(detailed_pnl, x = item, y = value, type = type) +
+    labs(title = "P&L with Multiple Subtotals")
+```
+
+## Combining with Other ggplot2 Elements
+
+Since `ibcs_waterfall()` returns a ggplot object, you can add layers:
+
+```{r}
+#| label: combined
+#| fig-width: 9
+#| fig-height: 5
+ibcs_waterfall(bridge, x = driver, y = value, type = type) +
+    # Add a reference line
+    geom_hline(yintercept = 800, linetype = "dashed",
+               color = ibcs_colors()$previous) +
+    annotate("text", x = 6, y = 810, label = "2023 Level",
+             hjust = 1, size = 3, color = ibcs_colors()$previous) +
+    labs(
+        title = "Revenue Bridge with Reference Line",
+        subtitle = "Comparison to prior year baseline"
+    )
+```
+
+## Best Practices
+
+1. **Order matters**: Arrange items in a logical flow (e.g., revenue
+   before costs, larger items before smaller)
+
+2. **Use subtotals sparingly**: Too many subtotals can clutter the chart
+
+3. **Label clearly**: Ensure each bar's contribution is understandable
+
+4. **Keep it simple**: Waterfall charts work best with 5-10 items;
+   aggregate if you have more
+
+5. **Color judiciously**: IBCS recommends gray tones for waterfall bars,
+   reserving red/green for explicit variance displays
+
+6. **Show the math**: Values should clearly show the calculation path
+   from start to end
