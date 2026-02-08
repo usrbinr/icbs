@@ -1,6 +1,6 @@
 Package: icbs
 Title: IBCS-Compliant Business Visualizations for ggplot2
-Version: 3.0.5
+Version: 3.0.10
 Authors@R:
     person("Alejandro", "Hagan", , "alejandro.hagan@outlook.com", role = c("aut", "cre"))
 Description: Create business visualizations following International Business
@@ -10,10 +10,13 @@ Description: Create business visualizations following International Business
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
+    cli,
     ggplot2,
     grid,
     patchwork,
     rlang,
+    S7,
+    scales,
     stats
 Suggests:
     knitr,
