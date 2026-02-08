@@ -87,6 +87,7 @@ utils::globalVariables(c(
     ".formatted_label", ".label_hjust", ".label_x", ".marquee_label",
     ".reference", ".scenario", ".type", ".value",
     ".variance_pct", ".variance_sign", ".x", ".y", ".ymax", ".ymin",
+    "component", "height", "label",  # for story_designer
     "x", "xend", "y", "yend"
 ))
 

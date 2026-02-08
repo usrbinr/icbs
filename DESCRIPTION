@@ -19,10 +19,12 @@ Imports:
     scales,
     stats
 Suggests:
+    clipr,
     knitr,
     marquee,
     quarto,
     rmarkdown,
+    shiny,
     testthat (>= 3.0.0)
 VignetteBuilder: quarto
 Roxygen: list(markdown = TRUE)
