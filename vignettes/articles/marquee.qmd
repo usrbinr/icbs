@@ -15,6 +15,7 @@ format:
 #| include: false
 library(icbs)
 library(ggplot2)
+library(marquee)
 ```
 
 ## Overview
