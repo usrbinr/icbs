@@ -1,4 +1,4 @@
-# icbs (development version)
+# icbs 1.0.0
 
 ## icbs 0.0.0.9000
 
