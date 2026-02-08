@@ -19,6 +19,8 @@ Imports:
     scales,
     stats
 Suggests:
+    base64enc,
+    bslib,
     clipr,
     knitr,
     marquee,
