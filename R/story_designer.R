@@ -170,6 +170,10 @@ story_designer <- function(plot = NULL,
                         shiny::selectInput("legend_halign", "Text alignment", width = "100%",
                             choices = c("Right" = "right", "Center" = "center", "Left" = "left")),
                         shiny::sliderInput("legend_size", "Font size", min = 8, max = 14, value = 10, step = 1),
+                        shiny::conditionalPanel(
+                            condition = "input.legend_position == 'left' || input.legend_position == 'right'",
+                            shiny::sliderInput("legend_width", "Legend width", min = 0.08, max = 0.25, value = 0.12, step = 0.02)
+                        ),
                         shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
                         shiny::checkboxInput("legend_uppercase", "Uppercase", value = FALSE)
                     )
@@ -828,9 +832,11 @@ story_designer <- function(plot = NULL,
                     names(colors) <- labels
                     # Determine orientation based on position
                     orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
+                    # For vertical legends, align text to left/right based on position
+                    h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
                     legend_plot <- legend_block(
                         colors,
-                        halign = input$legend_halign %||% "right",
+                        halign = h_align,
                         valign = "top",
                         orientation = orientation,
                         sep = input$legend_sep %||% " | ",
@@ -894,14 +900,16 @@ story_designer <- function(plot = NULL,
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$legend, h$caption))
                 } else if (legend_pos == "right") {
                     # Legend to right of chart (vertical)
+                    legend_w <- input$legend_width %||% 0.12
                     content_with_legend <- content + legend_plot +
-                        patchwork::plot_layout(widths = c(0.92, 0.08))
+                        patchwork::plot_layout(widths = c(1 - legend_w, legend_w))
                     result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
                 } else if (legend_pos == "left") {
                     # Legend to left of chart (vertical)
+                    legend_w <- input$legend_width %||% 0.12
                     content_with_legend <- legend_plot + content +
-                        patchwork::plot_layout(widths = c(0.08, 0.92))
+                        patchwork::plot_layout(widths = c(legend_w, 1 - legend_w))
                     result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
                 }
