@@ -52,8 +52,26 @@
   border: none;
   margin-bottom: 4px;
   border-radius: 6px !important;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.accordion-collapse {
+  overflow: visible;
+}
+
+.accordion-body {
+  overflow: visible;
+}
+
+/* Ensure dropdowns can overflow sidebar */
+.sidebar, .bslib-sidebar-layout > .sidebar {
+  overflow: visible !important;
+}
+
+.form-select, .shiny-input-container {
+  position: relative;
+  z-index: 1;
 }
 
 .accordion-button {
