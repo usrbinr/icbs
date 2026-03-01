@@ -151,6 +151,32 @@ story_designer <- function(plot = NULL,
                 ),
 
                 bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-danger me-2", " "), "Legend"),
+                    value = "Legend",
+                    icon = shiny::icon("palette"),
+                    shiny::checkboxInput("legend_enabled", "Enable text legend", value = FALSE),
+                    shiny::conditionalPanel(
+                        condition = "input.legend_enabled",
+                        shiny::textInput("legend_labels", "Categories (comma-separated)",
+                                         value = "Category A, Category B, Category C", width = "100%"),
+                        shiny::helpText(class = "text-muted small mt-1", "Colors for each category:"),
+                        shiny::fluidRow(
+                            shiny::column(4, shiny::textInput("legend_color_1", "Color 1", value = "#808080", width = "100%")),
+                            shiny::column(4, shiny::textInput("legend_color_2", "Color 2", value = "#B0B0B0", width = "100%")),
+                            shiny::column(4, shiny::textInput("legend_color_3", "Color 3", value = "#E69F00", width = "100%"))
+                        ),
+                        shiny::selectInput("legend_sep", "Separator", width = "100%",
+                            choices = c("Pipe ( | )" = " | ", "Bullet" = " \u2022 ",
+                                        "Dash ( - )" = " - ", "None" = "  ")),
+                        shiny::selectInput("legend_halign", "Alignment", width = "100%",
+                            choices = c("Right" = "right", "Center" = "center", "Left" = "left")),
+                        shiny::sliderInput("legend_size", "Font size", min = 8, max = 14, value = 10, step = 1),
+                        shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
+                        shiny::checkboxInput("legend_uppercase", "Uppercase", value = FALSE)
+                    )
+                ),
+
+                bslib::accordion_panel(
                     title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Plot"),
                     value = "Plot",
                     icon = shiny::icon("chart-bar"),
@@ -464,8 +490,10 @@ story_designer <- function(plot = NULL,
         })
 
         current_heights <- shiny::reactive({
+            legend_h <- if (input$legend_enabled %||% FALSE) 0.04 else 0
             list(title = input$title_height %||% 0.12,
                  subtitle = input$subtitle_height %||% 0.08,
+                 legend = legend_h,
                  caption = input$caption_height %||% 0.05)
         })
 
@@ -757,6 +785,37 @@ story_designer <- function(plot = NULL,
                 lineheight = input$narrative_lineheight %||% 1.4
             )
 
+            # Create legend block if enabled
+            legend_plot <- NULL
+            if (input$legend_enabled %||% FALSE) {
+                # Parse comma-separated labels
+                labels <- trimws(strsplit(input$legend_labels %||% "A, B, C", ",")[[1]])
+                # Get colors for each label (up to 3)
+                colors <- c(
+                    input$legend_color_1 %||% "#808080",
+                    input$legend_color_2 %||% "#B0B0B0",
+                    input$legend_color_3 %||% "#E69F00"
+                )
+                # Match colors to labels
+                n_labels <- length(labels)
+                if (n_labels > 0) {
+                    colors <- colors[seq_len(min(n_labels, 3))]
+                    if (n_labels > 3) {
+                        # Recycle colors if more than 3 labels
+                        colors <- rep(colors, length.out = n_labels)
+                    }
+                    names(colors) <- labels
+                    legend_plot <- legend_block(
+                        colors,
+                        halign = input$legend_halign %||% "right",
+                        sep = input$legend_sep %||% " | ",
+                        size = input$legend_size %||% 10,
+                        bold = input$legend_bold %||% TRUE,
+                        uppercase = input$legend_uppercase %||% FALSE
+                    )
+                }
+            }
+
             # Create caption with fine tune settings
             # Map caption_position to halign
             caption_halign <- switch(input$caption_position %||% "full_left",
@@ -778,8 +837,8 @@ story_designer <- function(plot = NULL,
             plot_width <- 1 - input$narrative_width
             caption_under_chart <- (input$caption_position %||% "full_left") == "under_chart"
 
-            # Calculate content height
-            content_height <- 1 - h$title - h$subtitle - h$caption
+            # Calculate content height (account for legend if enabled)
+            content_height <- 1 - h$title - h$subtitle - h$legend - h$caption
 
             if (caption_under_chart && input$narrative_position %in% c("left", "right")) {
                 # Caption only under chart, not full width
@@ -795,9 +854,14 @@ story_designer <- function(plot = NULL,
                         patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
                 }
 
-                # Stack without separate caption row
-                result <- title_plot / subtitle_plot / content +
-                    patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height + h$caption))
+                # Stack without separate caption row (with optional legend)
+                if (!is.null(legend_plot)) {
+                    result <- title_plot / subtitle_plot / legend_plot / content +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, h$legend, content_height + h$caption))
+                } else {
+                    result <- title_plot / subtitle_plot / content +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height + h$caption))
+                }
             } else {
                 # Full-width caption (default)
                 if (input$narrative_position == "right") {
@@ -815,9 +879,14 @@ story_designer <- function(plot = NULL,
                         patchwork::plot_layout(heights = c(plot_width, input$narrative_width))
                 }
 
-                # Stack everything vertically
-                result <- title_plot / subtitle_plot / content / caption_plot +
-                    patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
+                # Stack everything vertically (with optional legend)
+                if (!is.null(legend_plot)) {
+                    result <- title_plot / subtitle_plot / legend_plot / content / caption_plot +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, h$legend, content_height, h$caption))
+                } else {
+                    result <- title_plot / subtitle_plot / content / caption_plot +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
+                }
             }
 
             result
@@ -1096,13 +1165,41 @@ story_designer <- function(plot = NULL,
                 '    halign = "', caption_halign, '",\n',
                 '    color = "', input$caption_color %||% "#808080", '"\n',
                 ')\n\n',
+                # Legend code if enabled
+                if (input$legend_enabled %||% FALSE) {
+                    labels <- trimws(strsplit(input$legend_labels %||% "A, B, C", ",")[[1]])
+                    colors <- c(input$legend_color_1 %||% "#808080",
+                                input$legend_color_2 %||% "#B0B0B0",
+                                input$legend_color_3 %||% "#E69F00")[seq_len(min(length(labels), 3))]
+                    color_vec <- paste0('c(', paste0('"', labels, '" = "', colors, '"', collapse = ', '), ')')
+                    paste0(
+                        'legend_plot <- legend_block(\n',
+                        '    ', color_vec, ',\n',
+                        '    halign = "', input$legend_halign %||% "right", '",\n',
+                        '    sep = "', input$legend_sep %||% " | ", '",\n',
+                        '    size = ', input$legend_size %||% 10, ',\n',
+                        '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
+                        '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE", '\n',
+                        ')\n\n'
+                    )
+                } else "",
                 '# Combine styled plot + narrative\n',
                 'content <- styled_plot + narrative_plot +\n',
                 '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
                 '# Stack everything\n',
-                'final <- title_plot / subtitle_plot / content / caption_plot +\n',
-                '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ',
-                round(1 - h$title - h$subtitle - h$caption, 3), ', ', h$caption, '))'
+                if (input$legend_enabled %||% FALSE) {
+                    content_h <- round(1 - h$title - h$subtitle - h$legend - h$caption, 3)
+                    paste0(
+                        'final <- title_plot / subtitle_plot / legend_plot / content / caption_plot +\n',
+                        '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', h$legend, ', ', content_h, ', ', h$caption, '))'
+                    )
+                } else {
+                    paste0(
+                        'final <- title_plot / subtitle_plot / content / caption_plot +\n',
+                        '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ',
+                        round(1 - h$title - h$subtitle - h$caption, 3), ', ', h$caption, '))'
+                    )
+                }
             )
         })
 

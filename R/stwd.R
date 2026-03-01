@@ -810,6 +810,113 @@ caption_block <- function(caption,
     p
 }
 
+#' Create a Legend Block Plot
+#'
+#' Creates a standalone inline legend as a ggplot, showing colored category
+#' labels separated by a delimiter. Use above charts in patchwork compositions
+#' to replace traditional legends with clean, in-line text.
+#'
+#' @param colors Named vector where names are category labels and values are
+#'   colors (hex codes or R color names).
+#' @param halign Horizontal alignment: "left", "center", or "right". Default: "right".
+#' @param sep Separator between category labels. Default: " | ".
+#' @param size Text size in pts. Default: 10.
+#' @param bold Logical; make labels bold? Default: TRUE.
+#' @param uppercase Logical; convert labels to uppercase? Default: FALSE.
+#' @param margin_top Top margin in pts. Default: 0.
+#' @param margin_bottom Bottom margin in pts. Default: 5.
+#' @param margin_left Left margin in pts. Default: 5.
+#' @param margin_right Right margin in pts. Default: 5.
+#' @param ... Additional arguments passed to [marquee::geom_marquee()].
+#'
+#' @returns A ggplot object that can be combined with other plots via patchwork.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(patchwork)
+#'
+#' legend_colors <- c("ACCURATE" = "#808080", "NULL" = "#B0B0B0", "ERROR" = "#E69F00")
+#'
+#' legend_plot <- legend_block(legend_colors, halign = "right")
+#'
+#' title_block("My Title") / legend_plot / my_chart +
+#'     plot_layout(heights = c(0.08, 0.04, 0.88))
+#' }
+#'
+legend_block <- function(colors,
+                         halign = "right",
+                         sep = " | ",
+                         size = 10,
+                         bold = TRUE,
+                         uppercase = FALSE,
+                         margin_top = 0,
+                         margin_bottom = 5,
+                         margin_left = 5,
+                         margin_right = 5,
+                         ...) {
+
+    if (!requireNamespace("marquee", quietly = TRUE)) {
+        cli::cli_abort(
+            "Package {.pkg marquee} is required for {.fn legend_block}."
+        )
+    }
+
+    if (length(colors) == 0) {
+        cli::cli_abort("At least one color must be provided.")
+    }
+
+    # Get labels
+    labels <- names(colors)
+    if (is.null(labels)) {
+        cli::cli_abort("Colors must be a named vector (names = category labels).")
+    }
+
+    if (uppercase) {
+        labels <- toupper(labels)
+    }
+
+    # Format each label with its color using marquee syntax
+    formatted <- mapply(function(label, color) {
+        # Convert named color to hex if needed
+        if (!grepl("^#", color)) {
+            tryCatch({
+                rgb_vals <- grDevices::col2rgb(color)
+                color <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
+            }, error = function(e) {
+                color <- "#000000"
+            })
+        }
+        if (bold) {
+            paste0("**{", color, " ", label, "}**")
+        } else {
+            paste0("{", color, " ", label, "}")
+        }
+    }, labels, colors, SIMPLIFY = TRUE, USE.NAMES = FALSE)
+
+    # Combine with separator
+    legend_text <- paste(formatted, collapse = sep)
+
+    # Position
+    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 1)
+    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.98)
+
+    p <- ggplot() +
+        marquee::geom_marquee(
+            aes(x = x_pos, y = 0.5, label = legend_text),
+            hjust = hjust,
+            vjust = 0.5,
+            size = size,
+            ...
+        ) +
+        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+        scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+        theme_void() +
+        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
+
+    p
+}
+
 #' Create a Large Title Block (Deprecated)
 #'
 #' @description
@@ -1699,190 +1806,4 @@ geom_marquee_colored <- function(data,
 }
 
 
-# ============================================================================
-# Multi-Panel Layout Functions
-# ============================================================================
-
-#' make a 1 split 2 plot
-#'
-#' @param fig list of plots
-#' @param first_level_sign sign
-#'
-#' @returns ggplot
-#' @export
-#'
-one_to_split_to_two_layout <- function(fig,first_level_sign="+"){
-    
-    layout <- "
-##BCC
-AABCC
-AABDD
-##BDD
-"    
-    
-    pa <- fig[[1]]
-    pc <- fig[[2]]
-    pd <- fig[[3]]
-
-    pb <- make_connector(direction = "split", sign = first_level_sign)
-    
-    
-    
-    out <- pa + pb + pc + pd + plot_layout(design = layout)
-    
-    return(out)
-    
-}
-
-
-#' Make a 2 merge to 1 plot
-#'
-#' Creates a layout where two plots on the left converge via a connector
-#' into a single plot on the right.
-#'
-#' @param fig list of 3 ggplot objects: two left panels and one right panel
-#' @param first_level_sign sign to display on the connector (default: "+")
-#'
-#' @returns ggplot
-#' @export
-#'
-two_to_merge_to_one_layout <- function(fig, first_level_sign = "+") {
-
-    layout <- "
-CCB##
-CCBAA
-DDBAA
-DDB##
-"
-
-    pa <- fig[[3]]
-    pc <- fig[[1]]
-    pd <- fig[[2]]
-
-    pb <- make_connector(
-        direction = "merge",
-        sign = first_level_sign
-    )
-
-    out <- pa + pb + pc + pd + plot_layout(design = layout)
-
-    return(out)
-}
-
-
-#' Make a connector panel
-#'
-#' Creates a standalone connector ggplot element for use in multi-panel layouts.
-#' Supports split (one-to-two) and merge (two-to-one) directions.
-#'
-#' @param direction character, either "split" (left-to-right branching) or
-#'   "merge" (right-to-left converging). Default: "split".
-#' @param sign character label to display at the center of the connector.
-#'   Default: "+".
-#' @param line_col color of the connector lines. Default: "black".
-#' @param line_size linewidth of the connector lines. Default: 0.5.
-#' @param label_size text size of the center label. Default: 10.
-#' @param label_fill background fill of the center label. Default: "white".
-#'
-#' @returns ggplot
-#' @export
-#'
-make_connector <- function(direction = "split",
-                           sign = "+",
-                           line_col = "black",
-                           line_size = 0.5,
-                           label_size = 10,
-                           label_fill = "white") {
-
-    if (direction == "split") {
-        segs <- data.frame(
-            x    = c(-1, 0, 0, 0),
-            xend = c( 0, 0, 1, 1),
-            y    = c( 0, 3, 3, -3),
-            yend = c( 0, -3, 3, -3)
-        )
-    } else if (direction == "merge") {
-        segs <- data.frame(
-            x    = c( 0, 0, -1, -1),
-            xend = c( 1, 0,  0,  0),
-            y    = c( 0, 3,  3, -3),
-            yend = c( 0, -3, 3, -3)
-        )
-    } else {
-        stop("direction must be 'split' or 'merge'")
-    }
-
-    p <- ggplot(segs, aes(x = x, xend = xend, y = y, yend = yend)) +
-        geom_segment(color = line_col, linewidth = line_size) +
-        annotate(
-            "label",
-            x = 0, y = 0,
-            label = sign,
-            label.r = unit(0.5, "lines"),
-            fill = label_fill,
-            size = label_size
-        ) +
-        coord_fixed() +
-        theme_void()
-
-    return(p)
-}
-
-
-#' Add panel labels to a patchwork plot
-#'
-#' Adds letter labels (e.g. "A", "B", "C") to each panel of a patchwork
-#' composite plot.
-#'
-#' @param plot a patchwork plot object
-#' @param labels character vector of labels. Default: uppercase letters
-#'   matching the number of panels.
-#' @param style one of "upper" (A, B, C), "lower" (a, b, c), or "custom"
-#'   (use labels as-is). Default: "upper".
-#' @param fontface font face for labels. Default: "bold".
-#' @param size text size in pts. Default: 14.
-#' @param x x position of label within each panel. Default: 0.
-#' @param y y position of label within each panel. Default: 1.
-#' @param hjust horizontal justification. Default: -0.1.
-#' @param vjust vertical justification. Default: 1.1.
-#'
-#' @returns patchwork plot with annotation labels
-#' @export
-#'
-add_panel_labels <- function(plot,
-                             labels = NULL,
-                             style = "upper",
-                             fontface = "bold",
-                             size = 14,
-                             x = 0,
-                             y = 1,
-                             hjust = -0.1,
-                             vjust = 1.1) {
-
-    tag_levels <- switch(style,
-        upper = "A",
-        lower = "a",
-        NULL
-    )
-
-    if (!is.null(labels)) {
-        out <- plot + plot_annotation(tag_levels = list(labels))
-    } else if (!is.null(tag_levels)) {
-        out <- plot + plot_annotation(tag_levels = tag_levels)
-    } else {
-        stop("style must be 'upper', 'lower', or provide labels directly")
-    }
-
-    out <- out & theme(
-        plot.tag = element_text(
-            face = fontface,
-            size = size,
-            hjust = hjust,
-            vjust = vjust
-        ),
-        plot.tag.position = c(x, y)
-    )
-
-    return(out)
-}
 
