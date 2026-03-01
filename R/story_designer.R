@@ -221,13 +221,30 @@ story_designer <- function(plot = NULL,
                     value = "Plot",
                     icon = shiny::icon("chart-bar"),
                     shiny::selectInput("plot_theme", "Theme", width = "100%",
-                        choices = c("Minimal" = "minimal", "Classic" = "classic",
-                                    "Black & White" = "bw", "Light" = "light",
-                                    "Dark" = "dark", "Gray" = "gray",
-                                    "Linedraw" = "linedraw", "STWD" = "stwd", "Void" = "void")),
+                        choices = c("Minimal" = "minimal", "STWD" = "stwd", "Void" = "void")),
                     shiny::selectInput("plot_legend_pos", "Legend", width = "100%",
                         choices = c("Right" = "right", "Bottom" = "bottom",
-                                    "Top" = "top", "Left" = "left", "None" = "none"))
+                                    "Top" = "top", "Left" = "left", "None" = "none")),
+                    shiny::hr(),
+                    shiny::tags$label("Color Palette", class = "form-label"),
+                    shiny::selectInput("palette_package", "Package", width = "100%",
+                        choices = c("None" = "none", "MetBrewer" = "MetBrewer",
+                                    "PNWColors" = "PNWColors", "RColorBrewer" = "RColorBrewer",
+                                    "viridis" = "viridis")),
+                    shiny::conditionalPanel(
+                        condition = "input.palette_package != 'none'",
+                        shiny::uiOutput("palette_choices"),
+                        shiny::div(
+                            class = "d-flex gap-1 mb-2",
+                            shiny::actionButton("palette_prev", "", icon = shiny::icon("chevron-left"), class = "btn-sm btn-outline-secondary"),
+                            shiny::actionButton("palette_next", "", icon = shiny::icon("chevron-right"), class = "btn-sm btn-outline-secondary"),
+                            shiny::actionButton("palette_random", "Random", icon = shiny::icon("shuffle"), class = "btn-sm btn-outline-secondary")
+                        ),
+                        shiny::uiOutput("palette_preview"),
+                        shiny::radioButtons("palette_apply", "Apply to:",
+                            choices = c("Fill" = "fill", "Color" = "color", "Both" = "both"),
+                            selected = "fill", inline = TRUE)
+                    )
                 ),
 
                 bslib::accordion_panel(
@@ -507,6 +524,122 @@ story_designer <- function(plot = NULL,
         default_colors <- c("#808080", "#B0B0B0", "#E69F00", "#56B4E9", "#009E73",
                             "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
 
+        # --- Color Palette Functions ---
+        get_palette_names <- function(pkg) {
+            switch(pkg,
+                "MetBrewer" = if (requireNamespace("MetBrewer", quietly = TRUE)) {
+                    names(MetBrewer::MetPalettes)
+                } else character(0),
+                "PNWColors" = if (requireNamespace("PNWColors", quietly = TRUE)) {
+                    names(PNWColors::pnw_palettes)
+                } else character(0),
+                "RColorBrewer" = if (requireNamespace("RColorBrewer", quietly = TRUE)) {
+                    rownames(RColorBrewer::brewer.pal.info)
+                } else character(0),
+                "viridis" = c("viridis", "magma", "plasma", "inferno", "cividis", "mako", "rocket", "turbo"),
+                character(0)
+            )
+        }
+
+        get_palette_colors <- function(pkg, name, n = 8) {
+            tryCatch({
+                switch(pkg,
+                    "MetBrewer" = MetBrewer::met.brewer(name, n),
+                    "PNWColors" = PNWColors::pnw_palette(name, n),
+                    "RColorBrewer" = {
+                        max_n <- RColorBrewer::brewer.pal.info[name, "maxcolors"]
+                        RColorBrewer::brewer.pal(min(n, max_n), name)
+                    },
+                    "viridis" = if (requireNamespace("viridis", quietly = TRUE)) {
+                        viridis::viridis(n, option = name)
+                    } else grDevices::hcl.colors(n, name),
+                    grDevices::hcl.colors(n)
+                )
+            }, error = function(e) grDevices::hcl.colors(n))
+        }
+
+        # Reactive: available palettes for selected package
+        available_palettes <- shiny::reactive({
+            get_palette_names(input$palette_package %||% "none")
+        })
+
+        # Reactive: current palette index
+        palette_idx <- shiny::reactiveVal(1)
+
+        # Reset index when package changes
+        shiny::observeEvent(input$palette_package, {
+            palette_idx(1)
+        })
+
+        # Palette navigation buttons
+        shiny::observeEvent(input$palette_prev, {
+            palettes <- available_palettes()
+            if (length(palettes) > 0) {
+                idx <- palette_idx()
+                palette_idx(if (idx <= 1) length(palettes) else idx - 1)
+            }
+        })
+
+        shiny::observeEvent(input$palette_next, {
+            palettes <- available_palettes()
+            if (length(palettes) > 0) {
+                idx <- palette_idx()
+                palette_idx(if (idx >= length(palettes)) 1 else idx + 1)
+            }
+        })
+
+        shiny::observeEvent(input$palette_random, {
+            palettes <- available_palettes()
+            if (length(palettes) > 0) {
+                palette_idx(sample(length(palettes), 1))
+            }
+        })
+
+        # Sync dropdown selection with index
+        shiny::observeEvent(input$palette_name, {
+            palettes <- available_palettes()
+            idx <- match(input$palette_name, palettes)
+            if (!is.na(idx)) palette_idx(idx)
+        })
+
+        # Render palette dropdown
+        output$palette_choices <- shiny::renderUI({
+            palettes <- available_palettes()
+            if (length(palettes) == 0) return(NULL)
+            idx <- min(palette_idx(), length(palettes))
+            shiny::selectInput("palette_name", "Palette", width = "100%",
+                choices = palettes, selected = palettes[idx])
+        })
+
+        # Render palette preview swatches
+        output$palette_preview <- shiny::renderUI({
+            pkg <- input$palette_package %||% "none"
+            if (pkg == "none") return(NULL)
+            palettes <- available_palettes()
+            if (length(palettes) == 0) return(NULL)
+            idx <- min(palette_idx(), length(palettes))
+            colors <- get_palette_colors(pkg, palettes[idx], 8)
+            swatches <- lapply(colors, function(col) {
+                shiny::span(style = paste0(
+                    "display:inline-block;width:20px;height:20px;background:", col,
+                    ";border:1px solid #ccc;border-radius:2px;margin-right:2px;"
+                ))
+            })
+            shiny::div(class = "mb-2", swatches)
+        })
+
+        # Get current palette colors
+        current_palette <- shiny::reactive({
+            pkg <- input$palette_package %||% "none"
+            if (pkg == "none") return(NULL)
+            palettes <- available_palettes()
+            if (length(palettes) == 0) return(NULL)
+            idx <- min(palette_idx(), length(palettes))
+            get_palette_colors(pkg, palettes[idx], 12)
+        })
+
+        # --- End Color Palette Functions ---
+
         # Dynamic color inputs based on number of categories
         output$legend_color_inputs <- shiny::renderUI({
             labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
@@ -584,12 +717,6 @@ story_designer <- function(plot = NULL,
             # Get base theme
             base_theme <- switch(input$plot_theme %||% "minimal",
                 "minimal" = ggplot2::theme_minimal(),
-                "classic" = ggplot2::theme_classic(),
-                "bw" = ggplot2::theme_bw(),
-                "light" = ggplot2::theme_light(),
-                "dark" = ggplot2::theme_dark(),
-                "gray" = ggplot2::theme_gray(),
-                "linedraw" = ggplot2::theme_linedraw(),
                 "stwd" = theme_stwd(),
                 "void" = ggplot2::theme_void(),
                 ggplot2::theme_minimal()
@@ -693,7 +820,19 @@ story_designer <- function(plot = NULL,
                 )
             }
 
-            p + base_theme + theme_mods
+            # Apply color palette if selected
+            p <- p + base_theme + theme_mods
+            palette_colors <- current_palette()
+            if (!is.null(palette_colors)) {
+                apply_to <- input$palette_apply %||% "fill"
+                if (apply_to %in% c("fill", "both")) {
+                    p <- p + ggplot2::scale_fill_manual(values = palette_colors)
+                }
+                if (apply_to %in% c("color", "both")) {
+                    p <- p + ggplot2::scale_color_manual(values = palette_colors)
+                }
+            }
+            p
         })
 
         # Dimensions label
@@ -741,6 +880,8 @@ story_designer <- function(plot = NULL,
             # Plot settings
             shiny::updateSelectInput(session, "plot_theme", selected = "minimal")
             shiny::updateSelectInput(session, "plot_legend_pos", selected = "right")
+            shiny::updateSelectInput(session, "palette_package", selected = "none")
+            palette_idx(1)
             # X-Axis title
             shiny::updateSliderInput(session, "axis_title_x_size", value = 11)
             shiny::updateCheckboxInput(session, "axis_title_x_bold", value = FALSE)
@@ -1134,12 +1275,6 @@ story_designer <- function(plot = NULL,
             theme_name <- input$plot_theme %||% "minimal"
             theme_fn <- switch(theme_name,
                 "minimal" = "theme_minimal()",
-                "classic" = "theme_classic()",
-                "bw" = "theme_bw()",
-                "light" = "theme_light()",
-                "dark" = "theme_dark()",
-                "gray" = "theme_gray()",
-                "linedraw" = "theme_linedraw()",
                 "stwd" = "theme_stwd()",
                 "void" = "theme_void()",
                 "theme_minimal()"
@@ -1219,7 +1354,33 @@ story_designer <- function(plot = NULL,
                 '        axis.text = element_text(size = ', input$axis_text_size %||% 10,
                 ', color = "', input$axis_text_color %||% "#666666", '"),\n',
                 '        legend.position = "', input$plot_legend_pos %||% "right", '"', axis_line_code, grid_code, '\n',
-                '    )\n\n',
+                '    )',
+                # Add palette code if selected
+                if ((input$palette_package %||% "none") != "none") {
+                    pkg <- input$palette_package
+                    palettes <- available_palettes()
+                    idx <- min(palette_idx(), length(palettes))
+                    pal_name <- if (length(palettes) > 0) palettes[idx] else "viridis"
+                    apply_to <- input$palette_apply %||% "fill"
+
+                    pal_fn <- switch(pkg,
+                        "MetBrewer" = paste0('MetBrewer::met.brewer("', pal_name, '")'),
+                        "PNWColors" = paste0('PNWColors::pnw_palette("', pal_name, '", 8)'),
+                        "RColorBrewer" = paste0('RColorBrewer::brewer.pal(8, "', pal_name, '")'),
+                        "viridis" = paste0('viridis::viridis(8, option = "', pal_name, '")'),
+                        'viridis::viridis(8)'
+                    )
+
+                    scale_code <- ""
+                    if (apply_to %in% c("fill", "both")) {
+                        scale_code <- paste0(scale_code, ' +\n    scale_fill_manual(values = ', pal_fn, ')')
+                    }
+                    if (apply_to %in% c("color", "both")) {
+                        scale_code <- paste0(scale_code, ' +\n    scale_color_manual(values = ', pal_fn, ')')
+                    }
+                    scale_code
+                } else "",
+                '\n\n',
                 'title_plot <- title_block(\n',
                 '    "', gsub('"', '\\"', input$title_text), '",\n',
                 '    title_size = ', input$title_size, ',\n',

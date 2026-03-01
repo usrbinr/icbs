@@ -25,9 +25,13 @@ Suggests:
     clipr,
     knitr,
     marquee,
+    MetBrewer,
+    PNWColors,
+    RColorBrewer,
     rmarkdown,
     shiny,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    viridis
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3

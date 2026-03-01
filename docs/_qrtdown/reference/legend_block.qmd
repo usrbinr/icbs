@@ -2,7 +2,7 @@
 title: "legend_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L847)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L857)
 
 # `legend_block()`
 
@@ -14,10 +14,14 @@ Create a Legend Block Plot
 legend_block(
   colors,
   halign = "right",
+  valign = "center",
+  orientation = "horizontal",
   sep = " | ",
   size = 10,
   bold = TRUE,
   uppercase = FALSE,
+  lineheight = 1.6,
+  width = 0.95,
   margin_top = 0,
   margin_bottom = 5,
   margin_left = 5,
@@ -32,10 +36,14 @@ legend_block(
 |----------|-------------|
 | `colors` | Named vector where names are category labels and values are colors (hex codes or R color names). |
 | `halign` | Horizontal alignment: "left", "center", or "right". Default: "right". |
-| `sep` | Separator between category labels. Default: " \| ". |
+| `valign` | Vertical alignment (for vertical orientation): "top", "center", or "bottom". Default: "center". |
+| `orientation` | Either "horizontal" (labels side by side) or "vertical" (labels stacked). Default: "horizontal". |
+| `sep` | Separator between category labels (horizontal only). Default: " \| ". |
 | `size` | Text size in pts. Default: 10. |
 | `bold` | Logical; make labels bold? Default: TRUE. |
 | `uppercase` | Logical; convert labels to uppercase? Default: FALSE. |
+| `lineheight` | Line height multiplier for vertical legends. Default: 1.6. |
+| `width` | Text width for wrapping (0-1). Default: 0.95. |
 | `margin_top` | Top margin in pts. Default: 0. |
 | `margin_bottom` | Bottom margin in pts. Default: 5. |
 | `margin_left` | Left margin in pts. Default: 5. |
@@ -49,8 +57,8 @@ A ggplot object that can be combined with other plots via patchwork.
 ## Description
 
 Creates a standalone inline legend as a ggplot, showing colored category
-labels separated by a delimiter. Use above charts in patchwork compositions
-to replace traditional legends with clean, in-line text.
+labels separated by a delimiter. Use above/below charts or beside them
+in patchwork compositions to replace traditional legends with clean text.
 
 ## Examples
 
@@ -60,7 +68,11 @@ library(patchwork)
 
 legend_colors <- c("ACCURATE" = "#808080", "NULL" = "#B0B0B0", "ERROR" = "#E69F00")
 
+# Horizontal above chart
 legend_plot <- legend_block(legend_colors, halign = "right")
+
+# Vertical beside chart
+legend_vert <- legend_block(legend_colors, orientation = "vertical", valign = "top")
 
 title_block("My Title") / legend_plot / my_chart +
     plot_layout(heights = c(0.08, 0.04, 0.88))
