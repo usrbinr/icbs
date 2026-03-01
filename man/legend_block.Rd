@@ -13,6 +13,8 @@ legend_block(
   size = 10,
   bold = TRUE,
   uppercase = FALSE,
+  lineheight = 1.6,
+  width = 0.95,
   margin_top = 0,
   margin_bottom = 5,
   margin_left = 5,
@@ -39,6 +41,10 @@ or "bottom". Default: "center".}
 \item{bold}{Logical; make labels bold? Default: TRUE.}
 
 \item{uppercase}{Logical; convert labels to uppercase? Default: FALSE.}
+
+\item{lineheight}{Line height multiplier for vertical legends. Default: 1.6.}
+
+\item{width}{Text width for wrapping (0-1). Default: 0.95.}
 
 \item{margin_top}{Top margin in pts. Default: 0.}
 

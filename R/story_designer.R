@@ -204,7 +204,8 @@ story_designer <- function(plot = NULL,
                         shiny::sliderInput("legend_size", "Font size", min = 8, max = 14, value = 10, step = 1),
                         shiny::conditionalPanel(
                             condition = "input.legend_position == 'left' || input.legend_position == 'right'",
-                            shiny::sliderInput("legend_width", "Legend width", min = 0.08, max = 0.25, value = 0.12, step = 0.02)
+                            shiny::sliderInput("legend_width", "Legend width", min = 0.08, max = 0.25, value = 0.12, step = 0.02),
+                            shiny::sliderInput("legend_lineheight", "Line spacing", min = 1.0, max = 3.0, value = 1.6, step = 0.2)
                         ),
                         shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
                         shiny::checkboxInput("legend_uppercase", "Uppercase", value = FALSE)
@@ -886,7 +887,9 @@ story_designer <- function(plot = NULL,
                         sep = input$legend_sep %||% " | ",
                         size = input$legend_size %||% 10,
                         bold = input$legend_bold %||% TRUE,
-                        uppercase = input$legend_uppercase %||% FALSE
+                        uppercase = input$legend_uppercase %||% FALSE,
+                        lineheight = input$legend_lineheight %||% 1.6,
+                        width = 0.95
                     )
                 }
             }
@@ -1247,14 +1250,20 @@ story_designer <- function(plot = NULL,
                             input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
                         })
                         color_vec <- paste0('c(', paste0('"', labels, '" = "', colors, '"', collapse = ', '), ')')
+                        legend_pos <- input$legend_position %||% "above"
+                        orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
+                        h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
+                        lineheight_code <- if (orientation == "vertical") paste0(',\n    lineheight = ', input$legend_lineheight %||% 1.6) else ""
                         paste0(
                             'legend_plot <- legend_block(\n',
                             '    ', color_vec, ',\n',
-                            '    halign = "', input$legend_halign %||% "right", '",\n',
+                            '    halign = "', h_align, '",\n',
+                            '    orientation = "', orientation, '",\n',
                             '    sep = "', input$legend_sep %||% " | ", '",\n',
                             '    size = ', input$legend_size %||% 10, ',\n',
                             '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
-                            '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE", '\n',
+                            '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE",
+                            lineheight_code, '\n',
                             ')\n\n'
                         )
                     } else ""
@@ -1264,11 +1273,33 @@ story_designer <- function(plot = NULL,
                 '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
                 '# Stack everything\n',
                 if (input$legend_enabled %||% FALSE) {
-                    content_h <- round(1 - h$title - h$subtitle - h$legend - h$caption, 3)
-                    paste0(
-                        'final <- title_plot / subtitle_plot / legend_plot / content / caption_plot +\n',
-                        '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', h$legend, ', ', content_h, ', ', h$caption, '))'
-                    )
+                    legend_pos <- input$legend_position %||% "above"
+                    content_h <- round(1 - h$title - h$subtitle - (if (legend_pos %in% c("above", "below")) h$legend else 0) - h$caption, 3)
+                    if (legend_pos == "above") {
+                        paste0(
+                            'final <- title_plot / subtitle_plot / legend_plot / content / caption_plot +\n',
+                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', h$legend, ', ', content_h, ', ', h$caption, '))'
+                        )
+                    } else if (legend_pos == "below") {
+                        paste0(
+                            'final <- title_plot / subtitle_plot / content / legend_plot / caption_plot +\n',
+                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$legend, ', ', h$caption, '))'
+                        )
+                    } else if (legend_pos == "right") {
+                        legend_w <- input$legend_width %||% 0.12
+                        paste0(
+                            'content_with_legend <- patchwork::wrap_plots(content, legend_plot, widths = c(', round(1 - legend_w, 2), ', ', legend_w, '))\n',
+                            'final <- title_plot / subtitle_plot / content_with_legend / caption_plot +\n',
+                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$caption, '))'
+                        )
+                    } else {
+                        legend_w <- input$legend_width %||% 0.12
+                        paste0(
+                            'content_with_legend <- patchwork::wrap_plots(legend_plot, content, widths = c(', legend_w, ', ', round(1 - legend_w, 2), '))\n',
+                            'final <- title_plot / subtitle_plot / content_with_legend / caption_plot +\n',
+                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$caption, '))'
+                        )
+                    }
                 } else {
                     paste0(
                         'final <- title_plot / subtitle_plot / content / caption_plot +\n',

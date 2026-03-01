@@ -827,6 +827,8 @@ caption_block <- function(caption,
 #' @param size Text size in pts. Default: 10.
 #' @param bold Logical; make labels bold? Default: TRUE.
 #' @param uppercase Logical; convert labels to uppercase? Default: FALSE.
+#' @param lineheight Line height multiplier for vertical legends. Default: 1.6.
+#' @param width Text width for wrapping (0-1). Default: 0.95.
 #' @param margin_top Top margin in pts. Default: 0.
 #' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
@@ -860,6 +862,8 @@ legend_block <- function(colors,
                          size = 10,
                          bold = TRUE,
                          uppercase = FALSE,
+                         lineheight = 1.6,
+                         width = 0.95,
                          margin_top = 0,
                          margin_bottom = 5,
                          margin_left = 5,
@@ -920,6 +924,8 @@ legend_block <- function(colors,
                 hjust = hjust,
                 vjust = vjust_val,
                 size = size,
+                lineheight = lineheight,
+                width = width,
                 ...
             ) +
             scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -936,6 +942,7 @@ legend_block <- function(colors,
                 hjust = hjust,
                 vjust = 0.5,
                 size = size,
+                width = width,
                 ...
             ) +
             scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
