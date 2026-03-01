@@ -569,9 +569,18 @@ story_designer <- function(plot = NULL,
         # Reactive: current palette index
         palette_idx <- shiny::reactiveVal(1)
 
-        # Reset index when package changes
+        # Reactive: selected color indices (for custom selection)
+        selected_colors <- shiny::reactiveVal(integer(0))
+
+        # Reset index and selection when package changes
         shiny::observeEvent(input$palette_package, {
             palette_idx(1)
+            selected_colors(integer(0))
+        })
+
+        # Reset selection when palette changes
+        shiny::observeEvent(input$palette_name, {
+            selected_colors(integer(0))
         })
 
         # Palette navigation buttons
@@ -622,7 +631,18 @@ story_designer <- function(plot = NULL,
                 choices = palettes, selected = palettes[idx])
         })
 
-        # Render palette preview swatches with hex tooltips and click-to-copy
+        # Handle swatch clicks for selection
+        shiny::observeEvent(input$swatch_click, {
+            clicked_idx <- input$swatch_click
+            current <- selected_colors()
+            if (clicked_idx %in% current) {
+                selected_colors(setdiff(current, clicked_idx))
+            } else {
+                selected_colors(c(current, clicked_idx))
+            }
+        })
+
+        # Render palette preview swatches with selection support
         output$palette_preview <- shiny::renderUI({
             pkg <- input$palette_package %||% "none"
             if (pkg == "none") return(NULL)
@@ -630,35 +650,71 @@ story_designer <- function(plot = NULL,
             if (length(palettes) == 0) return(NULL)
             idx <- min(palette_idx(), length(palettes))
             colors <- get_palette_colors(pkg, palettes[idx], 8)
+            sel <- selected_colors()
+
             swatches <- lapply(seq_along(colors), function(i) {
                 col <- colors[i]
-                bslib::tooltip(
+                is_selected <- i %in% sel
+                # Show selection order number if selected
+                badge <- if (is_selected) {
+                    pos <- which(sel == i)
                     shiny::span(
-                        style = paste0(
-                            "display:inline-block;width:24px;height:24px;background:", col,
-                            ";border:1px solid #ccc;border-radius:3px;margin-right:3px;cursor:pointer;",
-                            "transition:transform 0.1s;"
+                        style = "position:absolute;top:-6px;right:-6px;background:#0d6efd;color:white;border-radius:50%;width:14px;height:14px;font-size:9px;display:flex;align-items:center;justify-content:center;",
+                        pos
+                    )
+                } else NULL
+
+                bslib::tooltip(
+                    shiny::div(
+                        style = "position:relative;display:inline-block;margin-right:4px;",
+                        shiny::span(
+                            style = paste0(
+                                "display:inline-block;width:28px;height:28px;background:", col,
+                                ";border:", if (is_selected) "3px solid #0d6efd" else "1px solid #ccc",
+                                ";border-radius:4px;cursor:pointer;transition:all 0.15s;"
+                            ),
+                            onclick = paste0("Shiny.setInputValue('swatch_click', ", i, ", {priority: 'event'});")
                         ),
-                        onclick = paste0(
-                            "navigator.clipboard.writeText('", col, "');",
-                            "this.style.transform='scale(1.2)';",
-                            "setTimeout(() => this.style.transform='scale(1)', 150);"
-                        )
+                        badge
                     ),
-                    paste0(col, " (click to copy)")
+                    paste0(col, if (is_selected) " (selected)" else " (click to select)")
                 )
             })
-            shiny::div(class = "mb-2", swatches)
+
+            # Show selected colors as copyable text
+            selected_hex <- if (length(sel) > 0) {
+                sel_colors <- colors[sel]
+                shiny::div(
+                    class = "mt-2 small",
+                    shiny::tags$code(
+                        style = "cursor:pointer;",
+                        onclick = paste0("navigator.clipboard.writeText('", paste(sel_colors, collapse = ", "), "');"),
+                        paste(sel_colors, collapse = ", ")
+                    ),
+                    shiny::span(class = "text-muted ms-1", "(click to copy)")
+                )
+            } else {
+                shiny::div(class = "mt-1 small text-muted", "Click swatches to select colors")
+            }
+
+            shiny::div(swatches, selected_hex)
         })
 
-        # Get current palette colors
+        # Get current palette colors (use selected if any, otherwise all)
         current_palette <- shiny::reactive({
             pkg <- input$palette_package %||% "none"
             if (pkg == "none") return(NULL)
             palettes <- available_palettes()
             if (length(palettes) == 0) return(NULL)
             idx <- min(palette_idx(), length(palettes))
-            get_palette_colors(pkg, palettes[idx], 12)
+            all_colors <- get_palette_colors(pkg, palettes[idx], 8)
+            sel <- selected_colors()
+            if (length(sel) > 0) {
+                # Return only selected colors in selection order
+                all_colors[sel]
+            } else {
+                all_colors
+            }
         })
 
         # --- End Color Palette Functions ---
@@ -843,28 +899,41 @@ story_designer <- function(plot = NULL,
                 )
             }
 
-            # Apply color palette if selected
+            # Apply color palette if selected (with error handling)
             p <- p + base_theme + theme_mods
             palette_colors <- current_palette()
-            if (!is.null(palette_colors)) {
+            if (!is.null(palette_colors) && length(palette_colors) > 0) {
                 apply_to <- input$palette_apply %||% "fill"
                 scale_type <- input$palette_scale %||% "discrete"
-                if (scale_type == "discrete") {
-                    if (apply_to %in% c("fill", "both")) {
-                        p <- p + ggplot2::scale_fill_manual(values = palette_colors)
+
+                # Try to apply the scale, silently fail if incompatible
+                p <- tryCatch({
+                    p_new <- p
+                    if (scale_type == "discrete") {
+                        if (apply_to %in% c("fill", "both")) {
+                            p_new <- p_new + ggplot2::scale_fill_manual(values = palette_colors)
+                        }
+                        if (apply_to %in% c("color", "both")) {
+                            p_new <- p_new + ggplot2::scale_color_manual(values = palette_colors)
+                        }
+                    } else {
+                        # Continuous scales - need at least 2 colors
+                        if (length(palette_colors) >= 2) {
+                            if (apply_to %in% c("fill", "both")) {
+                                p_new <- p_new + ggplot2::scale_fill_gradientn(colors = palette_colors)
+                            }
+                            if (apply_to %in% c("color", "both")) {
+                                p_new <- p_new + ggplot2::scale_color_gradientn(colors = palette_colors)
+                            }
+                        }
                     }
-                    if (apply_to %in% c("color", "both")) {
-                        p <- p + ggplot2::scale_color_manual(values = palette_colors)
-                    }
-                } else {
-                    # Continuous scales
-                    if (apply_to %in% c("fill", "both")) {
-                        p <- p + ggplot2::scale_fill_gradientn(colors = palette_colors)
-                    }
-                    if (apply_to %in% c("color", "both")) {
-                        p <- p + ggplot2::scale_color_gradientn(colors = palette_colors)
-                    }
-                }
+                    # Test if plot can be built (will error if scale incompatible)
+                    ggplot2::ggplot_build(p_new)
+                    p_new
+                }, error = function(e) {
+                    # Scale failed - return original plot without palette
+                    p
+                })
             }
             p
         })
