@@ -100,10 +100,11 @@ What should the audience do?",
             # Accordion for text components - no nested cards
             bslib::accordion(
                 id = "inputs_accordion",
-                open = c("Title", "Subtitle"),
+                open = FALSE,
 
                 bslib::accordion_panel(
-                    title = "Title",
+                    title = shiny::span(shiny::span(class = "badge bg-primary me-2", " "), "Title"),
+                    value = "Title",
                     icon = shiny::icon("heading"),
                     shiny::textAreaInput("title_text", NULL, value = title, rows = 2, width = "100%",
                                          placeholder = "Use **bold** or {#E69F00 color}"),
@@ -113,7 +114,8 @@ What should the audience do?",
                 ),
 
                 bslib::accordion_panel(
-                    title = "Subtitle",
+                    title = shiny::span(shiny::span(class = "badge bg-info me-2", " "), "Subtitle"),
+                    value = "Subtitle",
                     icon = shiny::icon("font"),
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
@@ -122,17 +124,23 @@ What should the audience do?",
                 ),
 
                 bslib::accordion_panel(
-                    title = "Narrative",
+                    title = shiny::span(shiny::span(class = "badge bg-success me-2", " "), "Narrative"),
+                    value = "Narrative",
                     icon = shiny::icon("align-left"),
                     shiny::textAreaInput("narrative_text", NULL, value = narrative, rows = 4, width = "100%"),
-                    shiny::selectInput("narrative_position", "Position",
-                                       choices = c("right", "left", "bottom"), selected = "right"),
+                    shiny::selectInput("narrative_position", "Layout",
+                                       choices = c("Chart LEFT | Narrative RIGHT" = "right",
+                                                   "Narrative LEFT | Chart RIGHT" = "left",
+                                                   "Chart TOP | Narrative BOTTOM" = "bottom",
+                                                   "Narrative TOP | Chart BOTTOM" = "top"),
+                                       selected = "right"),
                     shiny::sliderInput("narrative_width", "Width", min = 0.15, max = 0.50, value = 0.35, step = 0.05),
                     shiny::sliderInput("narrative_size", "Font size", min = 8, max = 14, value = 10, step = 1)
                 ),
 
                 bslib::accordion_panel(
-                    title = "Caption",
+                    title = shiny::span(shiny::span(class = "badge bg-secondary me-2", " "), "Caption"),
+                    value = "Caption",
                     icon = shiny::icon("quote-right"),
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
                     shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
@@ -185,6 +193,57 @@ What should the audience do?",
                         bslib::card_body(
                             shiny::plotOutput("height_diagram", height = "180px")
                         )
+                    )
+                )
+            ),
+
+            # Fine Tune tab
+            bslib::nav_panel(
+                title = shiny::span(shiny::icon("sliders-h"), " Fine Tune"),
+                bslib::accordion(
+                    id = "finetune_accordion",
+                    open = FALSE,
+                    # Title settings
+                    bslib::accordion_panel(
+                        title = shiny::span(shiny::span(class = "badge bg-primary me-2", " "), "Title"),
+                        value = "Title",
+                        shiny::selectInput("title_align", "Alignment", width = "100%",
+                            choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
+                        shiny::numericInput("title_lineheight", "Line height", value = 1.1, min = 0.8, max = 2, step = 0.1, width = "100%"),
+                        shiny::helpText(class = "text-muted small", "Line height: 1.0 = single spaced")
+                    ),
+                    # Subtitle settings
+                    bslib::accordion_panel(
+                        title = shiny::span(shiny::span(class = "badge bg-info me-2", " "), "Subtitle"),
+                        value = "Subtitle",
+                        shiny::selectInput("subtitle_align", "Alignment", width = "100%",
+                            choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
+                        shiny::numericInput("subtitle_lineheight", "Line height", value = 1.2, min = 0.8, max = 2, step = 0.1, width = "100%"),
+                        shiny::helpText(class = "text-muted small", "Line height: 1.0 = single spaced")
+                    ),
+                    # Narrative settings
+                    bslib::accordion_panel(
+                        title = shiny::span(shiny::span(class = "badge bg-success me-2", " "), "Narrative"),
+                        value = "Narrative",
+                        shiny::selectInput("narrative_halign", "Horizontal align", width = "100%",
+                            choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
+                        shiny::selectInput("narrative_valign", "Vertical align", width = "100%",
+                            choices = c("Top" = "top", "Center" = "center", "Bottom" = "bottom")),
+                        shiny::numericInput("narrative_lineheight", "Line height", value = 1.4, min = 0.8, max = 3, step = 0.1, width = "100%"),
+                        shiny::numericInput("narrative_padding", "Padding (pt)", value = 10, min = 0, max = 30, step = 1, width = "100%"),
+                        shiny::helpText(class = "text-muted small", "Line height 2.0 = double spaced")
+                    ),
+                    # Caption settings
+                    bslib::accordion_panel(
+                        title = shiny::span(shiny::span(class = "badge bg-secondary me-2", " "), "Caption"),
+                        value = "Caption",
+                        shiny::selectInput("caption_position", "Position", width = "100%",
+                            choices = c("Full width (left)" = "full_left",
+                                        "Full width (center)" = "full_center",
+                                        "Full width (right)" = "full_right",
+                                        "Under chart only" = "under_chart")),
+                        shiny::textInput("caption_color", "Color", value = "#808080", width = "100%"),
+                        shiny::helpText(class = "text-muted small", "Use hex (#808080) or color name")
                     )
                 )
             ),
@@ -247,7 +306,8 @@ What should the audience do?",
                     bslib::nav_panel("Plot", shiny::plotOutput("preview_chart", height = "250px")),
                     bslib::nav_panel("Title", shiny::plotOutput("preview_title", height = "100px")),
                     bslib::nav_panel("Subtitle", shiny::plotOutput("preview_subtitle", height = "80px")),
-                    bslib::nav_panel("Narrative", shiny::plotOutput("preview_narrative", height = "150px"))
+                    bslib::nav_panel("Narrative", shiny::plotOutput("preview_narrative", height = "150px")),
+                    bslib::nav_panel("Caption", shiny::plotOutput("preview_caption", height = "80px"))
                 )
             )
         )
@@ -258,6 +318,12 @@ What should the audience do?",
 
         # Define %||% locally for NULL handling
         `%||%` <- function(x, y) if (is.null(x)) y else x
+
+        # Debounced text inputs - wait 500ms after typing stops before updating
+        title_text_d <- shiny::debounce(shiny::reactive(input$title_text), 500)
+        subtitle_text_d <- shiny::debounce(shiny::reactive(input$subtitle_text), 500)
+        narrative_text_d <- shiny::debounce(shiny::reactive(input$narrative_text), 500)
+        caption_text_d <- shiny::debounce(shiny::reactive(input$caption_text), 500)
 
         # Convert named colors to hex in marquee syntax
         # Supports {colorname text} in addition to {#hex text}
@@ -313,11 +379,11 @@ What should the audience do?",
         }
 
         title_metrics <- shiny::reactive({
-            calc_text_metrics(input$title_text, input$title_size, input$output_width)
+            calc_text_metrics(title_text_d(), input$title_size, input$output_width)
         })
 
         subtitle_metrics <- shiny::reactive({
-            calc_text_metrics(input$subtitle_text, input$subtitle_size, input$output_width)
+            calc_text_metrics(subtitle_text_d(), input$subtitle_size, input$output_width)
         })
 
         current_heights <- shiny::reactive({
@@ -386,58 +452,108 @@ What should the audience do?",
         build_layout <- shiny::reactive({
             h <- current_heights()
 
-            # Convert named colors to hex
-            title_txt <- convert_named_colors(input$title_text)
-            subtitle_txt <- convert_named_colors(input$subtitle_text)
-            narrative_txt <- convert_named_colors(input$narrative_text)
-            caption_txt <- convert_named_colors(input$caption_text)
+            # Convert named colors to hex (using debounced text inputs)
+            title_txt <- convert_named_colors(title_text_d())
+            subtitle_txt <- convert_named_colors(subtitle_text_d())
+            narrative_txt <- convert_named_colors(narrative_text_d())
+            caption_txt <- convert_named_colors(caption_text_d())
 
-            # Create title block with custom margins
+            # Create title block with fine tune settings
+            title_margin <- input$title_margin_lr %||% 5
             title_plot <- title_block(
                 title_txt,
                 title_size = input$title_size,
+                halign = input$title_align %||% "left",
+                lineheight = input$title_lineheight %||% 1.1,
+                margin_left = title_margin,
+                margin_right = title_margin,
                 margin_bottom = input$title_margin_bottom
             )
 
-            # Create subtitle block with custom margins
+            # Create subtitle block with fine tune settings
+            subtitle_margin <- input$subtitle_margin_lr %||% 5
             subtitle_plot <- subtitle_block(
                 subtitle_txt,
                 subtitle_size = input$subtitle_size,
+                halign = input$subtitle_align %||% "left",
+                lineheight = input$subtitle_lineheight %||% 1.2,
+                margin_left = subtitle_margin,
+                margin_right = subtitle_margin,
                 margin_bottom = input$subtitle_margin_bottom
             )
 
-            # Create narrative
+            # Create narrative with fine tune settings
             narrative_plot <- text_narrative(
                 narrative_txt,
-                size = input$narrative_size
+                size = input$narrative_size,
+                halign = input$narrative_halign %||% "left",
+                valign = input$narrative_valign %||% "top",
+                padding = input$narrative_padding %||% 10,
+                lineheight = input$narrative_lineheight %||% 1.4
             )
 
-            # Create caption
+            # Create caption with fine tune settings
+            # Map caption_position to halign
+            caption_halign <- switch(input$caption_position %||% "full_left",
+                "full_left" = "left",
+                "full_center" = "center",
+                "full_right" = "right",
+                "under_chart" = "left",
+                "left"
+            )
             caption_plot <- caption_block(
                 caption_txt,
-                caption_size = input$caption_size
+                caption_size = input$caption_size,
+                halign = caption_halign,
+                color = input$caption_color %||% "#808080"
             )
 
             # Build content area (plot + narrative)
             content <- user_plot
             plot_width <- 1 - input$narrative_width
-            if (input$narrative_position == "right") {
-                content <- content + narrative_plot +
-                    patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
-            } else if (input$narrative_position == "left") {
-                content <- narrative_plot + content +
-                    patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
-            } else {
-                content <- content / narrative_plot +
-                    patchwork::plot_layout(heights = c(plot_width, input$narrative_width))
-            }
+            caption_under_chart <- (input$caption_position %||% "full_left") == "under_chart"
 
             # Calculate content height
             content_height <- 1 - h$title - h$subtitle - h$caption
 
-            # Stack everything vertically
-            result <- title_plot / subtitle_plot / content / caption_plot +
-                patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
+            if (caption_under_chart && input$narrative_position %in% c("left", "right")) {
+                # Caption only under chart, not full width
+                # Nest caption with chart before combining with narrative
+                chart_with_caption <- user_plot / caption_plot +
+                    patchwork::plot_layout(heights = c(1 - h$caption / content_height, h$caption / content_height))
+
+                if (input$narrative_position == "right") {
+                    content <- chart_with_caption + narrative_plot +
+                        patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
+                } else {
+                    content <- narrative_plot + chart_with_caption +
+                        patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
+                }
+
+                # Stack without separate caption row
+                result <- title_plot / subtitle_plot / content +
+                    patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height + h$caption))
+            } else {
+                # Full-width caption (default)
+                if (input$narrative_position == "right") {
+                    content <- content + narrative_plot +
+                        patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
+                } else if (input$narrative_position == "left") {
+                    content <- narrative_plot + content +
+                        patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
+                } else if (input$narrative_position == "top") {
+                    content <- narrative_plot / content +
+                        patchwork::plot_layout(heights = c(input$narrative_width, plot_width))
+                } else {
+                    # bottom
+                    content <- content / narrative_plot +
+                        patchwork::plot_layout(heights = c(plot_width, input$narrative_width))
+                }
+
+                # Stack everything vertically
+                result <- title_plot / subtitle_plot / content / caption_plot +
+                    patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
+            }
 
             result
         })
@@ -567,17 +683,28 @@ What should the audience do?",
         }, res = 96, bg = "white")
 
         output$preview_title <- shiny::renderPlot({
-            title_block(convert_named_colors(input$title_text), title_size = input$title_size,
+            title_block(convert_named_colors(title_text_d()), title_size = input$title_size,
                         margin_bottom = input$title_margin_bottom)
         }, res = 96, bg = "white")
 
         output$preview_subtitle <- shiny::renderPlot({
-            subtitle_block(convert_named_colors(input$subtitle_text), subtitle_size = input$subtitle_size,
+            subtitle_block(convert_named_colors(subtitle_text_d()), subtitle_size = input$subtitle_size,
                            margin_bottom = input$subtitle_margin_bottom)
         }, res = 96, bg = "white")
 
         output$preview_narrative <- shiny::renderPlot({
-            text_narrative(convert_named_colors(input$narrative_text), size = input$narrative_size)
+            text_narrative(convert_named_colors(narrative_text_d()), size = input$narrative_size,
+                halign = input$narrative_halign %||% "left",
+                lineheight = input$narrative_lineheight %||% 1.4)
+        }, res = 96, bg = "white")
+
+        output$preview_caption <- shiny::renderPlot({
+            caption_halign <- switch(input$caption_position %||% "full_left",
+                "full_left" = "left", "full_center" = "center", "full_right" = "right", "under_chart" = "left", "left")
+            # Use smaller margins for preview so caption is clearly visible
+            caption_block(convert_named_colors(caption_text_d()), caption_size = input$caption_size,
+                halign = caption_halign, color = input$caption_color %||% "#808080",
+                margin_top = 2, margin_bottom = 2)
         }, res = 96, bg = "white")
 
         # Generated code
