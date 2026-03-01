@@ -69,15 +69,27 @@
   overflow: visible !important;
 }
 
-.form-select, .shiny-input-container {
+/* Fix dropdown z-index so options appear above other elements */
+.shiny-input-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* When select is focused, raise the entire container */
+.shiny-input-container:focus-within {
+  z-index: 1100 !important;
+}
+
+.form-select {
   position: relative;
 }
 
-/* Fix dropdown z-index so options appear above other elements */
-.form-select:focus,
+.form-select:focus {
+  z-index: 1050 !important;
+}
+
 .selectize-dropdown,
-.selectize-input,
-select.form-select {
+.selectize-input {
   z-index: 1050 !important;
 }
 
@@ -86,10 +98,26 @@ select.form-select {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
 
-/* Bootstrap select dropdown */
+/* Bootstrap select dropdown - ensure it renders above siblings */
+select.form-select {
+  position: relative;
+}
+
+select.form-select:focus {
+  z-index: 1050 !important;
+}
+
 select.form-select option {
   background: white;
   padding: 8px;
+}
+
+/* Radio buttons and checkboxes should stay below dropdowns */
+.shiny-options-group,
+.radio,
+.checkbox {
+  position: relative;
+  z-index: 0;
 }
 
 .accordion-button {
