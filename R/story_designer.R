@@ -102,10 +102,16 @@ story_designer <- function(plot = NULL,
                     title = shiny::span(shiny::span(class = "badge bg-primary me-2", " "), "Title"),
                     value = "Title",
                     icon = shiny::icon("heading"),
+                    shiny::div(
+                        class = "d-flex align-items-center gap-2 mb-1",
+                        shiny::span("Text", class = "small"),
+                        bslib::tooltip(
+                            shiny::icon("circle-info", class = "text-muted"),
+                            "**bold** | *italic* | {#E69F00 colored text} | {red named color}"
+                        )
+                    ),
                     shiny::textAreaInput("title_text", NULL, value = title, rows = 2, width = "100%",
                                          placeholder = "Use **bold** or {#E69F00 color}"),
-                    shiny::helpText(class = "text-muted small mt-1",
-                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {red text} or {#E69F00 text}")),
                     shiny::sliderInput("title_size", "Font size", min = 10, max = 24, value = 16, step = 1),
                     shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
                     shiny::uiOutput("title_metrics")
@@ -115,9 +121,15 @@ story_designer <- function(plot = NULL,
                     title = shiny::span(shiny::span(class = "badge bg-info me-2", " "), "Subtitle"),
                     value = "Subtitle",
                     icon = shiny::icon("font"),
+                    shiny::div(
+                        class = "d-flex align-items-center gap-2 mb-1",
+                        shiny::span("Text", class = "small"),
+                        bslib::tooltip(
+                            shiny::icon("circle-info", class = "text-muted"),
+                            "**bold** | *italic* | {#hex color} | {colorname text}"
+                        )
+                    ),
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
-                    shiny::helpText(class = "text-muted small mt-1",
-                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {blue text}")),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
                     shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
                     shiny::uiOutput("subtitle_metrics")
@@ -127,9 +139,15 @@ story_designer <- function(plot = NULL,
                     title = shiny::span(shiny::span(class = "badge bg-success me-2", " "), "Narrative"),
                     value = "Narrative",
                     icon = shiny::icon("align-left"),
+                    shiny::div(
+                        class = "d-flex align-items-center gap-2 mb-1",
+                        shiny::span("Text", class = "small"),
+                        bslib::tooltip(
+                            shiny::icon("circle-info", class = "text-muted"),
+                            "**bold** | *italic* | {#hex color} | Use blank lines for paragraphs"
+                        )
+                    ),
                     shiny::textAreaInput("narrative_text", NULL, value = narrative, rows = 4, width = "100%"),
-                    shiny::helpText(class = "text-muted small mt-1",
-                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {green text}")),
                     shiny::selectInput("narrative_position", "Layout",
                                        choices = c("Chart LEFT | Narrative RIGHT" = "right",
                                                    "Narrative LEFT | Chart RIGHT" = "left",
@@ -145,8 +163,15 @@ story_designer <- function(plot = NULL,
                     title = shiny::span(shiny::span(class = "badge bg-secondary me-2", " "), "Caption"),
                     value = "Caption",
                     icon = shiny::icon("quote-right"),
+                    shiny::div(
+                        class = "d-flex align-items-center gap-2 mb-1",
+                        shiny::span("Text", class = "small"),
+                        bslib::tooltip(
+                            shiny::icon("circle-info", class = "text-muted"),
+                            "Source attribution (e.g., SOURCE: Company Database)"
+                        )
+                    ),
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
-                    shiny::helpText(class = "text-muted small mt-1", "Source attribution"),
                     shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
                 ),
 
@@ -162,7 +187,14 @@ story_designer <- function(plot = NULL,
                                         "Right of chart (vertical)" = "right", "Left of chart (vertical)" = "left")),
                         shiny::textInput("legend_labels", "Categories (comma-separated)",
                                          value = "Category A, Category B, Category C", width = "100%"),
-                        shiny::helpText(class = "text-muted small mt-1", "Colors for each category:"),
+                        shiny::div(
+                            class = "d-flex align-items-center gap-2 mb-1 mt-2",
+                            shiny::span("Colors", class = "small"),
+                            bslib::tooltip(
+                                shiny::icon("circle-info", class = "text-muted"),
+                                "Use hex (#808080) or color names (red, steelblue)"
+                            )
+                        ),
                         shiny::uiOutput("legend_color_inputs"),
                         shiny::selectInput("legend_sep", "Separator", width = "100%",
                             choices = c("Pipe ( | )" = " | ", "Bullet" = " \u2022 ",
@@ -315,8 +347,11 @@ story_designer <- function(plot = NULL,
                         value = "Title",
                         shiny::selectInput("title_align", "Alignment", width = "100%",
                             choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
-                        shiny::numericInput("title_lineheight", "Line height", value = 1.1, min = 0.8, max = 2, step = 0.1, width = "100%"),
-                        shiny::helpText(class = "text-muted small", "Line height: 1.0 = single spaced")
+                        shiny::div(
+                            class = "d-flex align-items-center gap-2",
+                            shiny::numericInput("title_lineheight", "Line height", value = 1.1, min = 0.8, max = 2, step = 0.1, width = "80%"),
+                            bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 1.5 = 1.5x, 2.0 = double")
+                        )
                     ),
                     # Subtitle settings
                     bslib::accordion_panel(
@@ -324,8 +359,11 @@ story_designer <- function(plot = NULL,
                         value = "Subtitle",
                         shiny::selectInput("subtitle_align", "Alignment", width = "100%",
                             choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
-                        shiny::numericInput("subtitle_lineheight", "Line height", value = 1.2, min = 0.8, max = 2, step = 0.1, width = "100%"),
-                        shiny::helpText(class = "text-muted small", "Line height: 1.0 = single spaced")
+                        shiny::div(
+                            class = "d-flex align-items-center gap-2",
+                            shiny::numericInput("subtitle_lineheight", "Line height", value = 1.2, min = 0.8, max = 2, step = 0.1, width = "80%"),
+                            bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 1.5 = 1.5x, 2.0 = double")
+                        )
                     ),
                     # Narrative settings
                     bslib::accordion_panel(
@@ -335,9 +373,12 @@ story_designer <- function(plot = NULL,
                             choices = c("Left" = "left", "Center" = "center", "Right" = "right")),
                         shiny::selectInput("narrative_valign", "Vertical align", width = "100%",
                             choices = c("Top" = "top", "Center" = "center", "Bottom" = "bottom")),
-                        shiny::numericInput("narrative_lineheight", "Line height", value = 1.4, min = 0.8, max = 3, step = 0.1, width = "100%"),
-                        shiny::numericInput("narrative_padding", "Padding (pt)", value = 10, min = 0, max = 30, step = 1, width = "100%"),
-                        shiny::helpText(class = "text-muted small", "Line height 2.0 = double spaced")
+                        shiny::div(
+                            class = "d-flex align-items-center gap-2",
+                            shiny::numericInput("narrative_lineheight", "Line height", value = 1.4, min = 0.8, max = 3, step = 0.1, width = "80%"),
+                            bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 2.0 = double")
+                        ),
+                        shiny::numericInput("narrative_padding", "Padding (pt)", value = 10, min = 0, max = 30, step = 1, width = "100%")
                     ),
                     # Caption settings
                     bslib::accordion_panel(
@@ -348,8 +389,11 @@ story_designer <- function(plot = NULL,
                                         "Full width (center)" = "full_center",
                                         "Full width (right)" = "full_right",
                                         "Under chart only" = "under_chart")),
-                        shiny::textInput("caption_color", "Color", value = "#808080", width = "100%"),
-                        shiny::helpText(class = "text-muted small", "Use hex (#808080) or color name")
+                        shiny::div(
+                            class = "d-flex align-items-center gap-2",
+                            shiny::textInput("caption_color", "Color", value = "#808080", width = "80%"),
+                            bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "Hex (#808080) or name (gray)")
+                        )
                     )
                 )
             ),
@@ -900,16 +944,15 @@ story_designer <- function(plot = NULL,
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$legend, h$caption))
                 } else if (legend_pos == "right") {
                     # Legend to right of chart (vertical)
+                    # For top/bottom narrative, legend goes beside the whole content block
                     legend_w <- input$legend_width %||% 0.12
-                    content_with_legend <- content + legend_plot +
-                        patchwork::plot_layout(widths = c(1 - legend_w, legend_w))
+                    content_with_legend <- patchwork::wrap_plots(content, legend_plot, widths = c(1 - legend_w, legend_w))
                     result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
                 } else if (legend_pos == "left") {
                     # Legend to left of chart (vertical)
                     legend_w <- input$legend_width %||% 0.12
-                    content_with_legend <- legend_plot + content +
-                        patchwork::plot_layout(widths = c(legend_w, 1 - legend_w))
+                    content_with_legend <- patchwork::wrap_plots(legend_plot, content, widths = c(legend_w, 1 - legend_w))
                     result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
                 }
