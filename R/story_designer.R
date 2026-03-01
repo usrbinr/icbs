@@ -68,7 +68,7 @@ What should the audience do?",
             ggplot2::aes(x = x, y = y)
         ) +
             ggplot2::geom_col(fill = "#E69F00") +
-            theme_ibcs() +
+            ggplot2::theme_minimal() +
             ggplot2::labs(x = NULL, y = NULL, title = NULL)
     }
 
@@ -168,30 +168,17 @@ What should the audience do?",
             # Controls tab
             bslib::nav_panel(
                 title = shiny::span(shiny::icon("sliders-h"), " Controls"),
-                bslib::layout_column_wrap(
-                    width = 1/2,
-
-                    # Height allocation
-                    bslib::card(
-                        bslib::card_header(class = "bg-light py-2", "Height Allocation"),
-                        bslib::card_body(
-                            shiny::checkboxInput("auto_heights", "Auto-calculate", value = TRUE),
-                            shiny::conditionalPanel(
-                                condition = "!input.auto_heights",
-                                shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.15, step = 0.01),
-                                shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.07, step = 0.01),
-                                shiny::sliderInput("caption_height", "Caption", min = 0.02, max = 0.10, value = 0.04, step = 0.01)
-                            ),
-                            shiny::plotOutput("height_diagram", height = "80px")
-                        )
-                    ),
-
-                    # Clipping status
-                    bslib::card(
-                        bslib::card_header(class = "bg-light py-2", "Clipping Status"),
-                        bslib::card_body(
-                            shiny::uiOutput("clipping_status")
-                        )
+                bslib::card(
+                    bslib::card_header(class = "bg-light py-2", "Section Heights"),
+                    bslib::card_body(
+                        shiny::checkboxInput("auto_heights", "Auto-calculate", value = TRUE),
+                        shiny::conditionalPanel(
+                            condition = "!input.auto_heights",
+                            shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.15, step = 0.01),
+                            shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.07, step = 0.01),
+                            shiny::sliderInput("caption_height", "Caption", min = 0.02, max = 0.10, value = 0.04, step = 0.01)
+                        ),
+                        shiny::plotOutput("height_diagram", height = "120px")
                     )
                 )
             ),
@@ -224,6 +211,29 @@ What should the audience do?",
 
     # Server
     server <- function(input, output, session) {
+
+        # Convert named colors to hex in marquee syntax
+        # Supports {colorname text} in addition to {#hex text}
+        convert_named_colors <- function(text) {
+            if (is.null(text) || text == "") return(text)
+            pattern <- "\\{([a-zA-Z][a-zA-Z0-9]*)\\s+([^}]+)\\}"
+            matches <- gregexpr(pattern, text, perl = TRUE)
+            if (matches[[1]][1] == -1) return(text)
+            result <- text
+            all_matches <- regmatches(text, matches)[[1]]
+            for (match in all_matches) {
+                parts <- regmatches(match, regexec(pattern, match, perl = TRUE))[[1]]
+                color_name <- parts[2]
+                content <- parts[3]
+                tryCatch({
+                    rgb_vals <- grDevices::col2rgb(color_name)
+                    hex_code <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
+                    replacement <- paste0("{", hex_code, " ", content, "}")
+                    result <- sub(match, replacement, result, fixed = TRUE)
+                }, error = function(e) { })
+            }
+            result
+        }
 
         # Calculate text metrics
         calc_text_metrics <- function(text, font_size, output_width, is_narrative = FALSE) {
@@ -362,28 +372,31 @@ What should the audience do?",
             }
         })
 
-        # Height diagram
+        # Height diagram - vertical (top to bottom)
         output$height_diagram <- shiny::renderPlot({
             h <- current_heights()
             content_height <- 1 - h$title - h$subtitle - h$caption
 
             df <- data.frame(
                 component = factor(c("Title", "Subtitle", "Content", "Caption"),
-                                   levels = c("Caption", "Content", "Subtitle", "Title")),
+                                   levels = c("Title", "Subtitle", "Content", "Caption")),
                 height = c(h$title, h$subtitle, content_height, h$caption),
                 label = paste0(round(c(h$title, h$subtitle, content_height, h$caption) * 100), "%")
             )
+            df$ymax <- cumsum(df$height)
+            df$ymin <- c(0, head(df$ymax, -1))
+            df$ymid <- (df$ymin + df$ymax) / 2
 
-            ggplot2::ggplot(df, ggplot2::aes(x = 1, y = height, fill = component)) +
-                ggplot2::geom_col(width = 0.5, color = "white", linewidth = 0.5) +
-                ggplot2::geom_text(ggplot2::aes(label = label),
-                                   position = ggplot2::position_stack(vjust = 0.5),
+            ggplot2::ggplot(df) +
+                ggplot2::geom_rect(ggplot2::aes(xmin = 0, xmax = 1, ymin = ymin, ymax = ymax, fill = component),
+                                   color = "white", linewidth = 0.5) +
+                ggplot2::geom_text(ggplot2::aes(x = 0.5, y = ymid, label = label),
                                    size = 3, color = "white", fontface = "bold") +
+                ggplot2::scale_y_reverse() +
                 ggplot2::scale_fill_manual(values = c(
                     "Title" = "#3498db", "Subtitle" = "#5dade2",
                     "Content" = "#27ae60", "Caption" = "#95a5a6"
                 )) +
-                ggplot2::coord_flip() +
                 ggplot2::theme_void() +
                 ggplot2::theme(legend.position = "none")
         }, bg = "transparent")
@@ -392,29 +405,35 @@ What should the audience do?",
         build_layout <- shiny::reactive({
             h <- current_heights()
 
+            # Convert named colors to hex
+            title_txt <- convert_named_colors(input$title_text)
+            subtitle_txt <- convert_named_colors(input$subtitle_text)
+            narrative_txt <- convert_named_colors(input$narrative_text)
+            caption_txt <- convert_named_colors(input$caption_text)
+
             # Create title block with custom margins
             title_plot <- title_block(
-                input$title_text,
+                title_txt,
                 title_size = input$title_size,
                 margin_bottom = input$title_margin_bottom
             )
 
             # Create subtitle block with custom margins
             subtitle_plot <- subtitle_block(
-                input$subtitle_text,
+                subtitle_txt,
                 subtitle_size = input$subtitle_size,
                 margin_bottom = input$subtitle_margin_bottom
             )
 
             # Create narrative
             narrative_plot <- text_narrative(
-                input$narrative_text,
+                narrative_txt,
                 size = input$narrative_size
             )
 
             # Create caption
             caption_plot <- caption_block(
-                input$caption_text,
+                caption_txt,
                 caption_size = input$caption_size
             )
 
@@ -491,19 +510,19 @@ What should the audience do?",
 
         shiny::observeEvent(input$close_actual, { actual_size_data(NULL) })
 
-        # Component previews - with custom margins
+        # Component previews - with named color conversion
         output$preview_title <- shiny::renderPlot({
-            title_block(input$title_text, title_size = input$title_size,
+            title_block(convert_named_colors(input$title_text), title_size = input$title_size,
                         margin_bottom = input$title_margin_bottom)
         }, res = 96, bg = "white")
 
         output$preview_subtitle <- shiny::renderPlot({
-            subtitle_block(input$subtitle_text, subtitle_size = input$subtitle_size,
+            subtitle_block(convert_named_colors(input$subtitle_text), subtitle_size = input$subtitle_size,
                            margin_bottom = input$subtitle_margin_bottom)
         }, res = 96, bg = "white")
 
         output$preview_narrative <- shiny::renderPlot({
-            text_narrative(input$narrative_text, size = input$narrative_size)
+            text_narrative(convert_named_colors(input$narrative_text), size = input$narrative_size)
         }, res = 96, bg = "white")
 
         # Generated code
