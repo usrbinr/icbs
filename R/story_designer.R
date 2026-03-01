@@ -114,6 +114,7 @@ story_designer <- function(plot = NULL,
                                          placeholder = "Use **bold** or {#E69F00 color}"),
                     shiny::sliderInput("title_size", "Font size", min = 10, max = 24, value = 16, step = 1),
                     shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
+                    shiny::sliderInput("title_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5),
                     shiny::uiOutput("title_metrics")
                 ),
 
@@ -132,6 +133,7 @@ story_designer <- function(plot = NULL,
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
                     shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
+                    shiny::sliderInput("subtitle_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5),
                     shiny::uiOutput("subtitle_metrics")
                 ),
 
@@ -172,7 +174,8 @@ story_designer <- function(plot = NULL,
                         )
                     ),
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
-                    shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
+                    shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1),
+                    shiny::sliderInput("caption_wrap", "Wrap at chars (0=off)", min = 0, max = 100, value = 0, step = 5)
                 ),
 
                 bslib::accordion_panel(
@@ -837,7 +840,8 @@ story_designer <- function(plot = NULL,
                 lineheight = input$title_lineheight %||% 1.1,
                 margin_left = title_margin,
                 margin_right = title_margin,
-                margin_bottom = input$title_margin_bottom
+                margin_bottom = input$title_margin_bottom,
+                wrap_width = if ((input$title_wrap %||% 0) > 0) input$title_wrap else NULL
             )
 
             # Create subtitle block with fine tune settings
@@ -849,7 +853,8 @@ story_designer <- function(plot = NULL,
                 lineheight = input$subtitle_lineheight %||% 1.2,
                 margin_left = subtitle_margin,
                 margin_right = subtitle_margin,
-                margin_bottom = input$subtitle_margin_bottom
+                margin_bottom = input$subtitle_margin_bottom,
+                wrap_width = if ((input$subtitle_wrap %||% 0) > 0) input$subtitle_wrap else NULL
             )
 
             # Create narrative with fine tune settings
@@ -914,7 +919,8 @@ story_designer <- function(plot = NULL,
                 caption_txt,
                 caption_size = input$caption_size,
                 halign = caption_halign,
-                color = input$caption_color %||% "#808080"
+                color = input$caption_color %||% "#808080",
+                wrap_width = if ((input$caption_wrap %||% 0) > 0) input$caption_wrap else NULL
             )
 
             # Build content area (plot + narrative)
@@ -1224,14 +1230,16 @@ story_designer <- function(plot = NULL,
                 '    title_size = ', input$title_size, ',\n',
                 '    halign = "', input$title_align %||% "left", '",\n',
                 '    lineheight = ', input$title_lineheight %||% 1.1, ',\n',
-                '    margin_bottom = ', input$title_margin_bottom, '\n',
+                '    margin_bottom = ', input$title_margin_bottom,
+                if ((input$title_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$title_wrap) else '', '\n',
                 ')\n\n',
                 'subtitle_plot <- subtitle_block(\n',
                 '    "', gsub('"', '\\"', input$subtitle_text), '",\n',
                 '    subtitle_size = ', input$subtitle_size, ',\n',
                 '    halign = "', input$subtitle_align %||% "left", '",\n',
                 '    lineheight = ', input$subtitle_lineheight %||% 1.2, ',\n',
-                '    margin_bottom = ', input$subtitle_margin_bottom, '\n',
+                '    margin_bottom = ', input$subtitle_margin_bottom,
+                if ((input$subtitle_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$subtitle_wrap) else '', '\n',
                 ')\n\n',
                 'narrative_plot <- text_narrative(\n',
                 '    "', gsub('\n', '\\n', gsub('"', '\\"', input$narrative_text)), '",\n',
@@ -1245,7 +1253,8 @@ story_designer <- function(plot = NULL,
                 '    "', gsub('"', '\\"', input$caption_text), '",\n',
                 '    caption_size = ', input$caption_size, ',\n',
                 '    halign = "', caption_halign, '",\n',
-                '    color = "', input$caption_color %||% "#808080", '"\n',
+                '    color = "', input$caption_color %||% "#808080", '"',
+                if ((input$caption_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$caption_wrap) else '', '\n',
                 ')\n\n',
                 # Legend code if enabled
                 if (input$legend_enabled %||% FALSE) {
