@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(icbs)
+library(stwd)
 
-test_check("icbs")
+test_check("stwd")

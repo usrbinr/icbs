@@ -1,4 +1,4 @@
-# Create icbs hex logo
+# Create stwd hex logo
 library(ggplot2)
 library(hexSticker)
 
@@ -53,7 +53,7 @@ p <- ggplot(bar_data) +
 # Create the hex sticker with light background and warm accent
 sticker(
   p,
-  package = "icbs",
+  package = "stwd",
   p_size = 22,
   p_y = 1.45,
   p_color = "#2d2d2d",
@@ -72,7 +72,7 @@ sticker(
 # Also save as SVG
 sticker(
   p,
-  package = "icbs",
+  package = "stwd",
   p_size = 22,
   p_y = 1.45,
   p_color = "#2d2d2d",

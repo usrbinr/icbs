@@ -13,7 +13,7 @@ format:
 ```{r}
 #| label: setup
 #| include: false
-library(icbs)
+library(stwd)
 library(ggplot2)
 library(marquee)
 ```
@@ -22,11 +22,11 @@ library(marquee)
 
 The [marquee package](https://marquee.r-lib.org/) provides rich text
 formatting for R graphics, including the ability to color text inline.
-The icbs package integrates with marquee to create labels where the text
+The stwd package integrates with marquee to create labels where the text
 color automatically matches data values.
 ## Why Colored Labels?
 
-In IBCS visualizations, you often want variance labels to match their
+In data visualizations, you often want labels to match their
 meaning:
 
 - **Green text** for positive variances
@@ -80,7 +80,8 @@ You can use `marquee_color_labels()` to pre-format your data, then use
 #| eval: false
 library(marquee)
 
-cols <- ibcs_colors()
+#  Define colors for examples
+cols <- list(actual = "#404040", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
 
 # Prepare data
 variance_data <- data.frame(
@@ -112,7 +113,7 @@ ggplot(variance_data, aes(x = category, y = value)) +
         size = 4
     ) +
     labs(title = "Sales with Colored Variance Labels") +
-    theme_ibcs()
+    theme_minimal()
 ```
 
 ### Using geom_marquee_colored()
@@ -138,7 +139,7 @@ ggplot(variance_data, aes(x = category, y = value)) +
         size = 4
     ) +
     labs(title = "Sales with Auto-Colored Variance Labels") +
-    theme_ibcs()
+    theme_minimal()
 ```
 
 ## Practical Examples
@@ -152,7 +153,8 @@ ggplot(variance_data, aes(x = category, y = value)) +
 #| eval: false
 library(marquee)
 
-cols <- ibcs_colors()
+#  Define colors for examples
+cols <- list(actual = "#404040", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
 
 # Sales performance data
 sales <- data.frame(
@@ -191,7 +193,7 @@ ggplot(sales, aes(x = reorder(region, variance))) +
         title = "Regional Sales Performance vs Plan",
         x = NULL, y = "Sales ($M)"
     ) +
-    theme_ibcs()
+    theme_minimal()
 ```
 
 ### Waterfall with Colored Value Labels
@@ -203,7 +205,8 @@ ggplot(sales, aes(x = reorder(region, variance))) +
 #| eval: false
 library(marquee)
 
-cols <- ibcs_colors()
+#  Define colors for examples
+cols <- list(actual = "#404040", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
 
 # Bridge data
 bridge <- data.frame(
@@ -260,7 +263,7 @@ ggplot(bridge, aes(x = driver)) +
         size = 4
     ) +
     labs(title = "Revenue Bridge with Colored Labels", x = NULL, y = "Revenue ($M)") +
-    theme_ibcs()
+    theme_minimal()
 ```
 
 ## Marquee Syntax Reference

@@ -13,14 +13,14 @@ format:
 ```{r}
 #| label: setup
 #| include: false
-library(icbs)
+library(stwd)
 library(ggplot2)
 library(patchwork)
 ```
 
 ## Overview
 
-The icbs package provides functions for creating multi-panel layouts with
+The stwd package provides functions for creating multi-panel layouts with
 visual connectors that show relationships between charts. These are useful
 for showing:
 
@@ -88,7 +88,8 @@ connect to two charts on the right (showing a breakdown or split):
 #| fig-width: 10
 #| fig-height: 6
 # Create example plots
-cols <- ibcs_colors()
+#  Define colors for examples
+cols <- list(actual = "#404040", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
 
 # Total sales (left panel)
 total_sales <- data.frame(
@@ -99,7 +100,7 @@ total_sales <- data.frame(
 plot_total <- ggplot(total_sales, aes(x = quarter, y = sales)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Total Sales", y = "Sales ($M)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Online sales (top right)
 online_sales <- data.frame(
@@ -110,7 +111,7 @@ online_sales <- data.frame(
 plot_online <- ggplot(online_sales, aes(x = quarter, y = sales)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Online Sales", y = "Sales ($M)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Retail sales (bottom right)
 retail_sales <- data.frame(
@@ -121,7 +122,7 @@ retail_sales <- data.frame(
 plot_retail <- ggplot(retail_sales, aes(x = quarter, y = sales)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Retail Sales", y = "Sales ($M)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Combine with split layout
 one_to_split_to_two_layout(
@@ -148,7 +149,7 @@ product_a <- data.frame(
 plot_a <- ggplot(product_a, aes(x = month, y = revenue)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Product A", y = "Revenue ($K)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Product B (bottom left)
 product_b <- data.frame(
@@ -159,7 +160,7 @@ product_b <- data.frame(
 plot_b <- ggplot(product_b, aes(x = month, y = revenue)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Product B", y = "Revenue ($K)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Combined (right)
 combined <- data.frame(
@@ -170,7 +171,7 @@ combined <- data.frame(
 plot_combined <- ggplot(combined, aes(x = month, y = revenue)) +
     geom_col(fill = cols$actual, width = 0.6) +
     labs(title = "Total Revenue", y = "Revenue ($K)") +
-    theme_ibcs()
+    theme_minimal()
 
 # Combine with merge layout
 two_to_merge_to_one_layout(
@@ -192,12 +193,12 @@ figures:
 p1 <- ggplot(mtcars, aes(x = mpg)) +
     geom_histogram(fill = cols$actual, bins = 10) +
     labs(title = "MPG Distribution") +
-    theme_ibcs()
+    theme_minimal()
 
 p2 <- ggplot(mtcars, aes(x = wt, y = mpg)) +
     geom_point(color = cols$actual) +
     labs(title = "Weight vs MPG") +
-    theme_ibcs()
+    theme_minimal()
 
 combined_plot <- p1 + p2
 
@@ -252,19 +253,19 @@ revenue_plot <- ggplot(data.frame(x = 1:4, y = c(100, 120, 115, 130)),
                         aes(x = x, y = y)) +
     geom_col(fill = cols$actual) +
     labs(title = "Revenue") +
-    theme_ibcs()
+    theme_minimal()
 
 cost_plot <- ggplot(data.frame(x = 1:4, y = c(60, 70, 65, 75)),
                      aes(x = x, y = y)) +
     geom_col(fill = cols$actual) +
     labs(title = "Costs") +
-    theme_ibcs()
+    theme_minimal()
 
 profit_plot <- ggplot(data.frame(x = 1:4, y = c(40, 50, 50, 55)),
                        aes(x = x, y = y)) +
     geom_col(fill = cols$actual) +
     labs(title = "Profit") +
-    theme_ibcs()
+    theme_minimal()
 
 # Custom layout with connector
 layout <- "
@@ -305,21 +306,21 @@ p_total <- ggplot(total_by_year, aes(x = year, y = sales)) +
     geom_point(color = cols$actual, size = 3) +
     labs(title = "Total Company Sales", y = "Sales ($M)", x = NULL) +
     scale_y_continuous(limits = c(0, 1100)) +
-    theme_ibcs()
+    theme_minimal()
 
 p_north <- ggplot(north_by_year, aes(x = year, y = sales)) +
     geom_line(color = cols$actual, linewidth = 1) +
     geom_point(color = cols$actual, size = 3) +
     labs(title = "North Region", y = "Sales ($M)", x = NULL) +
     scale_y_continuous(limits = c(0, 700)) +
-    theme_ibcs()
+    theme_minimal()
 
 p_south <- ggplot(south_by_year, aes(x = year, y = sales)) +
     geom_line(color = cols$actual, linewidth = 1) +
     geom_point(color = cols$actual, size = 3) +
     labs(title = "South Region", y = "Sales ($M)", x = NULL) +
     scale_y_continuous(limits = c(0, 700)) +
-    theme_ibcs()
+    theme_minimal()
 
 one_to_split_to_two_layout(
     list(p_total, p_north, p_south),

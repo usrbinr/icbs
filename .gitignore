@@ -19,3 +19,8 @@ citation.qmd
 index.qmd
 reference.qmd
 reference/
+
+# Development files
+test.R
+_brand.yml
+_qrtdown-styles.css

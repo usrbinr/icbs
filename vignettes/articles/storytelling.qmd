@@ -17,7 +17,7 @@ library(patchwork)
 
 ## Overview
 
-The icbs package includes functions inspired by
+The stwd package includes functions inspired by
 [Storytelling with Data](https://www.storytellingwithdata.com/) principles
 for creating presentation-ready charts. These tools help you:
 - Combine charts with narrative text
@@ -61,7 +61,7 @@ p <- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +
     coord_flip() +
     scale_fill_manual(values = fill_colors, guide = "none") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-    theme_ibcs() +
+    theme_minimal() +
     labs(x = NULL, y = "Units Sold")
 
 # Compose the full story - title is large by default (16pt)
@@ -152,7 +152,7 @@ ggplot(df, aes(x = metric, y = value, fill = metric)) +
         ),
         x = NULL, y = "$ Millions"
     ) +
-    theme_ibcs() +
+    theme_minimal() +
     theme_marquee()
 ```
 
@@ -229,7 +229,7 @@ chart <- ggplot(df, aes(x, y, fill = x)) +
     geom_col() +
     scale_fill_manual(values = c(A = "#E63946", B = "#CCCCCC", C = "#CCCCCC"),
                       guide = "none") +
-    theme_ibcs()
+    theme_minimal()
 
 # Stack components with custom heights
 title_block("**{#E63946 Category A} Leads the Pack**", title_size = 18) /
@@ -269,7 +269,7 @@ chart <- ggplot(df, aes(x = quarter, y = sales, fill = quarter)) +
              hjust = 1, size = 3, color = "#666666") +
     scale_fill_manual(values = fill_colors, guide = "none") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-    theme_ibcs() +
+    theme_minimal() +
     labs(x = NULL, y = "Sales (units)")
 
 # Narrative panel
@@ -333,7 +333,7 @@ ggplot(df, aes(x = reorder(category, sales), y = sales, fill = category)) +
     coord_flip() +
     scale_fill_marquee(fill_colors, bold = TRUE) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-    theme_ibcs() +
+    theme_minimal() +
     theme(legend.text = element_marquee()) +
     labs(
         title = "Sales by Category",
@@ -369,7 +369,7 @@ ggplot(df, aes(x = category, y = value, fill = category)) +
     geom_marquee(aes(label = bar_label, y = 5), size = 4) +
     scale_fill_manual(values = fill_colors, guide = "none") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-    theme_ibcs() +
+    theme_minimal() +
     labs(title = "Regional Performance", x = NULL, y = "Score")
 ```
 
@@ -408,7 +408,7 @@ chart <- ggplot(
     coord_flip() +
     scale_fill_manual(values = highlights, guide = "none") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
-    theme_ibcs() +
+    theme_minimal() +
     labs(x = NULL, y = "Revenue ($M)")
 
 # Compose

@@ -49,7 +49,7 @@ The ASCII diagram shows how your layout will be structured. When you have both a
 # Create a placeholder plot for demonstration
 p <- ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
     geom_col() +
-    theme_ibcs()
+    theme_minimal()
 
 # Layout with narrative on the RIGHT
 story_sitrep(
@@ -170,7 +170,7 @@ df <- data.frame(
 p <- ggplot(df, aes(x = reorder(region, sales), y = sales)) +
     geom_col(fill = "#E63946") +
     coord_flip() +
-    theme_ibcs() +
+    theme_minimal() +
     labs(x = NULL, y = "Sales ($M)")
 
 story_layout(

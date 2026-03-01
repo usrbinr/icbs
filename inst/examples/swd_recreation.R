@@ -1,9 +1,9 @@
 # =============================================================================
-# Recreating the Storytelling with Data Look with icbs
+# Recreating the Storytelling with Data Look with stwd
 # Based on: https://albert-rapp.de/posts/ggplot2-tips/10_recreating_swd_look/
 # =============================================================================
 #
-# This example demonstrates how to use icbs::story_layout() to create
+# This example demonstrates how to use stwd::story_layout() to create
 # presentation-ready visualizations following SWD principles.
 #
 # KEY CONCEPTS:
@@ -15,14 +15,14 @@
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-library(icbs)
+library(stwd)
 library(patchwork)
 
 # =============================================================================
 # MARQUEE SYNTAX GUIDE
 # =============================================================================
 #
-# The marquee package (used by icbs) supports markdown-like formatting:
+# The marquee package (used by stwd) supports markdown-like formatting:
 #
 #   **bold text**           -> bold
 #   *italic text*           -> italic

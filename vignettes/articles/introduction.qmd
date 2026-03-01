@@ -1,5 +1,5 @@
 ---
-title: "Introduction to icbs"
+title: "Introduction to stwd"
 format:
   html:
     toc: true
@@ -9,102 +9,106 @@ format:
 ```{r}
 #| label: setup
 #| include: false
-library(icbs)
+library(stwd)
 library(ggplot2)
+library(patchwork)
 ```
 
-## What is icbs?
-The **icbs** package provides tools for creating visualizations that follow the
-[International Business Communication Standards (IBCS)](https://www.ibcs.com/).
-IBCS is a set of practical rules for designing comprehensible reports,
-presentations, and dashboards.
+## What is stwd?
+
+The **stwd** package provides tools for creating presentation-ready visualizations
+following [Storytelling with Data](https://www.storytellingwithdata.com/) principles.
+It helps you build complete "story layouts" that combine charts with narrative text,
+colored titles, and supporting context.
 
 ## Key Features
 
 The package includes:
 
-1. **IBCS Theme & Colors** - A clean ggplot2 theme and standardized color palette
-2. **Scenario Notation** - Scales for distinguishing Actual, Plan, Previous Year, and Forecast data
-3. **Variance Charts** - Visualize deviations with integrated variance indicators
-4. **Waterfall Charts** - Show how values build up or break down
+1. **Story Layouts** - Combine charts with titles, subtitles, narratives, and captions
+2. **Story Designer** - Interactive Shiny app for designing layouts
+3. **Highlight Colors** - Strategic color use (gray out noise, highlight signal)
+4. **Marquee Integration** - Color-matched text in titles and labels
 5. **Multi-Panel Layouts** - Connectors for showing relationships between plots
-6. **Marquee Integration** - Color-matched text labels
 
-## The SUCCESS Framework
+## The SWD Approach
 
-IBCS is built on the SUCCESS framework:
-- **S**ay - Convey a clear message
-- **U**nify - Apply consistent semantic notation
-- **C**ondense - Increase information density
-- **C**heck - Ensure visual integrity
-- **E**xpress - Choose proper visualizations
-- **S**implify - Avoid clutter
-- **S**tructure - Organize content logically
+Traditional charts put the burden on the reader to interpret meaning.
+Storytelling with Data (SWD) charts guide the reader by:
+
+- **Highlighting what matters** - Gray out the noise, color the signal
+- **Embedding the legend in the title** - No separate legend box needed
+- **Adding narrative context** - Explain the "so what?" alongside the chart
+- **Using a clear visual hierarchy** - Big title, supporting chart, explanatory text
 
 ## Quick Start
 
-### Apply the IBCS Theme
+### Create a Story Layout
 
 ```{r}
-#| label: theme-example
-#| fig-width: 7
-#| fig-height: 4
-ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
-    geom_boxplot(fill = ibcs_colors()$actual) +
-    labs(
-        title = "Fuel Efficiency by Cylinder Count",
-        x = "Cylinders",
-        y = "Miles per Gallon"
-    ) +
-    theme_ibcs()
-```
-
-### Create a Variance Chart
-
-```{r}
-#| label: variance-example
-#| fig-width: 7
-#| fig-height: 4
-sales_data <- data.frame(
-    product = c("Widget A", "Widget B", "Widget C", "Widget D"),
-    actual = c(120, 85, 95, 110),
-    plan = c(100, 90, 100, 100)
+#| label: story-example
+#| fig-width: 10
+#| fig-height: 7
+# Sample data
+df <- data.frame(
+    product = c("Apples", "Oranges", "Bananas", "Grapes"),
+    sales = c(120, 85, 95, 110)
 )
 
-ibcs_variance_chart(
-    sales_data,
-    x = product,
-    actual = actual,
-    reference = plan,
-    horizontal = TRUE
+# Highlight only the winner
+fill_colors <- highlight_colors(
+    df$product,
+    highlight = c("Apples" = "#E63946")
+)
+
+# Create the base chart
+p <- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +
+    geom_col(width = 0.7) +
+    coord_flip() +
+    scale_fill_manual(values = fill_colors, guide = "none") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    theme_minimal() +
+    labs(x = NULL, y = "Units Sold")
+
+# Compose the full story
+story_layout(
+    plot = p,
+    title = "**Q4 Sales: {#E63946 Apples} Take the Lead**",
+    subtitle = "Fruit category performance, October-December 2024",
+    narrative = "**Key takeaway:**
+
+{#E63946 Apples} outsold all other fruits
+this quarter, driven by seasonal demand
+and promotional pricing.
+
+**Recommendation:** Increase apple
+inventory for Q1.",
+    caption = "Source: Internal Sales Database"
 )
 ```
 
-### Create a Waterfall Chart
+### Use the Interactive Designer
 
-```{r}
-#| label: waterfall-example
-#| fig-width: 7
-#| fig-height: 4
-income_data <- data.frame(
-    item = c("Revenue", "COGS", "Gross Profit", "Operating Expenses", "Net Income"),
-    value = c(1000, -400, NA, -350, NA),
-    type = c("start", "negative", "subtotal", "negative", "end")
-)
+Launch the Story Designer Shiny app to interactively design layouts:
 
-ibcs_waterfall(income_data, x = item, y = value, type = type)
+```r
+story_designer()
 ```
+
+The app lets you:
+
+- Adjust text sizes and spacing
+- Preview layouts at actual export size
+- Detect text clipping issues
+- Generate code for your final layout
 
 ## Learn More
 
-- [IBCS Theme and Colors](theme-colors.html) - Detailed guide to styling
-- [Scenario Notation](scenario-notation.html) - How to show AC, PL, PY, FC
-- [Variance Charts](variance-charts.html) - Deviation analysis
-- [Waterfall Charts](waterfall-charts.html) - Contribution analysis
+- [Storytelling Layouts](storytelling.html) - Complete guide to story layouts
 - [Multi-Panel Layouts](layouts.html) - Connecting related charts
 - [Marquee Integration](marquee.html) - Colored text labels
 
 ## References
 
-- [IBCS Standards](https://www.ibcs.com/standards/)
-- [IBCS SUCCESS Framework](https://www.ibcs.com/ibcs-standards-1-2/)
+- [Storytelling with Data](https://www.storytellingwithdata.com/)
+- [Recreating the SWD Look](https://albert-rapp.de/posts/ggplot2-tips/10_recreating_swd_look/)
