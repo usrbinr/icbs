@@ -165,21 +165,64 @@ What should the audience do?",
                 )
             ),
 
-            # Controls tab
+            # Sections tab
             bslib::nav_panel(
-                title = shiny::span(shiny::icon("sliders-h"), " Controls"),
-                bslib::card(
-                    bslib::card_header(class = "bg-light py-2", "Section Heights"),
-                    bslib::card_body(
-                        shiny::checkboxInput("auto_heights", "Auto-calculate", value = TRUE),
-                        shiny::conditionalPanel(
-                            condition = "!input.auto_heights",
-                            shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.15, step = 0.01),
-                            shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.07, step = 0.01),
-                            shiny::sliderInput("caption_height", "Caption", min = 0.02, max = 0.10, value = 0.04, step = 0.01)
-                        ),
-                        shiny::plotOutput("height_diagram", height = "120px")
+                title = shiny::span(shiny::icon("th-large"), " Sections"),
+                bslib::layout_column_wrap(
+                    width = 1/2,
+                    # Controls on left
+                    bslib::card(
+                        bslib::card_header(class = "bg-light py-2", "Section Heights"),
+                        bslib::card_body(
+                            shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.12, step = 0.01),
+                            shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.08, step = 0.01),
+                            shiny::sliderInput("caption_height", "Caption", min = 0.02, max = 0.10, value = 0.05, step = 0.01)
+                        )
+                    ),
+                    # Diagram on right
+                    bslib::card(
+                        bslib::card_header(class = "bg-light py-2", "Layout Preview"),
+                        bslib::card_body(
+                            shiny::plotOutput("height_diagram", height = "180px")
+                        )
                     )
+                )
+            ),
+
+            # Export tab
+            bslib::nav_panel(
+                title = shiny::span(shiny::icon("download"), " Export"),
+                bslib::card_body(
+                    class = "p-3",
+                    shiny::div(
+                        class = "row g-3 mb-3",
+                        shiny::div(
+                            class = "col-auto",
+                            shiny::selectInput("export_format", "Format", width = "100px",
+                                               choices = c("PNG" = "png", "PDF" = "pdf", "SVG" = "svg"),
+                                               selected = "png")
+                        ),
+                        shiny::div(
+                            class = "col-auto",
+                            shiny::numericInput("export_width", "Width (in)", value = 12, min = 4, max = 24, step = 0.5, width = "100px")
+                        ),
+                        shiny::div(
+                            class = "col-auto",
+                            shiny::numericInput("export_height", "Height (in)", value = 9, min = 3, max = 18, step = 0.5, width = "100px")
+                        ),
+                        shiny::div(
+                            class = "col-auto",
+                            shiny::numericInput("export_dpi", "DPI", value = 150, min = 72, max = 600, step = 10, width = "80px")
+                        )
+                    ),
+                    shiny::div(
+                        class = "d-flex gap-2 mb-3",
+                        shiny::actionButton("render_export", "Preview Export",
+                                            class = "btn-success", icon = shiny::icon("eye")),
+                        shiny::downloadButton("download_export", "Download", class = "btn-primary")
+                    ),
+                    shiny::uiOutput("export_info"),
+                    shiny::uiOutput("export_preview")
                 )
             ),
 
@@ -201,6 +244,7 @@ What should the audience do?",
             bslib::nav_panel(
                 title = shiny::span(shiny::icon("layer-group"), " Components"),
                 bslib::navset_card_underline(
+                    bslib::nav_panel("Plot", shiny::plotOutput("preview_chart", height = "250px")),
                     bslib::nav_panel("Title", shiny::plotOutput("preview_title", height = "100px")),
                     bslib::nav_panel("Subtitle", shiny::plotOutput("preview_subtitle", height = "80px")),
                     bslib::nav_panel("Narrative", shiny::plotOutput("preview_narrative", height = "150px"))
@@ -211,6 +255,9 @@ What should the audience do?",
 
     # Server
     server <- function(input, output, session) {
+
+        # Define %||% locally for NULL handling
+        `%||%` <- function(x, y) if (is.null(x)) y else x
 
         # Convert named colors to hex in marquee syntax
         # Supports {colorname text} in addition to {#hex text}
@@ -235,38 +282,34 @@ What should the audience do?",
             result
         }
 
-        # Calculate text metrics
+        # Calculate text metrics - simplified for better defaults
         calc_text_metrics <- function(text, font_size, output_width, is_narrative = FALSE) {
             if (is.null(text) || text == "") {
-                return(list(chars = 0, est_lines = 0, required_height = 0))
+                return(list(chars = 0, est_lines = 1, required_height = 0.08))
             }
 
-            clean_text <- gsub("\\{#[A-Fa-f0-9]+ ([^}]+)\\}", "\\1", text)
+            # Clean text for counting
+            clean_text <- gsub("\\{[^}]+\\s+([^}]+)\\}", "\\1", text)
             clean_text <- gsub("\\*+", "", clean_text)
             chars <- nchar(clean_text)
 
-            if (is_narrative) {
-                effective_width <- output_width * input$narrative_width * 0.85
-            } else {
-                effective_width <- output_width * 0.85
-            }
-
-            base_chars_per_line <- 28
-            chars_per_line <- max(15, base_chars_per_line - (font_size - 12))
-            chars_per_line <- floor(chars_per_line * (effective_width / 12))
-
+            # Count explicit line breaks
             explicit_lines <- length(strsplit(text, "\n")[[1]])
-            est_lines <- ceiling(chars / max(chars_per_line, 15) * 1.3)
-            est_lines <- max(est_lines, explicit_lines)
 
-            height_per_line <- 0.05 + (font_size / 250)
-            required_height <- max(0.08, est_lines * height_per_line + 0.04)
+            # Simple estimate: ~50-70 chars per line at typical widths
+            chars_per_line <- 55
+            wrapped_lines <- ceiling(chars / chars_per_line)
+            est_lines <- max(explicit_lines, wrapped_lines)
 
-            if (!is_narrative) {
-                required_height <- min(required_height, 0.40)
-            }
+            # Height based on font size and lines
+            # Title at 16pt needs ~0.10-0.12 per line, subtitle at 11pt needs ~0.06-0.08
+            base_height <- if (font_size >= 14) 0.10 else 0.06
+            required_height <- est_lines * base_height + 0.02  # padding
 
-            list(chars = chars, est_lines = est_lines, required_height = round(required_height, 3))
+            # Clamp to reasonable bounds
+            required_height <- max(0.08, min(required_height, 0.35))
+
+            list(chars = chars, est_lines = est_lines, required_height = round(required_height, 2))
         }
 
         title_metrics <- shiny::reactive({
@@ -278,15 +321,9 @@ What should the audience do?",
         })
 
         current_heights <- shiny::reactive({
-            if (input$auto_heights) {
-                list(title = title_metrics()$required_height,
-                     subtitle = subtitle_metrics()$required_height,
-                     caption = 0.04)
-            } else {
-                list(title = input$title_height,
-                     subtitle = input$subtitle_height,
-                     caption = input$caption_height)
-            }
+            list(title = input$title_height %||% 0.12,
+                 subtitle = input$subtitle_height %||% 0.08,
+                 caption = input$caption_height %||% 0.05)
         })
 
         # Dimensions label
@@ -306,71 +343,15 @@ What should the audience do?",
             )
         })
 
-        # Metrics - simple inline badges, no nested cards
+        # Metrics - simple inline badges (unused but kept for reference)
         output$title_metrics <- shiny::renderUI({
-            m <- title_metrics()
-            h <- current_heights()
-            is_clipping <- !input$auto_heights && h$title < m$required_height
-
-            shiny::div(
-                class = if (is_clipping) "p-2 bg-danger-subtle rounded" else "p-2 bg-success-subtle rounded",
-                shiny::span(class = "badge bg-secondary me-1", paste0(m$chars, " chars")),
-                shiny::span(class = "badge bg-secondary me-1", paste0("~", m$est_lines, " lines")),
-                shiny::span(class = "badge bg-info me-1", paste0("need: ", m$required_height)),
-                shiny::span(class = "badge bg-primary me-1", paste0("have: ", round(h$title, 3))),
-                if (is_clipping) shiny::actionLink("fix_title", shiny::icon("wrench"), title = "Auto-fix")
-            )
+            NULL
         })
 
         output$subtitle_metrics <- shiny::renderUI({
-            m <- subtitle_metrics()
-            h <- current_heights()
-            is_clipping <- !input$auto_heights && h$subtitle < m$required_height
-
-            shiny::div(
-                class = if (is_clipping) "p-2 bg-danger-subtle rounded" else "p-2 bg-success-subtle rounded",
-                shiny::span(class = "badge bg-secondary me-1", paste0(m$chars, " chars")),
-                shiny::span(class = "badge bg-secondary me-1", paste0("~", m$est_lines, " lines")),
-                shiny::span(class = "badge bg-info me-1", paste0("need: ", m$required_height)),
-                shiny::span(class = "badge bg-primary me-1", paste0("have: ", round(h$subtitle, 3))),
-                if (is_clipping) shiny::actionLink("fix_subtitle", shiny::icon("wrench"), title = "Auto-fix")
-            )
+            NULL
         })
 
-        # Auto-fix handlers
-        shiny::observeEvent(input$fix_title, {
-            shiny::updateSliderInput(session, "title_height", value = title_metrics()$required_height)
-        })
-        shiny::observeEvent(input$fix_subtitle, {
-            shiny::updateSliderInput(session, "subtitle_height", value = subtitle_metrics()$required_height)
-        })
-
-        # Clipping status
-        output$clipping_status <- shiny::renderUI({
-            h <- current_heights()
-            tm <- title_metrics()
-            sm <- subtitle_metrics()
-            content_height <- 1 - h$title - h$subtitle - h$caption
-
-            issues <- character(0)
-            if (!input$auto_heights) {
-                if (h$title < tm$required_height) issues <- c(issues, "Title clipped")
-                if (h$subtitle < sm$required_height) issues <- c(issues, "Subtitle clipped")
-            }
-            if (content_height < 0.3) issues <- c(issues, "Content area small")
-
-            if (length(issues) == 0) {
-                shiny::div(
-                    class = "alert alert-success py-2 mb-0",
-                    shiny::icon("check-circle"), " All OK! Content: ", round(content_height * 100), "%"
-                )
-            } else {
-                shiny::div(
-                    class = "alert alert-danger py-2 mb-0",
-                    shiny::icon("exclamation-triangle"), " ", paste(issues, collapse = ", ")
-                )
-            }
-        })
 
         # Height diagram - vertical (top to bottom)
         output$height_diagram <- shiny::renderPlot({
@@ -510,7 +491,81 @@ What should the audience do?",
 
         shiny::observeEvent(input$close_actual, { actual_size_data(NULL) })
 
+        # Export tab handlers
+        export_data <- shiny::reactiveVal(NULL)
+
+        output$export_info <- shiny::renderUI({
+            w <- input$export_width %||% 12
+            h <- input$export_height %||% 9
+            dpi <- input$export_dpi %||% 150
+            fmt <- toupper(input$export_format %||% "png")
+            shiny::div(
+                class = "text-muted small mb-2",
+                shiny::strong(fmt), " output: ", w, '" x ', h, '" @ ', dpi, ' DPI = ',
+                shiny::strong(round(w * dpi), " x ", round(h * dpi), " px")
+            )
+        })
+
+        shiny::observeEvent(input$render_export, {
+            shiny::withProgress(message = "Rendering export preview...", {
+                w <- input$export_width %||% 12
+                h <- input$export_height %||% 9
+                dpi <- input$export_dpi %||% 150
+                temp_file <- tempfile(fileext = ".png")
+                ggplot2::ggsave(temp_file, build_layout(), width = w, height = h, dpi = dpi, bg = "white")
+                img_data <- base64enc::base64encode(temp_file)
+                export_data(list(data = img_data, px_width = round(w * dpi), px_height = round(h * dpi)))
+                unlink(temp_file)
+            })
+        })
+
+        output$export_preview <- shiny::renderUI({
+            img_info <- export_data()
+            if (is.null(img_info)) {
+                return(shiny::div(
+                    class = "text-center p-4 bg-light rounded",
+                    shiny::icon("image", class = "fa-2x text-muted mb-2"), shiny::br(),
+                    shiny::span(class = "text-muted", "Click 'Preview Export' to see output")
+                ))
+            }
+            shiny::div(
+                shiny::div(
+                    class = "bg-success text-white p-2 rounded-top",
+                    shiny::icon("check-circle"), " Preview: ",
+                    shiny::strong(img_info$px_width, " x ", img_info$px_height, " px")
+                ),
+                shiny::div(
+                    style = "max-height: 400px; overflow: auto; border: 2px solid #28a745; border-top: none;",
+                    shiny::tags$img(src = paste0("data:image/png;base64,", img_info$data), style = "display: block;")
+                )
+            )
+        })
+
+        output$download_export <- shiny::downloadHandler(
+            filename = function() {
+                fmt <- input$export_format %||% "png"
+                paste0("story_layout_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".", fmt)
+            },
+            content = function(file) {
+                w <- input$export_width %||% 12
+                h <- input$export_height %||% 9
+                dpi <- input$export_dpi %||% 150
+                fmt <- input$export_format %||% "png"
+                if (fmt == "pdf") {
+                    ggplot2::ggsave(file, build_layout(), width = w, height = h, device = "pdf", bg = "white")
+                } else if (fmt == "svg") {
+                    ggplot2::ggsave(file, build_layout(), width = w, height = h, device = "svg", bg = "white")
+                } else {
+                    ggplot2::ggsave(file, build_layout(), width = w, height = h, dpi = dpi, bg = "white")
+                }
+            }
+        )
+
         # Component previews - with named color conversion
+        output$preview_chart <- shiny::renderPlot({
+            user_plot
+        }, res = 96, bg = "white")
+
         output$preview_title <- shiny::renderPlot({
             title_block(convert_named_colors(input$title_text), title_size = input$title_size,
                         margin_bottom = input$title_margin_bottom)
@@ -575,12 +630,9 @@ What should the audience do?",
                     '    subtitle_size = ', input$subtitle_size, ',\n',
                     '    narrative_size = ', input$narrative_size, ',\n',
                     '    caption_size = ', input$caption_size, ',\n',
-                    if (input$auto_heights) {
-                        paste0('    auto_heights = TRUE,\n    output_width = ', input$output_width, '\n')
-                    } else {
-                        paste0('    title_height = ', h$title, ',\n    subtitle_height = ', h$subtitle,
-                               ',\n    caption_height = ', h$caption, ',\n    auto_heights = FALSE\n')
-                    },
+                    '    title_height = ', h$title, ',\n',
+                    '    subtitle_height = ', h$subtitle, ',\n',
+                    '    caption_height = ', h$caption, '\n',
                     ')'
                 )
             }
