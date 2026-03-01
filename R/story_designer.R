@@ -205,7 +205,8 @@ story_designer <- function(plot = NULL,
                         shiny::conditionalPanel(
                             condition = "input.legend_position == 'left' || input.legend_position == 'right'",
                             shiny::sliderInput("legend_width", "Legend width", min = 0.08, max = 0.25, value = 0.12, step = 0.02),
-                            shiny::sliderInput("legend_lineheight", "Line spacing", min = 1.0, max = 3.0, value = 1.6, step = 0.2)
+                            shiny::sliderInput("legend_lineheight", "Line spacing", min = 1.0, max = 3.0, value = 1.6, step = 0.2),
+                            shiny::sliderInput("legend_wrap", "Wrap at chars", min = 0, max = 20, value = 0, step = 1)
                         ),
                         shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
                         shiny::checkboxInput("legend_uppercase", "Uppercase", value = FALSE)
@@ -894,7 +895,8 @@ story_designer <- function(plot = NULL,
                         bold = input$legend_bold %||% TRUE,
                         uppercase = input$legend_uppercase %||% FALSE,
                         lineheight = input$legend_lineheight %||% 1.6,
-                        width = 0.95
+                        width = 0.95,
+                        wrap_width = if ((input$legend_wrap %||% 0) > 0) input$legend_wrap else NULL
                     )
                 }
             }
@@ -1259,6 +1261,7 @@ story_designer <- function(plot = NULL,
                         orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
                         h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
                         lineheight_code <- if (orientation == "vertical") paste0(',\n    lineheight = ', input$legend_lineheight %||% 1.6) else ""
+                        wrap_code <- if ((input$legend_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$legend_wrap) else ""
                         paste0(
                             'legend_plot <- legend_block(\n',
                             '    ', color_vec, ',\n',
@@ -1268,7 +1271,7 @@ story_designer <- function(plot = NULL,
                             '    size = ', input$legend_size %||% 10, ',\n',
                             '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
                             '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE",
-                            lineheight_code, '\n',
+                            lineheight_code, wrap_code, '\n',
                             ')\n\n'
                         )
                     } else ""

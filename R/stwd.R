@@ -829,6 +829,8 @@ caption_block <- function(caption,
 #' @param uppercase Logical; convert labels to uppercase? Default: FALSE.
 #' @param lineheight Line height multiplier for vertical legends. Default: 1.6.
 #' @param width Text width for wrapping (0-1). Default: 0.95.
+#' @param wrap_width Character width to wrap labels at. Useful for long labels
+#'   in vertical legends. Default: NULL (no wrapping).
 #' @param margin_top Top margin in pts. Default: 0.
 #' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
@@ -864,6 +866,7 @@ legend_block <- function(colors,
                          uppercase = FALSE,
                          lineheight = 1.6,
                          width = 0.95,
+                         wrap_width = NULL,
                          margin_top = 0,
                          margin_bottom = 5,
                          margin_left = 5,
@@ -888,6 +891,13 @@ legend_block <- function(colors,
 
     if (uppercase) {
         labels <- toupper(labels)
+    }
+
+    # Wrap labels if wrap_width specified
+    if (!is.null(wrap_width) && wrap_width > 0) {
+        labels <- sapply(labels, function(lbl) {
+            paste(strwrap(lbl, width = wrap_width), collapse = "\n")
+        }, USE.NAMES = FALSE)
     }
 
     # Format each label with its color using marquee syntax
