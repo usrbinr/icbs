@@ -1,0 +1,60 @@
+---
+title: "inline_legend"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L385)
+
+# `inline_legend()`
+
+Create an Inline Legend Annotation
+
+## Usage
+
+```r
+inline_legend(
+  colors,
+  x = 0,
+  y = 0,
+  orientation = "horizontal",
+  sep = " • ",
+  bold = TRUE
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `colors` | Named vector of colors (names = category labels). |
+| `x` | X position for the legend. Default: 0. |
+| `y` | Y position for the legend. Default: 0. |
+| `orientation` | Either "horizontal" or "vertical". Default: "horizontal". |
+| `sep` | Separator between items for horizontal layout. Default: bullet. |
+| `bold` | Make text bold. Default: TRUE. |
+
+## Value
+
+A data frame with columns `x`, `y`, and `label` (marquee-formatted).
+
+## Description
+
+Creates a data frame suitable for adding colored text annotations
+as an inline legend replacement. Use with `geom_marquee()`.
+
+## Examples
+
+```r
+## Not run: 
+fill_colors <- c("Apples" = "#E63946", "Oranges" = "#F4A261")
+
+# Add as annotation layer
+ggplot(...) +
+    geom_marquee(
+        data = inline_legend(fill_colors, x = 1, y = 100),
+        aes(x = x, y = y, label = label),
+        hjust = 0
+    )
+
+## End(Not run)
+```
+

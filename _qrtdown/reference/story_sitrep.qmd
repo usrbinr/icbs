@@ -1,0 +1,82 @@
+---
+title: "story_sitrep"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1010)
+
+# `story_sitrep()`
+
+Get a Situation Report for a Story Layout
+
+## Usage
+
+```r
+story_sitrep(
+  plot = NULL,
+  title = NULL,
+  subtitle = NULL,
+  narrative = NULL,
+  caption = NULL,
+  narrative_position = "right",
+  narrative_width = 0.35,
+  title_size = 16,
+  subtitle_size = 11,
+  narrative_size = 10,
+  caption_size = 9,
+  title_height = 0.15,
+  subtitle_height = 0.07,
+  caption_height = 0.05,
+  show_tips = TRUE
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `plot` | The main ggplot visualization (or NULL to just see layout structure). |
+| `title` | Optional title (text or ggplot). |
+| `subtitle` | Optional subtitle (text or ggplot). |
+| `narrative` | Optional narrative (text or ggplot). |
+| `caption` | Optional caption (text or ggplot). |
+| `narrative_position` | Position of narrative: "right", "left", "bottom". |
+| `narrative_width` | Width proportion for narrative (0-1). |
+| `title_size` | Size for title in pts. |
+| `subtitle_size` | Size for subtitle in pts. |
+| `narrative_size` | Size for narrative text in pts. |
+| `caption_size` | Size for caption in pts. |
+| `title_height` | Height proportion for title row. |
+| `subtitle_height` | Height proportion for subtitle row. |
+| `caption_height` | Height proportion for caption row. |
+| `show_tips` | Logical. Show SWD-inspired tips? Default: TRUE. |
+
+## Value
+
+A `StorySitrep` S7 object with properties:
+
+- @components: data.frame of component details
+
+- @layout: list of layout proportions
+
+- @diagram: ASCII representation of the layout
+
+- @tips: character vector of SWD-inspired suggestions
+
+## Description
+
+Returns diagnostic information about a story layout composition,
+including which components are present, their sizes, layout proportions,
+and an ASCII diagram of the structure.
+
+## Examples
+
+```r
+# Check layout before building
+story_sitrep(
+    title = "My Title",
+    subtitle = "My Subtitle",
+    narrative = "Some text",
+    narrative_position = "right"
+)
+```
+

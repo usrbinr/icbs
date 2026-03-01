@@ -1,0 +1,63 @@
+---
+title: "caption_block"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L773)
+
+# `caption_block()`
+
+Create a Caption Block Plot
+
+## Usage
+
+```r
+caption_block(
+  caption,
+  caption_size = 9,
+  halign = "left",
+  color = "#808080",
+  margin_top = 10,
+  margin_bottom = 5,
+  margin_left = 5,
+  margin_right = 5,
+  ...
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `caption` | Caption text (marquee-formatted). |
+| `caption_size` | Size for caption in pts. Default: 9. |
+| `halign` | Horizontal alignment. Default: "left". |
+| `color` | Text color. Default: gray (#808080). |
+| `margin_top` | Top margin in pts. Default: 10. |
+| `margin_bottom` | Bottom margin in pts. Default: 5. |
+| `margin_left` | Left margin in pts. Default: 5. |
+| `margin_right` | Right margin in pts. Default: 5. |
+| `...` | Additional arguments passed to `marquee::geom_marquee()`. |
+
+## Value
+
+A ggplot object that can be combined with other plots via patchwork.
+
+## Description
+
+Creates a standalone caption element as a ggplot, for use at the
+bottom of a patchwork composition. Captions typically contain source
+attributions and notes.
+
+## Examples
+
+```r
+## Not run: 
+library(patchwork)
+
+caption_plot <- caption_block("Source: Internal Sales Database")
+
+my_chart / caption_plot + plot_layout(heights = c(0.95, 0.05))
+
+## End(Not run)
+```
+

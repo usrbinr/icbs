@@ -1,0 +1,40 @@
+---
+title: "title_header"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L830)
+
+# `title_header()`
+
+Create a Large Title Block (Deprecated)
+
+## Usage
+
+```r
+title_header(
+  title,
+  subtitle = NULL,
+  title_size = 8,
+  subtitle_size = 4,
+  halign = "left"
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `title` | Main title text (marquee-formatted). |
+| `subtitle` | Optional subtitle text (marquee-formatted). |
+| `title_size` | Size for title. Default: 8. |
+| `subtitle_size` | Size for subtitle. Default: 4. |
+| `halign` | Horizontal alignment. Default: "left". |
+
+## Value
+
+A ggplot object.
+
+## Description
+
+Use `title_block()` and `subtitle_block()` instead for more control.
+

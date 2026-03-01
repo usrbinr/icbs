@@ -1,0 +1,27 @@
+---
+title: "one_to_split_to_two_layout"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1714)
+
+# `one_to_split_to_two_layout()`
+
+make a 1 split 2 plot
+
+## Usage
+
+```r
+one_to_split_to_two_layout(fig, first_level_sign = "+")
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `fig` | list of plots |
+| `first_level_sign` | sign |
+
+## Value
+
+ggplot
+

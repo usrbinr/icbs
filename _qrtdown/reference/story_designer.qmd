@@ -1,0 +1,58 @@
+---
+title: "story_designer"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L30)
+
+# `story_designer()`
+
+Interactive Story Layout Designer
+
+## Usage
+
+```r
+story_designer(
+  plot = NULL,
+  title = "**Your {#E69F00 title} here**",
+  subtitle = "Supporting context for your visualization",
+  narrative = "**KEY INSIGHT:**\nYour narrative here.",
+  caption = "SOURCE: Your data source"
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `plot` | Optional ggplot object to include in the preview. If NULL, a placeholder chart is used. |
+| `title` | Initial title text. |
+| `subtitle` | Initial subtitle text. |
+| `narrative` | Initial narrative text. |
+| `caption` | Initial caption text. |
+
+## Value
+
+Launches a Shiny app. When you click "Copy Code", the
+generated `story_layout()` call is copied to your clipboard.
+
+## Description
+
+Launches a Shiny app to interactively design story layouts with
+real-time clipping detection. Helps you find the right height
+allocations before exporting.
+
+## Examples
+
+```r
+## Not run: 
+# Launch with defaults
+story_designer()
+
+# Launch with your plot
+library(ggplot2)
+p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_col()
+story_designer(plot = p, title = "My Title")
+
+## End(Not run)
+```
+

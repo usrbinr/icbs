@@ -1,0 +1,46 @@
+---
+title: "theme_stwd"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L467)
+
+# `theme_stwd()`
+
+STWD Theme for Storytelling
+
+## Usage
+
+```r
+theme_stwd(base_size = 11, base_family = "")
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `base_size` | Base font size. Default: 11. |
+| `base_family` | Base font family. Default: "" (system default). |
+
+## Value
+
+A ggplot2 theme object.
+
+## Description
+
+A clean, minimal theme optimized for data storytelling. Follows
+best practices from "Storytelling with Data" - removes distractions,
+emphasizes the data, and provides clean typography.
+
+## Examples
+
+```r
+## Not run: 
+library(ggplot2)
+
+ggplot(mtcars, aes(wt, mpg)) +
+    geom_point() +
+    theme_stwd()
+
+## End(Not run)
+```
+

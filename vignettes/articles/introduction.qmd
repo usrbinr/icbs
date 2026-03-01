@@ -1,0 +1,114 @@
+---
+title: "Introduction to stwd"
+format:
+  html:
+    toc: true
+    code-fold: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(stwd)
+library(ggplot2)
+library(patchwork)
+```
+
+## What is stwd?
+
+The **stwd** package provides tools for creating presentation-ready visualizations
+following [Storytelling with Data](https://www.storytellingwithdata.com/) principles.
+It helps you build complete "story layouts" that combine charts with narrative text,
+colored titles, and supporting context.
+
+## Key Features
+
+The package includes:
+
+1. **Story Layouts** - Combine charts with titles, subtitles, narratives, and captions
+2. **Story Designer** - Interactive Shiny app for designing layouts
+3. **Highlight Colors** - Strategic color use (gray out noise, highlight signal)
+4. **Marquee Integration** - Color-matched text in titles and labels
+5. **Multi-Panel Layouts** - Connectors for showing relationships between plots
+
+## The SWD Approach
+
+Traditional charts put the burden on the reader to interpret meaning.
+Storytelling with Data (SWD) charts guide the reader by:
+
+- **Highlighting what matters** - Gray out the noise, color the signal
+- **Embedding the legend in the title** - No separate legend box needed
+- **Adding narrative context** - Explain the "so what?" alongside the chart
+- **Using a clear visual hierarchy** - Big title, supporting chart, explanatory text
+
+## Quick Start
+
+### Create a Story Layout
+
+```{r}
+#| label: story-example
+#| fig-width: 10
+#| fig-height: 7
+# Sample data
+df <- data.frame(
+    product = c("Apples", "Oranges", "Bananas", "Grapes"),
+    sales = c(120, 85, 95, 110)
+)
+
+# Highlight only the winner
+fill_colors <- highlight_colors(
+    df$product,
+    highlight = c("Apples" = "#E63946")
+)
+
+# Create the base chart
+p <- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +
+    geom_col(width = 0.7) +
+    coord_flip() +
+    scale_fill_manual(values = fill_colors, guide = "none") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+    theme_minimal() +
+    labs(x = NULL, y = "Units Sold")
+
+# Compose the full story
+story_layout(
+    plot = p,
+    title = "**Q4 Sales: {#E63946 Apples} Take the Lead**",
+    subtitle = "Fruit category performance, October-December 2024",
+    narrative = "**Key takeaway:**
+
+{#E63946 Apples} outsold all other fruits
+this quarter, driven by seasonal demand
+and promotional pricing.
+
+**Recommendation:** Increase apple
+inventory for Q1.",
+    caption = "Source: Internal Sales Database"
+)
+```
+
+### Use the Interactive Designer
+
+Launch the Story Designer Shiny app to interactively design layouts:
+
+```r
+story_designer()
+```
+
+The app lets you:
+
+- Adjust text sizes and spacing
+- Preview layouts at actual export size
+- Detect text clipping issues
+- Generate code for your final layout
+
+## Learn More
+
+- [Storytelling Layouts](storytelling.html) - Complete guide to story layouts
+- [Multi-Panel Layouts](layouts.html) - Connecting related charts
+- [Marquee Integration](marquee.html) - Colored text labels
+
+## References
+
+- [Storytelling with Data](https://www.storytellingwithdata.com/)
+- [Recreating the SWD Look](https://albert-rapp.de/posts/ggplot2-tips/10_recreating_swd_look/)

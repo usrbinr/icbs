@@ -1,0 +1,69 @@
+---
+title: "title_block"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L631)
+
+# `title_block()`
+
+Create a Title Block Plot
+
+## Usage
+
+```r
+title_block(
+  title,
+  title_size = 16,
+  halign = "left",
+  lineheight = 1.1,
+  margin_top = 5,
+  margin_bottom = 5,
+  margin_left = 5,
+  margin_right = 5,
+  width = 0.95,
+  ...
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `title` | Main title text (marquee-formatted). Supports markdown formatting: **bold**, *italic*, {#color text. |
+| `title_size` | Size for title in pts. Default: 16 (matches SWD style). |
+| `halign` | Horizontal alignment: "left", "center", or "right". Default: "left". |
+| `lineheight` | Line height multiplier. Default: 1.1. |
+| `margin_top` | Top margin in pts. Default: 10. |
+| `margin_bottom` | Bottom margin in pts. Default: 15. |
+| `margin_left` | Left margin in pts. Default: 5. |
+| `margin_right` | Right margin in pts. Default: 5. |
+| `width` | Maximum width for text wrapping (0-1). Default: 0.95. |
+| `...` | Additional arguments passed to `marquee::geom_marquee()`. |
+
+## Value
+
+A ggplot object that can be combined with other plots via patchwork.
+
+## Description
+
+Creates a standalone title element as a ggplot, for use as the
+top element in a patchwork composition. Allows for larger, more
+prominent titles than standard ggplot titles, matching the SWD style
+where titles are bold statements that draw the eye.
+
+## Examples
+
+```r
+## Not run: 
+library(patchwork)
+
+title_plot <- title_block(
+    "**Q4 Sales: {#E63946 Apples} Take the Lead**",
+    title_size = 18
+)
+
+title_plot / my_chart + plot_layout(heights = c(0.08, 0.92))
+
+## End(Not run)
+```
+
