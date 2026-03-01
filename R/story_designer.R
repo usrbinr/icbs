@@ -243,7 +243,10 @@ story_designer <- function(plot = NULL,
                         shiny::uiOutput("palette_preview"),
                         shiny::radioButtons("palette_apply", "Apply to:",
                             choices = c("Fill" = "fill", "Color" = "color", "Both" = "both"),
-                            selected = "fill", inline = TRUE)
+                            selected = "fill", inline = TRUE),
+                        shiny::radioButtons("palette_scale", "Scale type:",
+                            choices = c("Discrete" = "discrete", "Continuous" = "continuous"),
+                            selected = "discrete", inline = TRUE)
                     )
                 ),
 
@@ -604,14 +607,22 @@ story_designer <- function(plot = NULL,
 
         # Render palette dropdown
         output$palette_choices <- shiny::renderUI({
+            pkg <- input$palette_package %||% "none"
+            if (pkg == "none") return(NULL)
             palettes <- available_palettes()
-            if (length(palettes) == 0) return(NULL)
+            if (length(palettes) == 0) {
+                return(shiny::div(
+                    class = "alert alert-warning py-1 px-2 small",
+                    shiny::icon("exclamation-triangle"),
+                    paste0(" Package '", pkg, "' not installed. Run: install.packages('", pkg, "')")
+                ))
+            }
             idx <- min(palette_idx(), length(palettes))
             shiny::selectInput("palette_name", "Palette", width = "100%",
                 choices = palettes, selected = palettes[idx])
         })
 
-        # Render palette preview swatches
+        # Render palette preview swatches with hex tooltips and click-to-copy
         output$palette_preview <- shiny::renderUI({
             pkg <- input$palette_package %||% "none"
             if (pkg == "none") return(NULL)
@@ -619,11 +630,23 @@ story_designer <- function(plot = NULL,
             if (length(palettes) == 0) return(NULL)
             idx <- min(palette_idx(), length(palettes))
             colors <- get_palette_colors(pkg, palettes[idx], 8)
-            swatches <- lapply(colors, function(col) {
-                shiny::span(style = paste0(
-                    "display:inline-block;width:20px;height:20px;background:", col,
-                    ";border:1px solid #ccc;border-radius:2px;margin-right:2px;"
-                ))
+            swatches <- lapply(seq_along(colors), function(i) {
+                col <- colors[i]
+                bslib::tooltip(
+                    shiny::span(
+                        style = paste0(
+                            "display:inline-block;width:24px;height:24px;background:", col,
+                            ";border:1px solid #ccc;border-radius:3px;margin-right:3px;cursor:pointer;",
+                            "transition:transform 0.1s;"
+                        ),
+                        onclick = paste0(
+                            "navigator.clipboard.writeText('", col, "');",
+                            "this.style.transform='scale(1.2)';",
+                            "setTimeout(() => this.style.transform='scale(1)', 150);"
+                        )
+                    ),
+                    paste0(col, " (click to copy)")
+                )
             })
             shiny::div(class = "mb-2", swatches)
         })
@@ -825,11 +848,22 @@ story_designer <- function(plot = NULL,
             palette_colors <- current_palette()
             if (!is.null(palette_colors)) {
                 apply_to <- input$palette_apply %||% "fill"
-                if (apply_to %in% c("fill", "both")) {
-                    p <- p + ggplot2::scale_fill_manual(values = palette_colors)
-                }
-                if (apply_to %in% c("color", "both")) {
-                    p <- p + ggplot2::scale_color_manual(values = palette_colors)
+                scale_type <- input$palette_scale %||% "discrete"
+                if (scale_type == "discrete") {
+                    if (apply_to %in% c("fill", "both")) {
+                        p <- p + ggplot2::scale_fill_manual(values = palette_colors)
+                    }
+                    if (apply_to %in% c("color", "both")) {
+                        p <- p + ggplot2::scale_color_manual(values = palette_colors)
+                    }
+                } else {
+                    # Continuous scales
+                    if (apply_to %in% c("fill", "both")) {
+                        p <- p + ggplot2::scale_fill_gradientn(colors = palette_colors)
+                    }
+                    if (apply_to %in% c("color", "both")) {
+                        p <- p + ggplot2::scale_color_gradientn(colors = palette_colors)
+                    }
                 }
             }
             p
@@ -1372,11 +1406,21 @@ story_designer <- function(plot = NULL,
                     )
 
                     scale_code <- ""
-                    if (apply_to %in% c("fill", "both")) {
-                        scale_code <- paste0(scale_code, ' +\n    scale_fill_manual(values = ', pal_fn, ')')
-                    }
-                    if (apply_to %in% c("color", "both")) {
-                        scale_code <- paste0(scale_code, ' +\n    scale_color_manual(values = ', pal_fn, ')')
+                    scale_type <- input$palette_scale %||% "discrete"
+                    if (scale_type == "discrete") {
+                        if (apply_to %in% c("fill", "both")) {
+                            scale_code <- paste0(scale_code, ' +\n    scale_fill_manual(values = ', pal_fn, ')')
+                        }
+                        if (apply_to %in% c("color", "both")) {
+                            scale_code <- paste0(scale_code, ' +\n    scale_color_manual(values = ', pal_fn, ')')
+                        }
+                    } else {
+                        if (apply_to %in% c("fill", "both")) {
+                            scale_code <- paste0(scale_code, ' +\n    scale_fill_gradientn(colors = ', pal_fn, ')')
+                        }
+                        if (apply_to %in% c("color", "both")) {
+                            scale_code <- paste0(scale_code, ' +\n    scale_color_gradientn(colors = ', pal_fn, ')')
+                        }
                     }
                     scale_code
                 } else "",
