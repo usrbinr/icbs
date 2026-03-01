@@ -607,33 +607,82 @@ story_designer <- function(plot = NULL,
         # --- Detect Plot Categories ---
         plot_categories <- shiny::reactive({
             tryCatch({
+                # Try multiple approaches to find the fill/color column
                 plot_data <- user_plot$data
-                fill_aes <- rlang::quo_get_expr(user_plot$mapping$fill)
-                color_aes <- rlang::quo_get_expr(user_plot$mapping$colour)
-
                 fill_levels <- NULL
                 color_levels <- NULL
 
-                if (!is.null(fill_aes) && is.name(fill_aes)) {
-                    col_name <- as.character(fill_aes)
-                    if (col_name %in% names(plot_data)) {
-                        vals <- plot_data[[col_name]]
+                # Approach 1: Check plot-level mapping
+                if (!is.null(user_plot$mapping$fill)) {
+                    fill_col <- tryCatch({
+                        rlang::as_name(user_plot$mapping$fill)
+                    }, error = function(e) NULL)
+
+                    if (!is.null(fill_col) && fill_col %in% names(plot_data)) {
+                        vals <- plot_data[[fill_col]]
                         if (is.factor(vals)) {
                             fill_levels <- levels(vals)
-                        } else {
-                            fill_levels <- unique(as.character(vals))
+                        } else if (is.character(vals)) {
+                            fill_levels <- unique(vals)
                         }
                     }
                 }
 
-                if (!is.null(color_aes) && is.name(color_aes)) {
-                    col_name <- as.character(color_aes)
-                    if (col_name %in% names(plot_data)) {
-                        vals <- plot_data[[col_name]]
+                # Approach 2: Check layer mappings if plot-level didn't work
+                if (is.null(fill_levels) && length(user_plot$layers) > 0) {
+                    for (layer in user_plot$layers) {
+                        if (!is.null(layer$mapping$fill)) {
+                            fill_col <- tryCatch({
+                                rlang::as_name(layer$mapping$fill)
+                            }, error = function(e) NULL)
+
+                            if (!is.null(fill_col) && fill_col %in% names(plot_data)) {
+                                vals <- plot_data[[fill_col]]
+                                if (is.factor(vals)) {
+                                    fill_levels <- levels(vals)
+                                } else if (is.character(vals)) {
+                                    fill_levels <- unique(vals)
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
+                # Same for color/colour
+                if (!is.null(user_plot$mapping$colour)) {
+                    color_col <- tryCatch({
+                        rlang::as_name(user_plot$mapping$colour)
+                    }, error = function(e) NULL)
+
+                    if (!is.null(color_col) && color_col %in% names(plot_data)) {
+                        vals <- plot_data[[color_col]]
                         if (is.factor(vals)) {
                             color_levels <- levels(vals)
-                        } else {
-                            color_levels <- unique(as.character(vals))
+                        } else if (is.character(vals)) {
+                            color_levels <- unique(vals)
+                        }
+                    }
+                }
+
+                # Check layer mappings for color
+                if (is.null(color_levels) && length(user_plot$layers) > 0) {
+                    for (layer in user_plot$layers) {
+                        col_mapping <- layer$mapping$colour %||% layer$mapping$color
+                        if (!is.null(col_mapping)) {
+                            color_col <- tryCatch({
+                                rlang::as_name(col_mapping)
+                            }, error = function(e) NULL)
+
+                            if (!is.null(color_col) && color_col %in% names(plot_data)) {
+                                vals <- plot_data[[color_col]]
+                                if (is.factor(vals)) {
+                                    color_levels <- levels(vals)
+                                } else if (is.character(vals)) {
+                                    color_levels <- unique(vals)
+                                }
+                                break
+                            }
                         }
                     }
                 }
@@ -851,6 +900,23 @@ story_designer <- function(plot = NULL,
             shiny::div(swatches, selected_hex)
         })
 
+        # Get current palette colors (use selected if any, otherwise all)
+        current_palette <- shiny::reactive({
+            pkg <- input$palette_package %||% "none"
+            if (pkg == "none") return(NULL)
+            palettes <- available_palettes()
+            if (length(palettes) == 0) return(NULL)
+            idx <- min(palette_idx(), length(palettes))
+            all_colors <- get_palette_colors(pkg, palettes[idx], 8)
+            sel <- selected_colors()
+            if (length(sel) > 0) {
+                # Return only selected colors in selection order
+                all_colors[sel]
+            } else {
+                all_colors
+            }
+        })
+
         # Render palette warning when categories > colors
         output$palette_warning <- shiny::renderUI({
             pkg <- input$palette_package %||% "none"
@@ -870,23 +936,6 @@ story_designer <- function(plot = NULL,
                     paste0(" ", n_cats, " categories but only ", n_colors, " colors. Consider Manual Colors section for precise control.")
                 )
             } else NULL
-        })
-
-        # Get current palette colors (use selected if any, otherwise all)
-        current_palette <- shiny::reactive({
-            pkg <- input$palette_package %||% "none"
-            if (pkg == "none") return(NULL)
-            palettes <- available_palettes()
-            if (length(palettes) == 0) return(NULL)
-            idx <- min(palette_idx(), length(palettes))
-            all_colors <- get_palette_colors(pkg, palettes[idx], 8)
-            sel <- selected_colors()
-            if (length(sel) > 0) {
-                # Return only selected colors in selection order
-                all_colors[sel]
-            } else {
-                all_colors
-            }
         })
 
         # --- End Color Palette Functions ---
