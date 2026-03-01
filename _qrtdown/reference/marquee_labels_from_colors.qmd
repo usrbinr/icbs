@@ -2,7 +2,7 @@
 title: "marquee_labels_from_colors"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1523)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1630)
 
 # `marquee_labels_from_colors()`
 

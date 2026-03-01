@@ -1,0 +1,70 @@
+---
+title: "legend_block"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L847)
+
+# `legend_block()`
+
+Create a Legend Block Plot
+
+## Usage
+
+```r
+legend_block(
+  colors,
+  halign = "right",
+  sep = " | ",
+  size = 10,
+  bold = TRUE,
+  uppercase = FALSE,
+  margin_top = 0,
+  margin_bottom = 5,
+  margin_left = 5,
+  margin_right = 5,
+  ...
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `colors` | Named vector where names are category labels and values are colors (hex codes or R color names). |
+| `halign` | Horizontal alignment: "left", "center", or "right". Default: "right". |
+| `sep` | Separator between category labels. Default: " \| ". |
+| `size` | Text size in pts. Default: 10. |
+| `bold` | Logical; make labels bold? Default: TRUE. |
+| `uppercase` | Logical; convert labels to uppercase? Default: FALSE. |
+| `margin_top` | Top margin in pts. Default: 0. |
+| `margin_bottom` | Bottom margin in pts. Default: 5. |
+| `margin_left` | Left margin in pts. Default: 5. |
+| `margin_right` | Right margin in pts. Default: 5. |
+| `...` | Additional arguments passed to `marquee::geom_marquee()`. |
+
+## Value
+
+A ggplot object that can be combined with other plots via patchwork.
+
+## Description
+
+Creates a standalone inline legend as a ggplot, showing colored category
+labels separated by a delimiter. Use above charts in patchwork compositions
+to replace traditional legends with clean, in-line text.
+
+## Examples
+
+```r
+## Not run: 
+library(patchwork)
+
+legend_colors <- c("ACCURATE" = "#808080", "NULL" = "#B0B0B0", "ERROR" = "#E69F00")
+
+legend_plot <- legend_block(legend_colors, halign = "right")
+
+title_block("My Title") / legend_plot / my_chart +
+    plot_layout(heights = c(0.08, 0.04, 0.88))
+
+## End(Not run)
+```
+
