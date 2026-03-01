@@ -239,7 +239,7 @@ story_designer <- function(plot = NULL,
                     value = "Plot",
                     icon = shiny::icon("chart-bar"),
                     shiny::selectInput("plot_theme", "Theme", width = "100%",
-                        choices = c("Minimal" = "minimal", "STWD" = "stwd", "Void" = "void")),
+                        choices = c("STWD" = "stwd", "Void" = "void")),
                     shiny::selectInput("plot_legend_pos", "Legend", width = "100%",
                         choices = c("Right" = "right", "Bottom" = "bottom",
                                     "Top" = "top", "Left" = "left", "None" = "none"))
@@ -1125,11 +1125,10 @@ story_designer <- function(plot = NULL,
             p <- user_plot
 
             # Get base theme
-            base_theme <- switch(input$plot_theme %||% "minimal",
-                "minimal" = ggplot2::theme_minimal(),
+            base_theme <- switch(input$plot_theme %||% "stwd",
                 "stwd" = theme_stwd(),
                 "void" = ggplot2::theme_void(),
-                ggplot2::theme_minimal()
+                theme_stwd()
             )
 
             # X-Axis title styling
@@ -1362,7 +1361,7 @@ story_designer <- function(plot = NULL,
             shiny::updateNumericInput(session, "narrative_padding", value = 10)
             shiny::updateTextInput(session, "caption_color", value = "#808080")
             # Plot settings
-            shiny::updateSelectInput(session, "plot_theme", selected = "minimal")
+            shiny::updateSelectInput(session, "plot_theme", selected = "stwd")
             shiny::updateSelectInput(session, "plot_legend_pos", selected = "right")
             shiny::updateSelectInput(session, "palette_package", selected = "none")
             palette_idx(1)
@@ -1757,12 +1756,11 @@ story_designer <- function(plot = NULL,
                 "full_left" = "left", "full_center" = "center", "full_right" = "right", "under_chart" = "left", "left")
 
             # Build plot theme code
-            theme_name <- input$plot_theme %||% "minimal"
+            theme_name <- input$plot_theme %||% "stwd"
             theme_fn <- switch(theme_name,
-                "minimal" = "theme_minimal()",
                 "stwd" = "theme_stwd()",
                 "void" = "theme_void()",
-                "theme_minimal()"
+                "theme_stwd()"
             )
             # X-Axis title
             x_title_face <- if (input$axis_title_x_bold %||% FALSE) "bold" else "plain"
