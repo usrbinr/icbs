@@ -981,15 +981,36 @@ story_designer <- function(plot = NULL,
             assignment_ui <- lapply(seq_along(levels_to_use), function(i) {
                 level_name <- levels_to_use[i]
                 input_id <- paste0("cat_color_", i)
-                label <- if (assign_mode == "number") {
-                    paste0("#", i)
+
+                # Create label with truncation
+                if (assign_mode == "number") {
+                    label_text <- paste0("#", i)
+                    needs_tooltip <- FALSE
                 } else {
-                    if (nchar(level_name) > 15) paste0(substr(level_name, 1, 12), "...") else level_name
+                    if (nchar(level_name) > 12) {
+                        label_text <- paste0(substr(level_name, 1, 10), "..")
+                        needs_tooltip <- TRUE
+                    } else {
+                        label_text <- level_name
+                        needs_tooltip <- FALSE
+                    }
+                }
+
+                # Label element with optional tooltip
+                label_elem <- if (needs_tooltip) {
+                    bslib::tooltip(
+                        shiny::span(label_text, class = "small",
+                            style = "width:70px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help;"),
+                        level_name
+                    )
+                } else {
+                    shiny::span(label_text, class = "small",
+                        style = "width:70px;display:inline-block;")
                 }
 
                 shiny::div(
                     class = "d-flex align-items-center gap-2 mb-1",
-                    shiny::span(label, class = "small", style = "width:80px;overflow:hidden;text-overflow:ellipsis;"),
+                    label_elem,
                     shiny::selectInput(input_id, NULL, width = "100%",
                         choices = color_choices,
                         selected = "default")
