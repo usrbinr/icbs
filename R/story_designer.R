@@ -1212,7 +1212,11 @@ story_designer <- function(plot = NULL,
                 if (input$grid_remove_all %||% FALSE) {
                     theme_mods <- theme_mods + ggplot2::theme(
                         panel.grid.major = ggplot2::element_blank(),
-                        panel.grid.minor = ggplot2::element_blank()
+                        panel.grid.major.x = ggplot2::element_blank(),
+                        panel.grid.major.y = ggplot2::element_blank(),
+                        panel.grid.minor = ggplot2::element_blank(),
+                        panel.grid.minor.x = ggplot2::element_blank(),
+                        panel.grid.minor.y = ggplot2::element_blank()
                     )
                 } else {
                     # Major grid
