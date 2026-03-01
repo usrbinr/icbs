@@ -122,9 +122,8 @@ story_designer <- function(plot = NULL,
                     ),
                     shiny::textAreaInput("title_text", NULL, value = title, rows = 2, width = "100%",
                                          placeholder = "Use **bold** or {#E69F00 color}"),
-                    shiny::sliderInput("title_size", "Font size", min = 10, max = 24, value = 16, step = 1),
+                    shiny::sliderInput("title_size", "Font size", min = 6, max = 24, value = 12, step = 1),
                     shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
-                    shiny::sliderInput("title_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5),
                     shiny::uiOutput("title_metrics")
                 ),
 
@@ -143,7 +142,6 @@ story_designer <- function(plot = NULL,
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
                     shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
-                    shiny::sliderInput("subtitle_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5),
                     shiny::uiOutput("subtitle_metrics")
                 ),
 
@@ -184,8 +182,7 @@ story_designer <- function(plot = NULL,
                         )
                     ),
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
-                    shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1),
-                    shiny::sliderInput("caption_wrap", "Wrap at chars (0=off)", min = 0, max = 100, value = 0, step = 5)
+                    shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
                 ),
 
                 bslib::accordion_panel(
@@ -234,9 +231,13 @@ story_designer <- function(plot = NULL,
                         choices = c("Minimal" = "minimal", "STWD" = "stwd", "Void" = "void")),
                     shiny::selectInput("plot_legend_pos", "Legend", width = "100%",
                         choices = c("Right" = "right", "Bottom" = "bottom",
-                                    "Top" = "top", "Left" = "left", "None" = "none")),
-                    shiny::hr(),
-                    shiny::tags$label("Color Palette", class = "form-label"),
+                                    "Top" = "top", "Left" = "left", "None" = "none"))
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-purple me-2", " "), "Color Palette"),
+                    value = "Color Palette",
+                    icon = shiny::icon("swatchbook"),
                     shiny::selectInput("palette_package", "Package", width = "100%",
                         choices = c("None" = "none",
                                     "ggsci (Scientific)" = "ggsci",
@@ -362,8 +363,8 @@ story_designer <- function(plot = NULL,
                     bslib::card(
                         bslib::card_header(class = "bg-light py-2", "Section Heights"),
                         bslib::card_body(
-                            shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.12, step = 0.01),
-                            shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.08, step = 0.01),
+                            shiny::sliderInput("title_height", "Title", min = 0.05, max = 0.40, value = 0.08, step = 0.01),
+                            shiny::sliderInput("subtitle_height", "Subtitle", min = 0.03, max = 0.20, value = 0.06, step = 0.01),
                             shiny::sliderInput("caption_height", "Caption", min = 0.02, max = 0.10, value = 0.05, step = 0.01)
                         )
                     ),
@@ -393,7 +394,8 @@ story_designer <- function(plot = NULL,
                             class = "d-flex align-items-center gap-2",
                             shiny::numericInput("title_lineheight", "Line height", value = 1.1, min = 0.8, max = 2, step = 0.1, width = "80%"),
                             bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 1.5 = 1.5x, 2.0 = double")
-                        )
+                        ),
+                        shiny::sliderInput("title_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5)
                     ),
                     # Subtitle settings
                     bslib::accordion_panel(
@@ -405,7 +407,8 @@ story_designer <- function(plot = NULL,
                             class = "d-flex align-items-center gap-2",
                             shiny::numericInput("subtitle_lineheight", "Line height", value = 1.2, min = 0.8, max = 2, step = 0.1, width = "80%"),
                             bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 1.5 = 1.5x, 2.0 = double")
-                        )
+                        ),
+                        shiny::sliderInput("subtitle_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5)
                     ),
                     # Narrative settings
                     bslib::accordion_panel(
@@ -436,7 +439,8 @@ story_designer <- function(plot = NULL,
                             class = "d-flex align-items-center gap-2",
                             shiny::textInput("caption_color", "Color", value = "#808080", width = "80%"),
                             bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "Hex (#808080) or name (gray)")
-                        )
+                        ),
+                        shiny::sliderInput("caption_wrap", "Wrap at chars (0=off)", min = 0, max = 100, value = 0, step = 5)
                     )
                 )
             ),
