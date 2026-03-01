@@ -1155,79 +1155,90 @@ story_designer <- function(plot = NULL,
             grid_major <- input$grid_major %||% "both"
             grid_minor <- input$grid_minor %||% "none"
 
-            # Build theme modifications
-            theme_mods <- ggplot2::theme(
-                axis.title.x = ggplot2::element_text(
-                    size = input$axis_title_x_size %||% 11,
-                    face = x_title_face,
-                    hjust = x_title_hjust,
-                    angle = x_title_angle,
-                    color = x_title_color,
-                    margin = ggplot2::margin(t = x_title_margin)
-                ),
-                axis.title.y = ggplot2::element_text(
-                    size = input$axis_title_y_size %||% 11,
-                    face = y_title_face,
-                    # When horizontal (angle=0), use vjust for vertical position; when vertical (angle=90), use hjust
-                    hjust = if (y_title_angle == 0) 0.5 else y_title_hjust,
-                    vjust = if (y_title_angle == 0) y_title_hjust else 0.5,
-                    angle = y_title_angle,
-                    color = y_title_color,
-                    margin = ggplot2::margin(r = y_title_margin)
-                ),
-                axis.text = ggplot2::element_text(
-                    size = text_size,
-                    color = text_color
-                ),
-                legend.position = input$plot_legend_pos %||% "right"
-            )
+            # Build theme modifications (skip axis styling for void theme)
+            current_theme <- input$plot_theme %||% "minimal"
+            is_void <- current_theme == "void"
 
-            # Axis line and ticks
-            axis_line_color <- input$axis_line_color %||% "#333333"
-            if (input$show_axis_line %||% FALSE) {
-                theme_mods <- theme_mods + ggplot2::theme(
-                    axis.line = ggplot2::element_line(color = axis_line_color)
-                )
-            }
-            if (input$show_ticks %||% FALSE) {
-                theme_mods <- theme_mods + ggplot2::theme(
-                    axis.ticks = ggplot2::element_line(color = axis_line_color)
+            if (is_void) {
+                # For void theme, only set legend position
+                theme_mods <- ggplot2::theme(
+                    legend.position = input$plot_legend_pos %||% "right"
                 )
             } else {
-                theme_mods <- theme_mods + ggplot2::theme(
-                    axis.ticks = ggplot2::element_blank()
+                theme_mods <- ggplot2::theme(
+                    axis.title.x = ggplot2::element_text(
+                        size = input$axis_title_x_size %||% 11,
+                        face = x_title_face,
+                        hjust = x_title_hjust,
+                        angle = x_title_angle,
+                        color = x_title_color,
+                        margin = ggplot2::margin(t = x_title_margin)
+                    ),
+                    axis.title.y = ggplot2::element_text(
+                        size = input$axis_title_y_size %||% 11,
+                        face = y_title_face,
+                        hjust = if (y_title_angle == 0) 0.5 else y_title_hjust,
+                        vjust = if (y_title_angle == 0) y_title_hjust else 0.5,
+                        angle = y_title_angle,
+                        color = y_title_color,
+                        margin = ggplot2::margin(r = y_title_margin)
+                    ),
+                    axis.text = ggplot2::element_text(
+                        size = text_size,
+                        color = text_color
+                    ),
+                    legend.position = input$plot_legend_pos %||% "right"
                 )
             }
 
-            # Grid lines - remove all overrides everything
-            if (input$grid_remove_all %||% FALSE) {
-                theme_mods <- theme_mods + ggplot2::theme(
-                    panel.grid.major = ggplot2::element_blank(),
-                    panel.grid.minor = ggplot2::element_blank()
-                )
-            } else {
-                # Major grid
-                major_h <- if (grid_major %in% c("both", "h")) {
-                    ggplot2::element_line(color = grid_color, linewidth = 0.5)
-                } else ggplot2::element_blank()
-                major_v <- if (grid_major %in% c("both", "v")) {
-                    ggplot2::element_line(color = grid_color, linewidth = 0.5)
-                } else ggplot2::element_blank()
+            # Axis line, ticks, and grid (skip for void theme)
+            if (!is_void) {
+                axis_line_color <- input$axis_line_color %||% "#333333"
+                if (input$show_axis_line %||% FALSE) {
+                    theme_mods <- theme_mods + ggplot2::theme(
+                        axis.line = ggplot2::element_line(color = axis_line_color)
+                    )
+                }
+                if (input$show_ticks %||% FALSE) {
+                    theme_mods <- theme_mods + ggplot2::theme(
+                        axis.ticks = ggplot2::element_line(color = axis_line_color)
+                    )
+                } else {
+                    theme_mods <- theme_mods + ggplot2::theme(
+                        axis.ticks = ggplot2::element_blank()
+                    )
+                }
 
-                # Minor grid
-                minor_h <- if (grid_minor %in% c("both", "h")) {
-                    ggplot2::element_line(color = grid_color, linewidth = 0.25)
-                } else ggplot2::element_blank()
-                minor_v <- if (grid_minor %in% c("both", "v")) {
-                    ggplot2::element_line(color = grid_color, linewidth = 0.25)
-                } else ggplot2::element_blank()
+                # Grid lines - remove all overrides everything
+                if (input$grid_remove_all %||% FALSE) {
+                    theme_mods <- theme_mods + ggplot2::theme(
+                        panel.grid.major = ggplot2::element_blank(),
+                        panel.grid.minor = ggplot2::element_blank()
+                    )
+                } else {
+                    # Major grid
+                    major_h <- if (grid_major %in% c("both", "h")) {
+                        ggplot2::element_line(color = grid_color, linewidth = 0.5)
+                    } else ggplot2::element_blank()
+                    major_v <- if (grid_major %in% c("both", "v")) {
+                        ggplot2::element_line(color = grid_color, linewidth = 0.5)
+                    } else ggplot2::element_blank()
 
-                theme_mods <- theme_mods + ggplot2::theme(
-                    panel.grid.major.y = major_h,
-                    panel.grid.major.x = major_v,
-                    panel.grid.minor.y = minor_h,
-                    panel.grid.minor.x = minor_v
-                )
+                    # Minor grid
+                    minor_h <- if (grid_minor %in% c("both", "h")) {
+                        ggplot2::element_line(color = grid_color, linewidth = 0.25)
+                    } else ggplot2::element_blank()
+                    minor_v <- if (grid_minor %in% c("both", "v")) {
+                        ggplot2::element_line(color = grid_color, linewidth = 0.25)
+                    } else ggplot2::element_blank()
+
+                    theme_mods <- theme_mods + ggplot2::theme(
+                        panel.grid.major.y = major_h,
+                        panel.grid.major.x = major_v,
+                        panel.grid.minor.y = minor_h,
+                        panel.grid.minor.x = minor_v
+                    )
+                }
             }
 
             # Apply color palette if selected (with error handling)
