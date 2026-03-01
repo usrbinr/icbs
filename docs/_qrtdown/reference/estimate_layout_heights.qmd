@@ -1,0 +1,60 @@
+---
+title: "estimate_layout_heights"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L897)
+
+# `estimate_layout_heights()`
+
+Estimate Layout Heights for Text
+
+## Usage
+
+```r
+estimate_layout_heights(
+  title = NULL,
+  subtitle = NULL,
+  narrative = NULL,
+  title_size = 16,
+  subtitle_size = 11,
+  narrative_size = 10,
+  caption = NULL,
+  narrative_width = 0.35,
+  output_width = 12
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `title` | Title text (or NULL). |
+| `subtitle` | Subtitle text (or NULL). |
+| `narrative` | Narrative text (or NULL). |
+| `title_size` | Title font size in pts. Default: 16. |
+| `subtitle_size` | Subtitle font size in pts. Default: 11. |
+| `narrative_size` | Narrative font size in pts. Default: 10. |
+| `caption` | Caption text (or NULL). |
+| `narrative_width` | Width proportion for narrative (affects line wrapping). Default: 0.35. |
+| `output_width` | Expected output width in inches. Default: 12. Larger widths mean fewer line wraps and smaller height requirements. |
+
+## Value
+
+A named list with recommended height proportions:
+
+- `title_height`: Proportion for title (0-1)
+
+- `subtitle_height`: Proportion for subtitle (0-1)
+
+- `caption_height`: Proportion for caption (0-1)
+
+- `content_height`: Remaining space for plot/narrative (0-1)
+
+- `narrative_width`: Echo of input (for convenience)
+
+## Description
+
+Estimates appropriate height proportions for title, subtitle, and narrative
+based on text length and font size. Use this to avoid text clipping.
+This is called automatically by `story_layout()` when `auto_heights = TRUE`.
+

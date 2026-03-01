@@ -1,0 +1,43 @@
+---
+title: "make_connector"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1790)
+
+# `make_connector()`
+
+Make a connector panel
+
+## Usage
+
+```r
+make_connector(
+  direction = "split",
+  sign = "+",
+  line_col = "black",
+  line_size = 0.5,
+  label_size = 10,
+  label_fill = "white"
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `direction` | character, either "split" (left-to-right branching) or "merge" (right-to-left converging). Default: "split". |
+| `sign` | character label to display at the center of the connector. Default: "+". |
+| `line_col` | color of the connector lines. Default: "black". |
+| `line_size` | linewidth of the connector lines. Default: 0.5. |
+| `label_size` | text size of the center label. Default: 10. |
+| `label_fill` | background fill of the center label. Default: "white". |
+
+## Value
+
+ggplot
+
+## Description
+
+Creates a standalone connector ggplot element for use in multi-panel layouts.
+Supports split (one-to-two) and merge (two-to-one) directions.
+

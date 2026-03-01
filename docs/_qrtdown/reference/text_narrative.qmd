@@ -1,0 +1,67 @@
+---
+title: "text_narrative"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L553)
+
+# `text_narrative()`
+
+Create a Text Narrative Block
+
+## Usage
+
+```r
+text_narrative(
+  text,
+  size = 4,
+  halign = "left",
+  valign = "top",
+  padding = 10,
+  lineheight = 1.4,
+  width = 1,
+  ...
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `text` | Character string with marquee-formatted text. Supports markdown: **bold**, *italic*, {#color text. |
+| `size` | Text size. Default: 4. |
+| `halign` | Horizontal alignment: "left", "center", or "right". Default: "left". |
+| `valign` | Vertical alignment: "top", "center", or "bottom". Default: "top". |
+| `padding` | Padding around text as a margin() object or numeric vector (top, right, bottom, left). Default: 10 on all sides. |
+| `lineheight` | Line height multiplier. Default: 1.4. |
+| `width` | Maximum width for text wrapping. Default: 1 (full width). |
+| `...` | Additional arguments passed to `marquee::geom_marquee()`. |
+
+## Value
+
+A ggplot object.
+
+## Description
+
+Creates a ggplot object containing formatted text, suitable for
+combining with charts via patchwork. Use for adding story context,
+callouts, or explanatory text alongside visualizations.
+
+## Examples
+
+```r
+## Not run: 
+library(marquee)
+library(patchwork)
+
+text_block <- text_narrative(
+    "**Key insight:** Sales in {#E63946 Q4} exceeded
+    expectations by 15%, driven primarily by
+    the {#2A9D8F new product line}.",
+    size = 4
+)
+
+my_chart + text_block + plot_layout(widths = c(0.6, 0.4))
+
+## End(Not run)
+```
+

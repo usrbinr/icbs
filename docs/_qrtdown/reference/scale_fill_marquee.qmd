@@ -1,0 +1,62 @@
+---
+title: "scale_fill_marquee"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1572)
+
+# `scale_fill_marquee()`
+
+Create a Fill Scale with Color-Matched Legend Text
+
+## Usage
+
+```r
+scale_fill_marquee(values, bold = FALSE, italic = FALSE, ...)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `values` | Named vector of fill colors (names = category levels). |
+| `bold` | Logical, make legend text bold. Default: FALSE. |
+| `italic` | Logical, make legend text italic. Default: FALSE. |
+| `...` | Additional arguments passed to `scale_fill_manual()`. |
+
+## Value
+
+A ggplot2 scale object.
+
+## Description
+
+Creates a `scale_fill_manual` where the legend text color matches
+the fill color of each category. Uses marquee for text rendering.
+
+## Examples
+
+```r
+## Not run: 
+library(ggplot2)
+library(marquee)
+
+df <- data.frame(
+    product = c("Apples", "Oranges", "Bananas", "Grapes"),
+    sales = c(120, 85, 95, 110)
+)
+
+fill_colors <- c(
+    "Apples" = "#E63946",
+    "Oranges" = "#F4A261",
+    "Bananas" = "#E9C46A",
+    "Grapes" = "#7B2D8E"
+)
+
+ggplot(df, aes(x = product, y = sales, fill = product)) +
+    geom_col() +
+    scale_fill_marquee(fill_colors, bold = TRUE) +
+    theme_minimal() +
+    theme(legend.text = marquee::element_marquee())
+
+## End(Not run)
+```
+

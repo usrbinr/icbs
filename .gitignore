@@ -24,3 +24,6 @@ reference/
 test.R
 _brand.yml
 _qrtdown-styles.css
+
+# qrtdown
+_qrtdown/

@@ -1,0 +1,47 @@
+---
+title: "marquee_title"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L292)
+
+# `marquee_title()`
+
+Create a Title with Embedded Colored Category Names
+
+## Usage
+
+```r
+marquee_title(template, colors, bold = TRUE)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `template` | A string with placeholders for categories. Use `{category_name` syntax for each category you want colored. |
+| `colors` | Named vector of colors (names = category levels). |
+| `bold` | Logical, make category names bold. Default: TRUE. |
+
+## Value
+
+A marquee-formatted string for use in `labs(title = ...)` or
+`labs(subtitle = ...)` with `theme(plot.title = element_marquee())`.
+
+## Description
+
+Builds a title string where category names are colored to match their
+fill colors. Useful for creating self-documenting titles that replace
+traditional legends.
+
+## Examples
+
+```r
+fill_colors <- c("Apples" = "#E63946", "Oranges" = "#F4A261")
+
+marquee_title(
+    "{Apples} outsold {Oranges} in Q4",
+    fill_colors
+)
+# Returns: "{#E63946 **Apples**} outsold {#F4A261 **Oranges**} in Q4"
+```
+

@@ -1,0 +1,47 @@
+---
+title: "marquee_color_labels"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L243)
+
+# `marquee_color_labels()`
+
+Format Labels with Matching Colors
+
+## Usage
+
+```r
+marquee_color_labels(labels, colors, bold = FALSE, italic = FALSE)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `labels` | Character vector of labels to format. |
+| `colors` | Character vector of colors (same length as labels). Can be hex codes (e.g., "#FF0000") or named colors (e.g., "red"). |
+| `bold` | Logical, make text bold. Default: FALSE. |
+| `italic` | Logical, make text italic. Default: FALSE. |
+
+## Value
+
+Character vector of marquee-formatted labels.
+
+## Description
+
+Creates marquee-formatted text labels where the text color matches
+a specified fill or color value. Use with `marquee::geom_marquee()`.
+
+## Examples
+
+```r
+labels <- c("Positive", "Negative")
+colors <- c("#006400", "#8B0000")
+marquee_color_labels(labels, colors)
+# Returns: c("{#006400 Positive}", "{#8B0000 Negative}")
+
+# With bold formatting:
+marquee_color_labels(labels, colors, bold = TRUE)
+# Returns: c("{#006400 **Positive**}", "{#8B0000 **Negative**}")
+```
+

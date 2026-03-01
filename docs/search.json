@@ -1,0 +1,394 @@
+[
+  {
+    "objectID": "NEWS.html#stwd-0.0.0.9000",
+    "href": "NEWS.html#stwd-0.0.0.9000",
+    "title": "stwd 3.1.0",
+    "section": "stwd 0.0.0.9000",
+    "text": "stwd 0.0.0.9000\n\nInitial development version\nAdded theme_ibcs() for IBCS-compliant ggplot2 theme\nAdded ibcs_colors() for standardized color palette\nAdded scenario notation scales: scale_fill_ibcs_scenario(), scale_color_ibcs_scenario()\nAdded variance visualization: ibcs_variance_chart(), scale_fill_ibcs_variance()\nAdded ibcs_waterfall() for waterfall charts\nAdded ibcs_bar_chart() for bar charts with scenario notation\nAdded multi-panel layout functions: one_to_split_to_two_layout(), two_to_merge_to_one_layout()\nAdded make_connector() for standalone connector elements\nAdded add_panel_labels() for patchwork plot labeling\nAdded marquee integration: marquee_color_labels(), geom_marquee_colored()"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html",
+    "href": "vignettes/articles/sitrep.html",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "",
+    "text": "When building complex story layouts with story_layout(), it can be difficult to understand how the various components fit together. The story_sitrep() function provides a “situation report” that shows you exactly what’s in your layout before you render it.\nThis is useful for:\n\nDebugging - Understanding why elements overlap or look wrong\nPlanning - Previewing layout proportions before committing\nDocumentation - Seeing all parameters at a glance"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#introduction",
+    "href": "vignettes/articles/sitrep.html#introduction",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "",
+    "text": "When building complex story layouts with story_layout(), it can be difficult to understand how the various components fit together. The story_sitrep() function provides a “situation report” that shows you exactly what’s in your layout before you render it.\nThis is useful for:\n\nDebugging - Understanding why elements overlap or look wrong\nPlanning - Previewing layout proportions before committing\nDocumentation - Seeing all parameters at a glance"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#basic-usage",
+    "href": "vignettes/articles/sitrep.html#basic-usage",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Basic Usage",
+    "text": "Basic Usage\nstory_sitrep() takes the same arguments as story_layout() and returns a diagnostic object:\n\nsitrep &lt;- story_sitrep(\n    title = \"My Report Title\",\n    subtitle = \"Supporting context here\",\n    narrative = \"Key insights and analysis\",\n    caption = \"Source: Data Team\"\n)\n\nsitrep\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• subtitle [text] (11pt)\n\n\n• narrative [text] (10pt)\n\n\n• caption [text] (9pt)\n\n\nNot included: \"plot\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"7%\"\n\n\n• Content height: \"73%\"\n\n\n• Caption height: \"5%\"\n\n\n• Narrative: \"right\" (\"35%\" width)\n\n\n• Plot width: \"65%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| SUBTITLE (7%)                                  |\n|------------------------------------------------|\n| NARRATIVE                                      |\n| (73%)                                          |\n|------------------------------------------------|\n| CAPTION (5%)                                   |\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\nThe output shows:\n\nComponents - Which elements are included, their type (text or ggplot), and size in points\nLayout Proportions - How much vertical space each element takes\nLayout Diagram - ASCII visualization of the structure\nTips - SWD-inspired suggestions for improvement"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#understanding-the-layout-diagram",
+    "href": "vignettes/articles/sitrep.html#understanding-the-layout-diagram",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Understanding the Layout Diagram",
+    "text": "Understanding the Layout Diagram\nThe ASCII diagram shows how your layout will be structured. When you have both a plot and narrative, the diagram shows their arrangement:\n\n# Create a placeholder plot for demonstration\np &lt;- ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +\n    geom_col() +\n    theme_minimal()\n\n# Layout with narrative on the RIGHT\nstory_sitrep(\n    plot = p,\n    title = \"Sales Analysis\",\n    narrative = \"Commentary here\",\n    narrative_position = \"right\"\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• plot [ggplot]\n\n\n• narrative [text] (10pt)\n\n\nNot included: \"subtitle\" and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n• Narrative: \"right\" (\"35%\" width)\n\n\n• Plot width: \"65%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| PLOT                          |NARRATIVE       |\n| 65%                           |35%             |\n|                               |                |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Including a source caption builds credibility with your audience\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\nCompare with narrative on the LEFT - notice how NARRATIVE and PLOT swap positions:\n\nstory_sitrep(\n    plot = p,\n    title = \"Sales Analysis\",\n    narrative = \"Commentary here\",\n    narrative_position = \"left\"\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• plot [ggplot]\n\n\n• narrative [text] (10pt)\n\n\nNot included: \"subtitle\" and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n• Narrative: \"left\" (\"35%\" width)\n\n\n• Plot width: \"65%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| NARRATIVE      |PLOT                           |\n| 35%            |65%                            |\n|                |                               |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Including a source caption builds credibility with your audience\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\nOr narrative at the BOTTOM (stacked vertically):\n\nstory_sitrep(\n    plot = p,\n    title = \"Sales Analysis\",\n    narrative = \"Commentary here\",\n    narrative_position = \"bottom\",\n    narrative_width = 0.2\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• plot [ggplot]\n\n\n• narrative [text] (10pt)\n\n\nNot included: \"subtitle\" and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n• Narrative: \"bottom\" (\"20%\" width)\n\n\n• Plot width: \"80%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| PLOT                                           |\n|                                                |\n|------------------------------------------------|\n| NARRATIVE (20% height)                           |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Including a source caption builds credibility with your audience\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#checking-proportions",
+    "href": "vignettes/articles/sitrep.html#checking-proportions",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Checking Proportions",
+    "text": "Checking Proportions\nThe sitrep helps you verify that your height allocations make sense:\n\n# Default proportions\nstory_sitrep(\n    title = \"Title\",\n    subtitle = \"Subtitle\",\n    caption = \"Caption\"\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• subtitle [text] (11pt)\n\n\n• caption [text] (9pt)\n\n\nNot included: \"plot\" and \"narrative\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"7%\"\n\n\n• Content height: \"73%\"\n\n\n• Caption height: \"5%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| SUBTITLE (7%)                                  |\n|------------------------------------------------|\n| CAPTION (5%)                                   |\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\nIf you have a long title that wraps to multiple lines, you may need more height:\n\n# Increased title height for wrapping text\nstory_sitrep(\n    title = \"This is a Very Long Title That Will Wrap to Multiple Lines\",\n    subtitle = \"Subtitle\",\n    title_height = 0.20\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• subtitle [text] (11pt)\n\n\nNot included: \"plot\", \"narrative\", and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"20%\"\n\n\n• Subtitle height: \"7%\"\n\n\n• Content height: \"73%\"\n\n\n• Caption height: \"0%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (20%)                                    |\n|------------------------------------------------|\n| SUBTITLE (7%)                                  |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#swd-inspired-tips",
+    "href": "vignettes/articles/sitrep.html#swd-inspired-tips",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "SWD-Inspired Tips",
+    "text": "SWD-Inspired Tips\nThe sitrep provides suggestions based on Storytelling with Data principles:\n\n# Small title - sitrep suggests larger for visual hierarchy\nstory_sitrep(\n    title = \"Small Title\",\n    title_size = 10\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (10pt)\n\n\nNot included: \"subtitle\", \"plot\", \"narrative\", and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\n\n# Plot without narrative - sitrep suggests adding context\nstory_sitrep(\n    plot = p,\n    title = \"Report\"\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• plot [ggplot]\n\n\nNot included: \"subtitle\", \"narrative\", and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| PLOT                                           |\n|                                                |\n| (85%)                                          |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ A narrative panel can explain the 'so what?' and guide your audience\n\n\nℹ Including a source caption builds credibility with your audience\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\n\n# Plot without source - sitrep suggests adding credibility\nstory_sitrep(\n    plot = p,\n    title = \"Report\",\n    narrative = \"Analysis\"\n)\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• plot [ggplot]\n\n\n• narrative [text] (10pt)\n\n\nNot included: \"subtitle\" and \"caption\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"0%\"\n\n\n• Content height: \"85%\"\n\n\n• Caption height: \"0%\"\n\n\n• Narrative: \"right\" (\"35%\" width)\n\n\n• Plot width: \"65%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| PLOT                          |NARRATIVE       |\n| 65%                           |35%             |\n|                               |                |\n|------------------------------------------------|\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ A subtitle can provide supporting context (time period, methodology, scope)\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Including a source caption builds credibility with your audience\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#workflow-sitrep-then-build",
+    "href": "vignettes/articles/sitrep.html#workflow-sitrep-then-build",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Workflow: Sitrep Then Build",
+    "text": "Workflow: Sitrep Then Build\nA recommended workflow is to check your sitrep before rendering:\n\n# Step 1: Check the sitrep\nmy_sitrep &lt;- story_sitrep(\n    title = \"**Q4 Results: {#E63946 Sales} Exceed Target**\",\n    subtitle = \"Regional performance summary\",\n    narrative = \"Key findings go here\",\n    narrative_position = \"right\",\n    narrative_width = 0.35,\n    caption = \"Source: Finance\"\n)\n\nmy_sitrep\n\n\n\n\n── Story Layout Sitrep ─────────────────────────────────────────────────────────\n\n\n\n\n\n── Components ──\n\n\n\n\n\n• title [text] (16pt)\n\n\n• subtitle [text] (11pt)\n\n\n• narrative [text] (10pt)\n\n\n• caption [text] (9pt)\n\n\nNot included: \"plot\"\n\n\n\n\n\n── Layout Proportions ──\n\n\n\n\n\n• Title height: \"15%\"\n\n\n• Subtitle height: \"7%\"\n\n\n• Content height: \"73%\"\n\n\n• Caption height: \"5%\"\n\n\n• Narrative: \"right\" (\"35%\" width)\n\n\n• Plot width: \"65%\"\n\n\n\n\n\n── Layout Diagram ──\n\n\n\n\n\n+------------------------------------------------+\n| TITLE (15%)                                    |\n|------------------------------------------------|\n| SUBTITLE (7%)                                  |\n|------------------------------------------------|\n| NARRATIVE                                      |\n| (73%)                                          |\n|------------------------------------------------|\n| CAPTION (5%)                                   |\n+------------------------------------------------+\n\n\n── Tips ──\n\n\nℹ Colored text in title should match corresponding chart elements for consistency\n\n\nℹ Use **bold** in narrative to emphasize key takeaways and action items\n\n\nℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\n\n\n\n# Step 2: If proportions look good, build the actual layout\ndf &lt;- data.frame(\n    region = c(\"North\", \"South\", \"East\", \"West\"),\n    sales = c(120, 95, 110, 85)\n)\n\np &lt;- ggplot(df, aes(x = reorder(region, sales), y = sales)) +\n    geom_col(fill = \"#E63946\") +\n    coord_flip() +\n    theme_minimal() +\n    labs(x = NULL, y = \"Sales ($M)\")\n\nstory_layout(\n    plot = p,\n    title = \"**Q4 Results: {#E63946 Sales} Exceed Target**\",\n    subtitle = \"Regional performance summary\",\n    narrative = \"**North region** led all markets\nwith $120M in sales.\n\nWest underperformed at $85M,\nrequiring attention in Q1.\",\n    narrative_position = \"right\",\n    narrative_width = 0.35,\n    caption = \"Source: Finance\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#accessing-sitrep-data-programmatically",
+    "href": "vignettes/articles/sitrep.html#accessing-sitrep-data-programmatically",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Accessing Sitrep Data Programmatically",
+    "text": "Accessing Sitrep Data Programmatically\nThe sitrep is an S7 object. You can access its properties directly:\n\nsitrep &lt;- story_sitrep(\n    title = \"Report\",\n    subtitle = \"Details\",\n    narrative = \"Analysis\"\n)\n\n# Access the components table\nsitrep@components\n\n  component present type size_pt\n1     title    TRUE text      16\n2  subtitle    TRUE text      11\n3      plot   FALSE &lt;NA&gt;      NA\n4 narrative    TRUE text      10\n5   caption   FALSE &lt;NA&gt;      NA\n\n# Access layout proportions\nsitrep@layout$content_height\n\n[1] 0.78\n\n# Check for tips\nsitrep@tips\n\n[1] \"Use **bold** in narrative to emphasize key takeaways and action items\"       \n[2] \"Use auto_heights=TRUE in story_layout() to automatically size title/subtitle\""
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#preventing-text-clipping-with-auto_heights",
+    "href": "vignettes/articles/sitrep.html#preventing-text-clipping-with-auto_heights",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Preventing Text Clipping with auto_heights",
+    "text": "Preventing Text Clipping with auto_heights\nA common issue is titles or subtitles getting clipped when they wrap to multiple lines. The auto_heights parameter (default TRUE) automatically calculates appropriate heights:\n\n# Long title that wraps - auto_heights handles it automatically\nstory_layout(\n    plot = p,\n    title = \"**{#E63946 10 warehouses} need immediate attention for error rates**\",\n    subtitle = \"What are the next steps at our highest volume sites?\",\n    caption = \"Source: Operations Dashboard\",\n    auto_heights = TRUE,  # Default - calculates heights from text length\n    output_width = 12     # Match your ggsave width for accurate estimates\n)\n\n\n\n\n\n\n\n\nFor manual control, set auto_heights = FALSE and specify heights explicitly:\n\nstory_layout(\n    plot = p,\n    title = \"Short title\",\n    auto_heights = FALSE,\n    title_height = 0.10,\n    subtitle_height = 0.06\n)\n\nBest practice: Keep titles under 60 characters. Concise, punchy titles are both easier to read AND less likely to have layout issues."
+  },
+  {
+    "objectID": "vignettes/articles/sitrep.html#summary",
+    "href": "vignettes/articles/sitrep.html#summary",
+    "title": "Debugging Layouts with story_sitrep()",
+    "section": "Summary",
+    "text": "Summary\n\n\n\nFunction\nPurpose\n\n\n\n\nstory_sitrep()\nPreview layout structure before rendering\n\n\n@components\nData frame of included elements\n\n\n@layout\nList of proportions and positions\n\n\n@diagram\nASCII visualization\n\n\n@tips\nSWD-inspired suggestions\n\n\n\nUse story_sitrep() to debug layouts, verify proportions, and get SWD-inspired suggestions before rendering."
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html",
+    "href": "vignettes/articles/layouts.html",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "",
+    "text": "The stwd package provides functions for creating multi-panel layouts with visual connectors that show relationships between charts. These are useful for showing:\n\nHow one dataset splits into subcategories\nHow multiple data sources merge into a combined view\nHierarchical or flow-based relationships"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#overview",
+    "href": "vignettes/articles/layouts.html#overview",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "",
+    "text": "The stwd package provides functions for creating multi-panel layouts with visual connectors that show relationships between charts. These are useful for showing:\n\nHow one dataset splits into subcategories\nHow multiple data sources merge into a combined view\nHierarchical or flow-based relationships"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#creating-connectors",
+    "href": "vignettes/articles/layouts.html#creating-connectors",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Creating Connectors",
+    "text": "Creating Connectors\n\nThe make_connector() Function\nThe make_connector() function creates a standalone connector element:\n\nmake_connector(direction = \"split\", sign = \"+\")\n\n\n\n\n\n\n\n\n\nmake_connector(direction = \"merge\", sign = \"+\")\n\n\n\n\n\n\n\n\n\n\nConnector Parameters\n\nmake_connector(\n    direction = \"split\",   # \"split\" or \"merge\"\n    sign = \"+\",            # Label in the center\n    line_col = \"black\",    # Line color\n    line_size = 0.5,       # Line width\n    label_size = 10,       # Text size\n    label_fill = \"white\"   # Label background\n)\n\n\n\nCustomizing Connectors\n\nmake_connector(\n    direction = \"split\",\n    sign = \"OR\",\n    line_col = \"steelblue\",\n    line_size = 1,\n    label_size = 8,\n    label_fill = \"lightblue\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#one-to-two-split-layout",
+    "href": "vignettes/articles/layouts.html#one-to-two-split-layout",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "One-to-Two Split Layout",
+    "text": "One-to-Two Split Layout\nUse one_to_split_to_two_layout() when one chart on the left should connect to two charts on the right (showing a breakdown or split):\n\n# Create example plots\n#  Define colors for examples\ncols &lt;- list(actual = \"#404040\", variance_positive = \"#006400\", variance_negative = \"#8B0000\", previous = \"#A0A0A0\")\n\n# Total sales (left panel)\ntotal_sales &lt;- data.frame(\n    quarter = c(\"Q1\", \"Q2\", \"Q3\", \"Q4\"),\n    sales = c(100, 120, 110, 130)\n)\n\nplot_total &lt;- ggplot(total_sales, aes(x = quarter, y = sales)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Total Sales\", y = \"Sales ($M)\") +\n    theme_minimal()\n\n# Online sales (top right)\nonline_sales &lt;- data.frame(\n    quarter = c(\"Q1\", \"Q2\", \"Q3\", \"Q4\"),\n    sales = c(60, 80, 75, 90)\n)\n\nplot_online &lt;- ggplot(online_sales, aes(x = quarter, y = sales)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Online Sales\", y = \"Sales ($M)\") +\n    theme_minimal()\n\n# Retail sales (bottom right)\nretail_sales &lt;- data.frame(\n    quarter = c(\"Q1\", \"Q2\", \"Q3\", \"Q4\"),\n    sales = c(40, 40, 35, 40)\n)\n\nplot_retail &lt;- ggplot(retail_sales, aes(x = quarter, y = sales)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Retail Sales\", y = \"Sales ($M)\") +\n    theme_minimal()\n\n# Combine with split layout\none_to_split_to_two_layout(\n    list(plot_total, plot_online, plot_retail),\n    first_level_sign = \"=\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#two-to-one-merge-layout",
+    "href": "vignettes/articles/layouts.html#two-to-one-merge-layout",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Two-to-One Merge Layout",
+    "text": "Two-to-One Merge Layout\nUse two_to_merge_to_one_layout() when two charts on the left should connect to one chart on the right (showing aggregation):\n\n# Product A (top left)\nproduct_a &lt;- data.frame(\n    month = c(\"Jan\", \"Feb\", \"Mar\"),\n    revenue = c(50, 55, 60)\n)\n\nplot_a &lt;- ggplot(product_a, aes(x = month, y = revenue)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Product A\", y = \"Revenue ($K)\") +\n    theme_minimal()\n\n# Product B (bottom left)\nproduct_b &lt;- data.frame(\n    month = c(\"Jan\", \"Feb\", \"Mar\"),\n    revenue = c(30, 35, 40)\n)\n\nplot_b &lt;- ggplot(product_b, aes(x = month, y = revenue)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Product B\", y = \"Revenue ($K)\") +\n    theme_minimal()\n\n# Combined (right)\ncombined &lt;- data.frame(\n    month = c(\"Jan\", \"Feb\", \"Mar\"),\n    revenue = c(80, 90, 100)\n)\n\nplot_combined &lt;- ggplot(combined, aes(x = month, y = revenue)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    labs(title = \"Total Revenue\", y = \"Revenue ($K)\") +\n    theme_minimal()\n\n# Combine with merge layout\ntwo_to_merge_to_one_layout(\n    list(plot_a, plot_b, plot_combined),\n    first_level_sign = \"+\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#adding-panel-labels",
+    "href": "vignettes/articles/layouts.html#adding-panel-labels",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Adding Panel Labels",
+    "text": "Adding Panel Labels\nUse add_panel_labels() to add letter labels (A, B, C) to multi-panel figures:\n\n# Create a simple multi-panel plot\np1 &lt;- ggplot(mtcars, aes(x = mpg)) +\n    geom_histogram(fill = cols$actual, bins = 10) +\n    labs(title = \"MPG Distribution\") +\n    theme_minimal()\n\np2 &lt;- ggplot(mtcars, aes(x = wt, y = mpg)) +\n    geom_point(color = cols$actual) +\n    labs(title = \"Weight vs MPG\") +\n    theme_minimal()\n\ncombined_plot &lt;- p1 + p2\n\n# Add labels\nadd_panel_labels(combined_plot)\n\n\n\n\n\n\n\n\n\nLabel Styles\n\n# Lowercase labels\nadd_panel_labels(combined_plot, style = \"lower\")\n\n\n\n\n\n\n\n\n\n# Custom labels\nadd_panel_labels(combined_plot, labels = c(\"Fig 1\", \"Fig 2\"))\n\n\n\n\n\n\n\n\n\n\nLabel Customization\n\nadd_panel_labels(\n    combined_plot,\n    style = \"upper\",\n    fontface = \"bold.italic\",\n    size = 16,\n    x = 0.05,\n    y = 0.95\n)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#building-custom-layouts",
+    "href": "vignettes/articles/layouts.html#building-custom-layouts",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Building Custom Layouts",
+    "text": "Building Custom Layouts\nYou can combine connectors with patchwork for custom layouts:\n\n# Create three related plots\nrevenue_plot &lt;- ggplot(data.frame(x = 1:4, y = c(100, 120, 115, 130)),\n                        aes(x = x, y = y)) +\n    geom_col(fill = cols$actual) +\n    labs(title = \"Revenue\") +\n    theme_minimal()\n\ncost_plot &lt;- ggplot(data.frame(x = 1:4, y = c(60, 70, 65, 75)),\n                     aes(x = x, y = y)) +\n    geom_col(fill = cols$actual) +\n    labs(title = \"Costs\") +\n    theme_minimal()\n\nprofit_plot &lt;- ggplot(data.frame(x = 1:4, y = c(40, 50, 50, 55)),\n                       aes(x = x, y = y)) +\n    geom_col(fill = cols$actual) +\n    labs(title = \"Profit\") +\n    theme_minimal()\n\n# Custom layout with connector\nlayout &lt;- \"\nAACBB\nAADBB\n\"\n\nconnector1 &lt;- make_connector(direction = \"split\", sign = \"-\")\n\nrevenue_plot + profit_plot + connector1 + cost_plot +\n    plot_layout(design = layout)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#practical-example-sales-breakdown",
+    "href": "vignettes/articles/layouts.html#practical-example-sales-breakdown",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Practical Example: Sales Breakdown",
+    "text": "Practical Example: Sales Breakdown\n\n# Regional breakdown example\ntotal_by_year &lt;- data.frame(\n    year = 2020:2024,\n    sales = c(800, 850, 900, 950, 1000)\n)\n\nnorth_by_year &lt;- data.frame(\n    year = 2020:2024,\n    sales = c(300, 320, 340, 360, 380)\n)\n\nsouth_by_year &lt;- data.frame(\n    year = 2020:2024,\n    sales = c(500, 530, 560, 590, 620)\n)\n\np_total &lt;- ggplot(total_by_year, aes(x = year, y = sales)) +\n    geom_line(color = cols$actual, linewidth = 1) +\n    geom_point(color = cols$actual, size = 3) +\n    labs(title = \"Total Company Sales\", y = \"Sales ($M)\", x = NULL) +\n    scale_y_continuous(limits = c(0, 1100)) +\n    theme_minimal()\n\np_north &lt;- ggplot(north_by_year, aes(x = year, y = sales)) +\n    geom_line(color = cols$actual, linewidth = 1) +\n    geom_point(color = cols$actual, size = 3) +\n    labs(title = \"North Region\", y = \"Sales ($M)\", x = NULL) +\n    scale_y_continuous(limits = c(0, 700)) +\n    theme_minimal()\n\np_south &lt;- ggplot(south_by_year, aes(x = year, y = sales)) +\n    geom_line(color = cols$actual, linewidth = 1) +\n    geom_point(color = cols$actual, size = 3) +\n    labs(title = \"South Region\", y = \"Sales ($M)\", x = NULL) +\n    scale_y_continuous(limits = c(0, 700)) +\n    theme_minimal()\n\none_to_split_to_two_layout(\n    list(p_total, p_north, p_south),\n    first_level_sign = \"=\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/layouts.html#best-practices",
+    "href": "vignettes/articles/layouts.html#best-practices",
+    "title": "Multi-Panel Layouts with Connectors",
+    "section": "Best Practices",
+    "text": "Best Practices\n\nUse connectors sparingly - Only when showing explicit relationships\nMatch scales when possible - Helps viewers compare across panels\nChoose meaningful signs - Use “+” for sums, “=” for breakdowns, “×” for products, etc.\nLabel panels - Use add_panel_labels() for reference in text\nKeep layouts simple - Complex layouts can confuse rather than clarify"
+  },
+  {
+    "objectID": "_qrtdown/citation.html",
+    "href": "_qrtdown/citation.html",
+    "title": "Citation",
+    "section": "",
+    "text": "To cite this package in publications, use:\n\nHagan A (2026). stwd: Storytelling with Data Visualizations for ggplot2. R package version 0.0.0.9000, https://codeberg.org/usrbinr/stwd.\n\n\n\n@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 0.0.0.9000},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+  },
+  {
+    "objectID": "_qrtdown/citation.html#bibtex-entry",
+    "href": "_qrtdown/citation.html#bibtex-entry",
+    "title": "Citation",
+    "section": "",
+    "text": "@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 0.0.0.9000},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+  },
+  {
+    "objectID": "_qrtdown/reference.html",
+    "href": "_qrtdown/reference.html",
+    "title": "Function reference",
+    "section": "",
+    "text": "All functions and classes exported by stwd."
+  },
+  {
+    "objectID": "_qrtdown/reference.html#functions",
+    "href": "_qrtdown/reference.html#functions",
+    "title": "Function reference",
+    "section": "Functions",
+    "text": "Functions\n\n\n\nFunction\nDescription\n\n\n\n\nadd_panel_labels()\nAdd panel labels to a patchwork plot\n\n\ncaption_block()\nCreate a Caption Block Plot\n\n\nestimate_layout_heights()\nEstimate Layout Heights for Text\n\n\ngeom_marquee_colored()\nCreate a Color-Matched Label Layer\n\n\nhighlight_colors()\nCreate a Highlight Color Palette\n\n\ninline_legend()\nCreate an Inline Legend Annotation\n\n\nmake_connector()\nMake a connector panel\n\n\nmarquee_color_labels()\nFormat Labels with Matching Colors\n\n\nmarquee_labels_from_colors()\nCreate Marquee-Formatted Labels from a Color Vector\n\n\nmarquee_title()\nCreate a Title with Embedded Colored Category Names\n\n\none_to_split_to_two_layout()\nmake a 1 split 2 plot\n\n\nscale_color_marquee()\nCreate a Color Scale with Color-Matched Legend Text\n\n\nscale_fill_marquee()\nCreate a Fill Scale with Color-Matched Legend Text\n\n\nstory_designer()\nInteractive Story Layout Designer\n\n\nstory_layout()\nCompose a Story Layout\n\n\nstory_sitrep()\nGet a Situation Report for a Story Layout\n\n\nstwd_color()\nColor Text with Marquee Syntax\n\n\nstwd_colors()\nList Available Color Names\n\n\nsubtitle_block()\nCreate a Subtitle Block Plot\n\n\ntext_narrative()\nCreate a Text Narrative Block\n\n\ntheme_marquee()\nApply Marquee Styling to Common Text Elements\n\n\ntheme_stwd()\nSTWD Theme for Storytelling\n\n\ntitle_block()\nCreate a Title Block Plot\n\n\ntitle_header()\nCreate a Large Title Block (Deprecated)\n\n\ntwo_to_merge_to_one_layout()\nMake a 2 merge to 1 plot"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "stwd",
+    "section": "",
+    "text": "Source Code\n\n\n\n\nMIT + file LICENSE\n\n\n\nCiting this package\n\n\n\n\nAlejandro Hagan (author, maintainer)"
+  },
+  {
+    "objectID": "index.html#description",
+    "href": "index.html#description",
+    "title": "stwd",
+    "section": "Description",
+    "text": "Description\nCreate presentation-ready visualizations following Storytelling with Data (‘SWD’) principles. Provides story layouts that combine charts with narrative text, colored titles, and supporting context. Includes an interactive Shiny app for designing layouts, strategic color highlighting, and integration with the marquee package for colored text labels."
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "stwd",
+    "section": "Installation",
+    "text": "Installation\n# Install from CRAN\ninstall.packages(\"stwd\")\n\n# Or install development version\n# pak::pkg_install(\"owner/stwd\")"
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "stwd",
+    "section": "Getting Started",
+    "text": "Getting Started\nSee the Get Started vignette for an introduction."
+  },
+  {
+    "objectID": "index.html#reference",
+    "href": "index.html#reference",
+    "title": "stwd",
+    "section": "Reference",
+    "text": "Reference\nSee the Reference for full function documentation."
+  },
+  {
+    "objectID": "_qrtdown/articles.html",
+    "href": "_qrtdown/articles.html",
+    "title": "Articles",
+    "section": "",
+    "text": "stwd Articles\nIn-depth guides and tutorials for using the package.\n\nIntroduction to stwd\nMulti-Panel Layouts with Connectors\nMarquee Integration for Colored Labels\nDebugging Layouts with story_sitrep()\nStorytelling with Data Layouts"
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html",
+    "href": "vignettes/articles/introduction.html",
+    "title": "Introduction to stwd",
+    "section": "",
+    "text": "The stwd package provides tools for creating presentation-ready visualizations following Storytelling with Data principles. It helps you build complete “story layouts” that combine charts with narrative text, colored titles, and supporting context."
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#what-is-stwd",
+    "href": "vignettes/articles/introduction.html#what-is-stwd",
+    "title": "Introduction to stwd",
+    "section": "",
+    "text": "The stwd package provides tools for creating presentation-ready visualizations following Storytelling with Data principles. It helps you build complete “story layouts” that combine charts with narrative text, colored titles, and supporting context."
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#key-features",
+    "href": "vignettes/articles/introduction.html#key-features",
+    "title": "Introduction to stwd",
+    "section": "Key Features",
+    "text": "Key Features\nThe package includes:\n\nStory Layouts - Combine charts with titles, subtitles, narratives, and captions\nStory Designer - Interactive Shiny app for designing layouts\nHighlight Colors - Strategic color use (gray out noise, highlight signal)\nMarquee Integration - Color-matched text in titles and labels\nMulti-Panel Layouts - Connectors for showing relationships between plots"
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#the-swd-approach",
+    "href": "vignettes/articles/introduction.html#the-swd-approach",
+    "title": "Introduction to stwd",
+    "section": "The SWD Approach",
+    "text": "The SWD Approach\nTraditional charts put the burden on the reader to interpret meaning. Storytelling with Data (SWD) charts guide the reader by:\n\nHighlighting what matters - Gray out the noise, color the signal\nEmbedding the legend in the title - No separate legend box needed\nAdding narrative context - Explain the “so what?” alongside the chart\nUsing a clear visual hierarchy - Big title, supporting chart, explanatory text"
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#quick-start",
+    "href": "vignettes/articles/introduction.html#quick-start",
+    "title": "Introduction to stwd",
+    "section": "Quick Start",
+    "text": "Quick Start\n\nCreate a Story Layout\n\n# Sample data\ndf &lt;- data.frame(\n    product = c(\"Apples\", \"Oranges\", \"Bananas\", \"Grapes\"),\n    sales = c(120, 85, 95, 110)\n)\n\n# Highlight only the winner\nfill_colors &lt;- highlight_colors(\n    df$product,\n    highlight = c(\"Apples\" = \"#E63946\")\n)\n\n# Create the base chart\np &lt;- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +\n    geom_col(width = 0.7) +\n    coord_flip() +\n    scale_fill_manual(values = fill_colors, guide = \"none\") +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +\n    theme_minimal() +\n    labs(x = NULL, y = \"Units Sold\")\n\n# Compose the full story\nstory_layout(\n    plot = p,\n    title = \"**Q4 Sales: {#E63946 Apples} Take the Lead**\",\n    subtitle = \"Fruit category performance, October-December 2024\",\n    narrative = \"**Key takeaway:**\n\n{#E63946 Apples} outsold all other fruits\nthis quarter, driven by seasonal demand\nand promotional pricing.\n\n**Recommendation:** Increase apple\ninventory for Q1.\",\n    caption = \"Source: Internal Sales Database\"\n)\n\n\n\n\n\n\n\n\n\n\nUse the Interactive Designer\nLaunch the Story Designer Shiny app to interactively design layouts:\nstory_designer()\nThe app lets you:\n\nAdjust text sizes and spacing\nPreview layouts at actual export size\nDetect text clipping issues\nGenerate code for your final layout"
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#learn-more",
+    "href": "vignettes/articles/introduction.html#learn-more",
+    "title": "Introduction to stwd",
+    "section": "Learn More",
+    "text": "Learn More\n\nStorytelling Layouts - Complete guide to story layouts\nMulti-Panel Layouts - Connecting related charts\nMarquee Integration - Colored text labels"
+  },
+  {
+    "objectID": "vignettes/articles/introduction.html#references",
+    "href": "vignettes/articles/introduction.html#references",
+    "title": "Introduction to stwd",
+    "section": "References",
+    "text": "References\n\nStorytelling with Data\nRecreating the SWD Look"
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html",
+    "href": "vignettes/articles/marquee.html",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "",
+    "text": "The marquee package provides rich text formatting for R graphics, including the ability to color text inline. The stwd package integrates with marquee to create labels where the text color automatically matches data values. ## Why Colored Labels?\nIn data visualizations, you often want labels to match their meaning:\n\nGreen text for positive variances\nRed text for negative variances\n\nThis creates visual consistency and immediate comprehension."
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#overview",
+    "href": "vignettes/articles/marquee.html#overview",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "",
+    "text": "The marquee package provides rich text formatting for R graphics, including the ability to color text inline. The stwd package integrates with marquee to create labels where the text color automatically matches data values. ## Why Colored Labels?\nIn data visualizations, you often want labels to match their meaning:\n\nGreen text for positive variances\nRed text for negative variances\n\nThis creates visual consistency and immediate comprehension."
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#the-marquee_color_labels-function",
+    "href": "vignettes/articles/marquee.html#the-marquee_color_labels-function",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "The marquee_color_labels() Function",
+    "text": "The marquee_color_labels() Function\nThis function formats text labels with marquee color syntax:\n\n# Basic usage\nlabels &lt;- c(\"Good\", \"Bad\", \"Neutral\")\ncolors &lt;- c(\"#006400\", \"#8B0000\", \"#404040\")\n\nmarquee_color_labels(labels, colors)\n\n[1] \"{#006400 Good}\"    \"{#8B0000 Bad}\"     \"{#404040 Neutral}\"\n\n\n\nWith Formatting Options\n\n# Bold labels\nmarquee_color_labels(labels, colors, bold = TRUE)\n\n[1] \"{#006400 **Good**}\"    \"{#8B0000 **Bad**}\"     \"{#404040 **Neutral**}\"\n\n\n\n# Italic labels\nmarquee_color_labels(labels, colors, italic = TRUE)\n\n[1] \"{#006400 *Good*}\"    \"{#8B0000 *Bad*}\"     \"{#404040 *Neutral*}\"\n\n\n\n# Bold and italic\nmarquee_color_labels(labels, colors, bold = TRUE, italic = TRUE)\n\n[1] \"{#006400 ***Good***}\"    \"{#8B0000 ***Bad***}\"    \n[3] \"{#404040 ***Neutral***}\""
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#using-with-ggplot2-and-marquee",
+    "href": "vignettes/articles/marquee.html#using-with-ggplot2-and-marquee",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "Using with ggplot2 and marquee",
+    "text": "Using with ggplot2 and marquee\n\nManual Approach\nYou can use marquee_color_labels() to pre-format your data, then use marquee::geom_marquee():\n\nlibrary(marquee)\n\n#  Define colors for examples\ncols &lt;- list(actual = \"#404040\", variance_positive = \"#006400\", variance_negative = \"#8B0000\", previous = \"#A0A0A0\")\n\n# Prepare data\nvariance_data &lt;- data.frame(\n    category = c(\"Product A\", \"Product B\", \"Product C\", \"Product D\"),\n    value = c(120, 85, 105, 95),\n    variance = c(20, -5, 5, -5)\n)\n\n# Determine colors based on variance\nvariance_data$text_color &lt;- ifelse(\n    variance_data$variance &gt;= 0,\n    cols$variance_positive,\n    cols$variance_negative\n)\n\n# Create formatted labels\nvariance_data$formatted_label &lt;- marquee_color_labels(\n    sprintf(\"%+d\", variance_data$variance),\n    variance_data$text_color,\n    bold = TRUE\n)\n\n# Plot with marquee\nggplot(variance_data, aes(x = category, y = value)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    geom_marquee(\n        aes(label = formatted_label),\n        vjust = -0.5,\n        size = 4\n    ) +\n    labs(title = \"Sales with Colored Variance Labels\") +\n    theme_minimal()\n\n\n\nUsing geom_marquee_colored()\nFor convenience, use geom_marquee_colored() which handles the formatting automatically:\n\nlibrary(marquee)\n\nvariance_data$label &lt;- sprintf(\"%+d\", variance_data$variance)\n\nggplot(variance_data, aes(x = category, y = value)) +\n    geom_col(fill = cols$actual, width = 0.6) +\n    geom_marquee_colored(\n        data = variance_data,\n        mapping = aes(x = category, y = value + 5, label = label, color = text_color),\n        bold = TRUE,\n        size = 4\n    ) +\n    labs(title = \"Sales with Auto-Colored Variance Labels\") +\n    theme_minimal()"
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#practical-examples",
+    "href": "vignettes/articles/marquee.html#practical-examples",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "Practical Examples",
+    "text": "Practical Examples\n\nVariance Chart with Colored Labels\n\nlibrary(marquee)\n\n#  Define colors for examples\ncols &lt;- list(actual = \"#404040\", variance_positive = \"#006400\", variance_negative = \"#8B0000\", previous = \"#A0A0A0\")\n\n# Sales performance data\nsales &lt;- data.frame(\n    region = c(\"North\", \"South\", \"East\", \"West\", \"Central\"),\n    actual = c(150, 120, 180, 95, 110),\n    plan = c(140, 130, 170, 100, 100)\n)\n\nsales$variance &lt;- sales$actual - sales$plan\nsales$variance_pct &lt;- round((sales$variance / sales$plan) * 100, 1)\nsales$var_color &lt;- ifelse(sales$variance &gt;= 0,\n                          cols$variance_positive,\n                          cols$variance_negative)\nsales$label &lt;- sprintf(\"%+.1f%%\", sales$variance_pct)\n\nggplot(sales, aes(x = reorder(region, variance))) +\n    # Reference bars (plan)\n    geom_col(aes(y = plan), fill = NA, color = cols$actual,\n             linewidth = 0.8, width = 0.6) +\n    # Actual bars\n    geom_col(aes(y = actual), fill = cols$actual, width = 0.4) +\n    # Colored variance labels\n    geom_marquee_colored(\n        data = sales,\n        mapping = aes(\n            x = reorder(region, variance),\n            y = actual + 8,\n            label = label,\n            color = var_color\n        ),\n        bold = TRUE,\n        size = 3.5\n    ) +\n    coord_flip() +\n    labs(\n        title = \"Regional Sales Performance vs Plan\",\n        x = NULL, y = \"Sales ($M)\"\n    ) +\n    theme_minimal()\n\n\n\nWaterfall with Colored Value Labels\n\nlibrary(marquee)\n\n#  Define colors for examples\ncols &lt;- list(actual = \"#404040\", variance_positive = \"#006400\", variance_negative = \"#8B0000\", previous = \"#A0A0A0\")\n\n# Bridge data\nbridge &lt;- data.frame(\n    driver = c(\"2023\", \"Volume\", \"Price\", \"Mix\", \"FX\", \"2024\"),\n    value = c(100, 15, 8, -5, -3, NA),\n    type = c(\"start\", \"positive\", \"positive\", \"negative\", \"negative\", \"end\")\n)\n\n# Calculate positions for waterfall\nbridge$running &lt;- cumsum(ifelse(is.na(bridge$value), 0, bridge$value))\nbridge$running[nrow(bridge)] &lt;- bridge$running[nrow(bridge) - 1]\nbridge$ymin &lt;- c(0, head(bridge$running, -1))\nbridge$ymax &lt;- bridge$running\nbridge$ymin[bridge$type %in% c(\"start\", \"end\")] &lt;- 0\n\n# Determine colors\nbridge$bar_fill &lt;- ifelse(\n    bridge$type %in% c(\"start\", \"end\"),\n    cols$actual,\n    cols$actual_light\n)\nbridge$label_color &lt;- ifelse(\n    bridge$type %in% c(\"start\", \"end\"),\n    \"white\",\n    ifelse(bridge$value &gt;= 0, cols$variance_positive, cols$variance_negative)\n)\n\n# Create labels\nbridge$label &lt;- ifelse(\n    bridge$type %in% c(\"start\", \"end\"),\n    sprintf(\"%.0f\", bridge$ymax),\n    sprintf(\"%+.0f\", bridge$value)\n)\n\nbridge$driver &lt;- factor(bridge$driver, levels = bridge$driver)\n\nggplot(bridge, aes(x = driver)) +\n    geom_rect(\n        aes(xmin = as.numeric(driver) - 0.4,\n            xmax = as.numeric(driver) + 0.4,\n            ymin = ymin, ymax = ymax),\n        fill = bridge$bar_fill,\n        color = cols$actual\n    ) +\n    geom_marquee_colored(\n        data = bridge,\n        mapping = aes(\n            x = driver,\n            y = (ymin + ymax) / 2,\n            label = label,\n            color = label_color\n        ),\n        bold = TRUE,\n        size = 4\n    ) +\n    labs(title = \"Revenue Bridge with Colored Labels\", x = NULL, y = \"Revenue ($M)\") +\n    theme_minimal()"
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#marquee-syntax-reference",
+    "href": "vignettes/articles/marquee.html#marquee-syntax-reference",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "Marquee Syntax Reference",
+    "text": "Marquee Syntax Reference\nThe marquee package uses a markdown-like syntax for formatting:\n\n\n\nSyntax\nResult\n\n\n\n\n{.red text}\nRed colored text\n\n\n{#FF0000 text}\nHex-colored text\n\n\n**text**\nBold text\n\n\n*text*\nItalic text\n\n\n***text***\nBold italic text\n\n\n{.red **text**}\nBold red text"
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#installation",
+    "href": "vignettes/articles/marquee.html#installation",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "Installation",
+    "text": "Installation\nIf marquee is not installed, install it from CRAN:\ninstall.packages(\"marquee\")"
+  },
+  {
+    "objectID": "vignettes/articles/marquee.html#best-practices",
+    "href": "vignettes/articles/marquee.html#best-practices",
+    "title": "Marquee Integration for Colored Labels",
+    "section": "Best Practices",
+    "text": "Best Practices\n\nUse sparingly - Colored text is powerful; don’t overuse it\nMatch semantics - Green for good, red for bad (in Western contexts)\nEnsure readability - Make sure colors have sufficient contrast\nConsider accessibility - Some users may have color vision deficiencies; use shape and position as additional indicators\nBe consistent - Use the same color meanings throughout your report"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html",
+    "href": "vignettes/articles/storytelling.html",
+    "title": "Storytelling with Data Layouts",
+    "section": "",
+    "text": "The stwd package includes functions inspired by Storytelling with Data principles for creating presentation-ready charts. These tools help you: - Combine charts with narrative text - Create self-documenting titles with colored category names - Use color strategically for emphasis - Build complete “story” layouts with one function call"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#overview",
+    "href": "vignettes/articles/storytelling.html#overview",
+    "title": "Storytelling with Data Layouts",
+    "section": "",
+    "text": "The stwd package includes functions inspired by Storytelling with Data principles for creating presentation-ready charts. These tools help you: - Combine charts with narrative text - Create self-documenting titles with colored category names - Use color strategically for emphasis - Build complete “story” layouts with one function call"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#the-swd-approach",
+    "href": "vignettes/articles/storytelling.html#the-swd-approach",
+    "title": "Storytelling with Data Layouts",
+    "section": "The SWD Approach",
+    "text": "The SWD Approach\nTraditional charts put the burden on the reader to interpret meaning. SWD-style charts guide the reader by:\n\nHighlighting what matters - Gray out the noise, color the signal\nEmbedding the legend in the title - No separate legend box needed\nAdding narrative context - Explain the “so what?” alongside the chart\nUsing a clear visual hierarchy - Big title, supporting chart, explanatory text"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#quick-start-story_layout",
+    "href": "vignettes/articles/storytelling.html#quick-start-story_layout",
+    "title": "Storytelling with Data Layouts",
+    "section": "Quick Start: story_layout()",
+    "text": "Quick Start: story_layout()\nThe story_layout() function combines all elements into a complete presentation-ready visualization. By default, titles are large and prominent (16pt), following the Storytelling with Data approach.\n\ndf &lt;- data.frame(\n    product = c(\"Apples\", \"Oranges\", \"Bananas\", \"Grapes\"),\n    sales = c(120, 85, 95, 110)\n)\n\n# Highlight only the winner\nfill_colors &lt;- highlight_colors(\n    df$product,\n    highlight = c(\"Apples\" = \"#E63946\")\n)\n\n# Create the base chart\np &lt;- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +\n    geom_col(width = 0.7) +\n    coord_flip() +\n    scale_fill_manual(values = fill_colors, guide = \"none\") +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +\n    theme_minimal() +\n    labs(x = NULL, y = \"Units Sold\")\n\n# Compose the full story - title is large by default (16pt)\nstory_layout(\n    plot = p,\n    title = \"**Q4 Sales: {#E63946 Apples} Take the Lead**\",\n    subtitle = \"Fruit category performance, October-December 2024\",\n    narrative = \"**Key takeaway:**\n\n{#E63946 Apples} outsold all other fruits\nthis quarter, driven by seasonal demand\nand promotional pricing.\n\nGrapes came in second at 110 units,\nwhile Oranges lagged at just 85.\n\n**Recommendation:** Increase apple\ninventory for Q1 to meet expected demand.\",\n    caption = \"Source: Internal Sales Database\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#building-blocks",
+    "href": "vignettes/articles/storytelling.html#building-blocks",
+    "title": "Storytelling with Data Layouts",
+    "section": "Building Blocks",
+    "text": "Building Blocks\n\nhighlight_colors(): Strategic Color Use\nInstead of coloring everything, highlight only what matters:\n\ncategories &lt;- c(\"A\", \"B\", \"C\", \"D\", \"E\")\n\n# Single highlight with default blue\nhighlight_colors(categories, \"C\")\n\n        A         B         C         D         E \n\"#D3D3D3\" \"#D3D3D3\" \"#1E90FF\" \"#D3D3D3\" \"#D3D3D3\" \n\n\n\n# Multiple highlights with custom colors\nhighlight_colors(\n    categories,\n    highlight = c(\"A\" = \"#E63946\", \"D\" = \"#2A9D8F\")\n)\n\n        A         B         C         D         E \n\"#E63946\" \"#D3D3D3\" \"#D3D3D3\" \"#2A9D8F\" \"#D3D3D3\" \n\n\n\n\nmarquee_title(): Self-Documenting Titles\nEmbed colored category names directly in your title:\n\nfill_colors &lt;- c(\n    \"Revenue\" = \"#2A9D8F\",\n    \"Costs\" = \"#E63946\",\n    \"Profit\" = \"#1E90FF\"\n)\n\nmarquee_title(\n    \"{Revenue} grew faster than {Costs}, boosting {Profit}\",\n    fill_colors\n)\n\n[1] \"{#2A9D8F **Revenue**} grew faster than {#E63946 **Costs**}, boosting {#1E90FF **Profit**}\"\n\n\nUse with theme_marquee() to render the colors:\n\ndf &lt;- data.frame(\n    metric = c(\"Revenue\", \"Costs\", \"Profit\"),\n    value = c(150, 100, 50)\n)\n\nfill_colors &lt;- c(\n    \"Revenue\" = \"#2A9D8F\",\n    \"Costs\" = \"#E76F51\",\n    \"Profit\" = \"#264653\"\n)\n\nggplot(df, aes(x = metric, y = value, fill = metric)) +\n    geom_col(width = 0.6) +\n    scale_fill_manual(values = fill_colors, guide = \"none\") +\n    labs(\n        title = marquee_title(\n            \"{Revenue} minus {Costs} equals {Profit}\",\n            fill_colors\n        ),\n        x = NULL, y = \"$ Millions\"\n    ) +\n    theme_minimal() +\n    theme_marquee()\n\n\n\n\n\n\n\n\n\n\ntext_narrative(): Standalone Text Blocks\nCreate text panels for use with patchwork:\n\ntext_narrative(\n    text = \"**Key insight:**\n\nThis quarter showed {#E63946 strong growth}\nin our core markets.\n\nAction items:\n- Expand capacity\n- Hire additional staff\",\n    size = 3.5\n)\n\n\n\n\n\n\n\n\n\n\nModular Block Functions\nEach component of a story layout is available as a standalone function, giving you full control over sizing, positioning, and styling.\n\ntitle_block(): Large Prominent Titles\n\ntitle_block(\n    \"**Quarterly Performance Review**\",\n    title_size = 18\n)\n\n\n\n\n\n\n\n\n\n\nsubtitle_block(): Supporting Context\n\nsubtitle_block(\n    \"{#2A9D8F Revenue} up 15% | {#E63946 Costs} down 3%\",\n    subtitle_size = 12\n)\n\n\n\n\n\n\n\n\n\n\ncaption_block(): Source Attribution\n\ncaption_block(\"Source: Finance Department | Q4 2024\")\n\n\n\n\n\n\n\n\n\n\nCombining Blocks Manually\nFor maximum control, combine blocks using patchwork:\n\ndf &lt;- data.frame(x = c(\"A\", \"B\", \"C\"), y = c(30, 50, 20))\n\nchart &lt;- ggplot(df, aes(x, y, fill = x)) +\n    geom_col() +\n    scale_fill_manual(values = c(A = \"#E63946\", B = \"#CCCCCC\", C = \"#CCCCCC\"),\n                      guide = \"none\") +\n    theme_minimal()\n\n# Stack components with custom heights\ntitle_block(\"**{#E63946 Category A} Leads the Pack**\", title_size = 18) /\nsubtitle_block(\"Year-over-year comparison by category\") /\nchart /\ncaption_block(\"Source: Internal Analytics\") +\n    plot_layout(heights = c(0.08, 0.05, 0.83, 0.04))"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#manual-composition-with-patchwork",
+    "href": "vignettes/articles/storytelling.html#manual-composition-with-patchwork",
+    "title": "Storytelling with Data Layouts",
+    "section": "Manual Composition with Patchwork",
+    "text": "Manual Composition with Patchwork\nFor full control, build layouts manually:\n\n# Data\ndf &lt;- data.frame(\n    quarter = c(\"Q1\", \"Q2\", \"Q3\", \"Q4\"),\n    sales = c(85, 92, 88, 120)\n)\n\n# Colors - highlight Q4\nfill_colors &lt;- highlight_colors(\n    df$quarter,\n    highlight = c(\"Q4\" = \"#E63946\")\n)\n\n# Main chart\nchart &lt;- ggplot(df, aes(x = quarter, y = sales, fill = quarter)) +\n    geom_col(width = 0.7) +\n    geom_hline(yintercept = 100, linetype = \"dashed\", color = \"#666666\") +\n    annotate(\"text\", x = 4.5, y = 102, label = \"Target\",\n             hjust = 1, size = 3, color = \"#666666\") +\n    scale_fill_manual(values = fill_colors, guide = \"none\") +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +\n    theme_minimal() +\n    labs(x = NULL, y = \"Sales (units)\")\n\n# Narrative panel\nnarrative &lt;- text_narrative(\n    text = \"**The {#E63946 Q4} breakthrough**\n\nAfter three quarters of hovering\naround 85-92 units, {#E63946 Q4}\nfinally broke through the 100-unit\ntarget with **120 units sold**.\n\nThis 30% jump was driven by:\n\n- Holiday promotions\n- New product launch\n- Expanded distribution\n\n**Next steps:** Maintain momentum\ninto Q1 with continued marketing.\",\n    size = 3.2,\n    valign = \"top\"\n)\n\n# Compose with patchwork\n(chart + narrative) +\n    plot_layout(widths = c(0.6, 0.4)) +\n    plot_annotation(\n        title = \"**Annual Sales Trend: {#E63946 Q4} Exceeds Target**\",\n        subtitle = \"Quarterly unit sales with 100-unit target line\",\n        caption = \"Source: Sales Database | Analysis: Product Team\",\n        theme = theme(\n            plot.title = element_marquee(size = 14),\n            plot.subtitle = element_marquee(size = 10),\n            plot.caption = element_marquee(size = 8)\n        )\n    )"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#colored-legend-text",
+    "href": "vignettes/articles/storytelling.html#colored-legend-text",
+    "title": "Storytelling with Data Layouts",
+    "section": "Colored Legend Text",
+    "text": "Colored Legend Text\nMatch legend text colors to bar fills using scale_fill_marquee():\n\ndf &lt;- data.frame(\n    category = c(\"Electronics\", \"Clothing\", \"Food\", \"Home\"),\n    sales = c(450, 320, 280, 190)\n)\n\nfill_colors &lt;- c(\n    \"Electronics\" = \"#264653\",\n    \"Clothing\" = \"#2A9D8F\",\n    \"Food\" = \"#E9C46A\",\n    \"Home\" = \"#E76F51\"\n)\n\nggplot(df, aes(x = reorder(category, sales), y = sales, fill = category)) +\n    geom_col(width = 0.7) +\n    coord_flip() +\n    scale_fill_marquee(fill_colors, bold = TRUE) +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +\n    theme_minimal() +\n    theme(legend.text = element_marquee()) +\n    labs(\n        title = \"Sales by Category\",\n        x = NULL, y = \"Revenue ($K)\", fill = NULL\n    )"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#adding-colored-labels-to-bars",
+    "href": "vignettes/articles/storytelling.html#adding-colored-labels-to-bars",
+    "title": "Storytelling with Data Layouts",
+    "section": "Adding Colored Labels to Bars",
+    "text": "Adding Colored Labels to Bars\nUse marquee_labels_from_colors() to create bar labels that match fills:\n\ndf &lt;- data.frame(\n    category = c(\"North\", \"South\", \"East\", \"West\"),\n    value = c(85, 120, 95, 110)\n)\n\nfill_colors &lt;- c(\n    \"North\" = \"#457B9D\",\n    \"South\" = \"#E63946\",\n    \"East\" = \"#2A9D8F\",\n    \"West\" = \"#F4A261\"\n)\n\n# Add formatted labels\ndf$bar_label &lt;- marquee_labels_from_colors(df$category, fill_colors, bold = TRUE)\n\nggplot(df, aes(x = category, y = value, fill = category)) +\n    geom_col(width = 0.7) +\n    geom_marquee(aes(label = bar_label, y = 5), size = 4) +\n    scale_fill_manual(values = fill_colors, guide = \"none\") +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +\n    theme_minimal() +\n    labs(title = \"Regional Performance\", x = NULL, y = \"Score\")"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#complete-example-executive-dashboard-panel",
+    "href": "vignettes/articles/storytelling.html#complete-example-executive-dashboard-panel",
+    "title": "Storytelling with Data Layouts",
+    "section": "Complete Example: Executive Dashboard Panel",
+    "text": "Complete Example: Executive Dashboard Panel\nPutting it all together for a board-ready visual:\n\n# Performance data\nperformance &lt;- data.frame(\n    region = c(\"North America\", \"Europe\", \"Asia Pacific\", \"Latin America\"),\n    actual = c(245, 180, 210, 85),\n    target = c(220, 190, 200, 100)\n)\n\nperformance$variance &lt;- performance$actual - performance$target\nperformance$var_pct &lt;- round(100 * performance$variance / performance$target, 1)\n\n# Highlight regions that beat target\nhighlights &lt;- setNames(\n    ifelse(performance$variance &gt;= 0, \"#2A9D8F\", \"#CCCCCC\"),\n    performance$region\n)\nhighlights[\"Asia Pacific\"] &lt;- \"#1E90FF\"  # Extra highlight for story\n\n# Chart\nchart &lt;- ggplot(\n    performance,\n    aes(x = reorder(region, actual), y = actual, fill = region)\n) +\n    geom_col(width = 0.7) +\n    geom_point(aes(y = target), shape = 4, size = 4, stroke = 1.5) +\n    coord_flip() +\n    scale_fill_manual(values = highlights, guide = \"none\") +\n    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +\n    theme_minimal() +\n    labs(x = NULL, y = \"Revenue ($M)\")\n\n# Compose\nstory_layout(\n    plot = chart,\n    title = \"**Regional Revenue: {#2A9D8F North America} and {#1E90FF Asia Pacific} Exceed Targets**\",\n    subtitle = \"FY2024 actual revenue vs. targets (X marks target)\",\n    narrative = \"**Executive Summary**\n\nTwo of four regions exceeded their\nannual revenue targets:\n\n{#2A9D8F **North America**}: +$25M (+11%)\nDriven by enterprise software deals\n\n{#1E90FF **Asia Pacific**}: +$10M (+5%)\nStrong growth in cloud services\n\n**Underperformers:**\n\nEurope missed by $10M due to\ncurrency headwinds.\n\nLatin America fell short by $15M;\nrestructuring plan underway.\n\n**FY2025 Outlook:** Cautiously\noptimistic with 8% growth target.\",\n    narrative_width = 0.38,\n    caption = \"Source: Finance | Prepared for Q4 Board Meeting\"\n)"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#tips-for-effective-storytelling-charts",
+    "href": "vignettes/articles/storytelling.html#tips-for-effective-storytelling-charts",
+    "title": "Storytelling with Data Layouts",
+    "section": "Tips for Effective Storytelling Charts",
+    "text": "Tips for Effective Storytelling Charts\n\nLead with the insight - Your title should state the conclusion, not just describe the data\nUse color sparingly - Gray is your friend; color only what matters\nIntegrate the legend - Embed category colors in titles or narrative text\nProvide context - The narrative panel explains “so what?” and “now what?”\nDesign for your audience - Executives want conclusions; analysts want details\nKeep text readable - Don’t shrink text to fit more in; simplify instead"
+  },
+  {
+    "objectID": "vignettes/articles/storytelling.html#function-reference",
+    "href": "vignettes/articles/storytelling.html#function-reference",
+    "title": "Storytelling with Data Layouts",
+    "section": "Function Reference",
+    "text": "Function Reference\n\n\n\nFunction\nPurpose\n\n\n\n\nstory_layout()\nOne-call complete story composition\n\n\ntitle_block()\nCreate large, prominent title plots (16pt default)\n\n\nsubtitle_block()\nCreate subtitle plots with context\n\n\ncaption_block()\nCreate caption/source plots\n\n\ntext_narrative()\nCreate standalone text blocks\n\n\nhighlight_colors()\nGray out non-essential categories\n\n\nmarquee_title()\nEmbed colored names in titles\n\n\nscale_fill_marquee()\nMatch legend text to fill colors\n\n\nmarquee_labels_from_colors()\nCreate colored bar labels\n\n\ntheme_marquee()\nEnable marquee for all text elements"
+  }
+]

@@ -1,0 +1,110 @@
+---
+title: "story_layout"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1353)
+
+# `story_layout()`
+
+Compose a Story Layout
+
+## Usage
+
+```r
+story_layout(
+  plot,
+  title = NULL,
+  subtitle = NULL,
+  narrative = NULL,
+  caption = NULL,
+  narrative_position = "right",
+  narrative_width = 0.35,
+  title_size = 16,
+  subtitle_size = 11,
+  narrative_size = 10,
+  caption_size = 9,
+  title_height = NULL,
+  subtitle_height = NULL,
+  caption_height = NULL,
+  auto_heights = TRUE,
+  output_width = 12
+)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `plot` | The main ggplot visualization. |
+| `title` | Optional title - either text (marquee-formatted) or a ggplot object created by `title_block()`. When text is provided, it's converted to a title_block with the specified title_size. |
+| `subtitle` | Optional subtitle - either text (marquee-formatted) or a ggplot object created by `subtitle_block()`. |
+| `narrative` | Optional narrative - either text (marquee-formatted) or a ggplot object created by `text_narrative()`. |
+| `caption` | Optional caption - either text or a ggplot object created by `caption_block()`. |
+| `narrative_position` | Position of narrative: "right", "left", "bottom". Default: "right". |
+| `narrative_width` | Width proportion for narrative (0-1). Default: 0.35. |
+| `title_size` | Size for title in pts. Default: 16 (large, prominent). |
+| `subtitle_size` | Size for subtitle in pts. Default: 11. |
+| `narrative_size` | Size for narrative text in pts. Default: 10. |
+| `caption_size` | Size for caption in pts. Default: 9. |
+| `title_height` | Height proportion for title row (0-1). When NULL and `auto_heights = TRUE`, this is calculated automatically based on text length. |
+| `subtitle_height` | Height proportion for subtitle row (0-1). When NULL and `auto_heights = TRUE`, this is calculated automatically. |
+| `caption_height` | Height proportion for caption row (0-1). When NULL and `auto_heights = TRUE`, this is calculated automatically. |
+| `auto_heights` | Logical. If TRUE (default), automatically calculates appropriate heights for title/subtitle/caption based on text length to prevent clipping. Set to FALSE to use fixed heights. |
+| `output_width` | Numeric. Expected output width in inches (default: 12). Used by auto_heights to estimate how many lines text will wrap to. |
+
+## Value
+
+A patchwork object.
+
+## Description
+
+Combines a chart with optional title, narrative text, and caption
+into a complete story layout using patchwork. Each component is a
+modular plot element, giving full control over sizing and positioning.
+
+## Details
+
+This function creates layouts inspired by
+[Storytelling with Data](https://www.storytellingwithdata.com/) principles,
+with large, prominent titles and supporting narrative text.
+
+## Examples
+
+```r
+## Not run: 
+library(ggplot2)
+library(marquee)
+
+p <- ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+    geom_col(fill = "#404040") +
+    theme_minimal()
+
+# Basic usage with text
+story_layout(
+    plot = p,
+    title = "**Fuel Efficiency by Cylinder Count**",
+    subtitle = "{#E63946 4-cylinder} cars lead in MPG",
+    narrative = "The data shows a clear trend:\n\n**Fewer cylinders = better mileage.**",
+    caption = "Source: Motor Trend, 1974"
+)
+
+# Full control with block functions
+story_layout(
+    plot = p,
+    title = title_block(
+        "**Fuel Efficiency by Cylinder Count**",
+        title_size = 20
+    ),
+    subtitle = subtitle_block(
+        "{#E63946 4-cylinder} cars lead in MPG",
+        subtitle_size = 12
+    ),
+    narrative = text_narrative(
+        "The data shows a clear trend:\n\n**Fewer cylinders = better mileage.**",
+        size = 11
+    )
+)
+
+## End(Not run)
+```
+
