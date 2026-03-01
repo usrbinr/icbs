@@ -202,11 +202,11 @@ story_designer <- function(plot = NULL,
                         shiny::selectInput("legend_halign", "Text alignment", width = "100%",
                             choices = c("Right" = "right", "Center" = "center", "Left" = "left")),
                         shiny::sliderInput("legend_size", "Font size", min = 8, max = 14, value = 10, step = 1),
+                        shiny::sliderInput("legend_wrap", "Wrap at chars (0=off)", min = 0, max = 20, value = 0, step = 1),
                         shiny::conditionalPanel(
                             condition = "input.legend_position == 'left' || input.legend_position == 'right'",
                             shiny::sliderInput("legend_width", "Legend width", min = 0.08, max = 0.25, value = 0.12, step = 0.02),
-                            shiny::sliderInput("legend_lineheight", "Line spacing", min = 1.0, max = 3.0, value = 1.6, step = 0.2),
-                            shiny::sliderInput("legend_wrap", "Wrap at chars", min = 0, max = 20, value = 0, step = 1)
+                            shiny::sliderInput("legend_lineheight", "Line spacing", min = 1.0, max = 3.0, value = 1.6, step = 0.2)
                         ),
                         shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
                         shiny::checkboxInput("legend_uppercase", "Uppercase", value = FALSE)
