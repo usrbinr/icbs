@@ -885,18 +885,13 @@ story_designer <- function(plot = NULL,
                     orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
                     # For vertical legends, align text to left/right based on position
                     h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
-                    # For side legends, use smaller font if user hasn't adjusted
-                    legend_size <- input$legend_size %||% 10
-                    if (orientation == "vertical" && legend_size > 8) {
-                        legend_size <- 8  # Auto-reduce for narrow columns
-                    }
                     legend_plot <- legend_block(
                         colors,
                         halign = h_align,
                         valign = "top",
                         orientation = orientation,
                         sep = input$legend_sep %||% " | ",
-                        size = legend_size,
+                        size = input$legend_size %||% 10,
                         bold = input$legend_bold %||% TRUE,
                         uppercase = input$legend_uppercase %||% FALSE,
                         lineheight = input$legend_lineheight %||% 1.6,
