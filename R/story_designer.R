@@ -222,7 +222,7 @@ story_designer <- function(plot = NULL,
                                     "Black & White" = "bw", "Light" = "light",
                                     "Dark" = "dark", "Gray" = "gray",
                                     "Linedraw" = "linedraw", "STWD" = "stwd", "Void" = "void")),
-                    shiny::selectInput("legend_position", "Legend", width = "100%",
+                    shiny::selectInput("plot_legend_pos", "Legend", width = "100%",
                         choices = c("Right" = "right", "Bottom" = "bottom",
                                     "Top" = "top", "Left" = "left", "None" = "none"))
                 ),
@@ -639,7 +639,7 @@ story_designer <- function(plot = NULL,
                     size = text_size,
                     color = text_color
                 ),
-                legend.position = input$legend_position %||% "right"
+                legend.position = input$plot_legend_pos %||% "right"
             )
 
             # Axis line and ticks
@@ -737,7 +737,7 @@ story_designer <- function(plot = NULL,
             shiny::updateTextInput(session, "caption_color", value = "#808080")
             # Plot settings
             shiny::updateSelectInput(session, "plot_theme", selected = "minimal")
-            shiny::updateSelectInput(session, "legend_position", selected = "right")
+            shiny::updateSelectInput(session, "plot_legend_pos", selected = "right")
             # X-Axis title
             shiny::updateSliderInput(session, "axis_title_x_size", value = 11)
             shiny::updateCheckboxInput(session, "axis_title_x_bold", value = FALSE)
@@ -1217,7 +1217,7 @@ story_designer <- function(plot = NULL,
                 '        ),\n',
                 '        axis.text = element_text(size = ', input$axis_text_size %||% 10,
                 ', color = "', input$axis_text_color %||% "#666666", '"),\n',
-                '        legend.position = "', input$legend_position %||% "right", '"', axis_line_code, grid_code, '\n',
+                '        legend.position = "', input$plot_legend_pos %||% "right", '"', axis_line_code, grid_code, '\n',
                 '    )\n\n',
                 'title_plot <- title_block(\n',
                 '    "', gsub('"', '\\"', input$title_text), '",\n',
