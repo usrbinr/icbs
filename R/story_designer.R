@@ -152,6 +152,74 @@ What should the audience do?",
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
                     shiny::helpText(class = "text-muted small mt-1", "Source attribution"),
                     shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Plot"),
+                    value = "Plot",
+                    icon = shiny::icon("chart-bar"),
+                    shiny::selectInput("plot_theme", "Theme", width = "100%",
+                        choices = c("Minimal" = "minimal", "Classic" = "classic",
+                                    "Black & White" = "bw", "Light" = "light",
+                                    "Dark" = "dark", "Gray" = "gray",
+                                    "Linedraw" = "linedraw", "STWD" = "stwd", "Void" = "void")),
+                    shiny::selectInput("legend_position", "Legend", width = "100%",
+                        choices = c("Right" = "right", "Bottom" = "bottom",
+                                    "Top" = "top", "Left" = "left", "None" = "none"))
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "X-Axis Label"),
+                    value = "X-Axis Label",
+                    icon = shiny::icon("arrows-left-right"),
+                    shiny::sliderInput("axis_title_x_size", "Size", min = 8, max = 16, value = 11, step = 1),
+                    shiny::checkboxInput("axis_title_x_bold", "Bold", value = FALSE),
+                    shiny::selectInput("axis_title_x_align", "Alignment", width = "100%",
+                        choices = c("Center" = "0.5", "Left" = "0", "Right" = "1")),
+                    shiny::selectInput("axis_title_x_angle", "Rotation", width = "100%",
+                        choices = c("Horizontal (0)" = "0", "Vertical (90)" = "90")),
+                    shiny::sliderInput("axis_title_x_margin", "Spacing from axis", min = 0, max = 20, value = 5, step = 1),
+                    shiny::textInput("axis_title_x_color", "Color", value = "#333333", width = "100%")
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Y-Axis Label"),
+                    value = "Y-Axis Label",
+                    icon = shiny::icon("arrows-up-down"),
+                    shiny::sliderInput("axis_title_y_size", "Size", min = 8, max = 16, value = 11, step = 1),
+                    shiny::checkboxInput("axis_title_y_bold", "Bold", value = FALSE),
+                    shiny::selectInput("axis_title_y_align", "Alignment", width = "100%",
+                        choices = c("Center" = "0.5", "Bottom" = "0", "Top" = "1")),
+                    shiny::selectInput("axis_title_y_angle", "Rotation", width = "100%",
+                        choices = c("Vertical (90)" = "90", "Horizontal (0)" = "0")),
+                    shiny::sliderInput("axis_title_y_margin", "Spacing from axis", min = 0, max = 20, value = 5, step = 1),
+                    shiny::textInput("axis_title_y_color", "Color", value = "#333333", width = "100%")
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Axis Text & Lines"),
+                    value = "Axis Text & Lines",
+                    icon = shiny::icon("font"),
+                    shiny::strong(class = "small", "Axis Text"),
+                    shiny::sliderInput("axis_text_size", "Size", min = 7, max = 14, value = 10, step = 1),
+                    shiny::textInput("axis_text_color", "Color", value = "#666666", width = "100%"),
+                    shiny::hr(class = "my-2"),
+                    shiny::strong(class = "small", "Axis Line & Ticks"),
+                    shiny::checkboxInput("show_axis_line", "Show axis line", value = FALSE),
+                    shiny::checkboxInput("show_ticks", "Show tick marks", value = FALSE),
+                    shiny::textInput("axis_line_color", "Line/tick color", value = "#333333", width = "100%")
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Grid Lines"),
+                    value = "Grid Lines",
+                    icon = shiny::icon("border-all"),
+                    shiny::checkboxInput("grid_remove_all", "Remove all grid lines", value = FALSE),
+                    shiny::selectInput("grid_major", "Major grid", width = "100%",
+                        choices = c("Both" = "both", "Horizontal only" = "h", "Vertical only" = "v", "None" = "none")),
+                    shiny::selectInput("grid_minor", "Minor grid", width = "100%",
+                        choices = c("None" = "none", "Both" = "both", "Horizontal only" = "h", "Vertical only" = "v")),
+                    shiny::textInput("grid_color", "Grid color", value = "#E5E5E5", width = "100%")
                 )
             ),
             # Reset button
@@ -405,6 +473,125 @@ What should the audience do?",
                  caption = input$caption_height %||% 0.05)
         })
 
+        # Apply plot theme and axis settings
+        styled_plot <- shiny::reactive({
+            p <- user_plot
+
+            # Get base theme
+            base_theme <- switch(input$plot_theme %||% "minimal",
+                "minimal" = ggplot2::theme_minimal(),
+                "classic" = ggplot2::theme_classic(),
+                "bw" = ggplot2::theme_bw(),
+                "light" = ggplot2::theme_light(),
+                "dark" = ggplot2::theme_dark(),
+                "gray" = ggplot2::theme_gray(),
+                "linedraw" = ggplot2::theme_linedraw(),
+                "stwd" = theme_stwd(),
+                "void" = ggplot2::theme_void(),
+                ggplot2::theme_minimal()
+            )
+
+            # X-Axis title styling
+            x_title_face <- if (input$axis_title_x_bold %||% FALSE) "bold" else "plain"
+            x_title_hjust <- as.numeric(input$axis_title_x_align %||% "0.5")
+            x_title_angle <- as.numeric(input$axis_title_x_angle %||% "0")
+            x_title_margin <- input$axis_title_x_margin %||% 5
+            x_title_color <- input$axis_title_x_color %||% "#333333"
+
+            # Y-Axis title styling
+            y_title_face <- if (input$axis_title_y_bold %||% FALSE) "bold" else "plain"
+            y_title_hjust <- as.numeric(input$axis_title_y_align %||% "0.5")
+            y_title_angle <- as.numeric(input$axis_title_y_angle %||% "90")
+            y_title_margin <- input$axis_title_y_margin %||% 5
+            y_title_color <- input$axis_title_y_color %||% "#333333"
+
+            # Axis text styling (just size and color)
+            text_color <- input$axis_text_color %||% "#666666"
+            text_size <- input$axis_text_size %||% 10
+
+            # Grid settings
+            grid_color <- input$grid_color %||% "#E5E5E5"
+            grid_major <- input$grid_major %||% "both"
+            grid_minor <- input$grid_minor %||% "none"
+
+            # Build theme modifications
+            theme_mods <- ggplot2::theme(
+                axis.title.x = ggplot2::element_text(
+                    size = input$axis_title_x_size %||% 11,
+                    face = x_title_face,
+                    hjust = x_title_hjust,
+                    angle = x_title_angle,
+                    color = x_title_color,
+                    margin = ggplot2::margin(t = x_title_margin)
+                ),
+                axis.title.y = ggplot2::element_text(
+                    size = input$axis_title_y_size %||% 11,
+                    face = y_title_face,
+                    # When horizontal (angle=0), use vjust for vertical position; when vertical (angle=90), use hjust
+                    hjust = if (y_title_angle == 0) 0.5 else y_title_hjust,
+                    vjust = if (y_title_angle == 0) y_title_hjust else 0.5,
+                    angle = y_title_angle,
+                    color = y_title_color,
+                    margin = ggplot2::margin(r = y_title_margin)
+                ),
+                axis.text = ggplot2::element_text(
+                    size = text_size,
+                    color = text_color
+                ),
+                legend.position = input$legend_position %||% "right"
+            )
+
+            # Axis line and ticks
+            axis_line_color <- input$axis_line_color %||% "#333333"
+            if (input$show_axis_line %||% FALSE) {
+                theme_mods <- theme_mods + ggplot2::theme(
+                    axis.line = ggplot2::element_line(color = axis_line_color)
+                )
+            }
+            if (input$show_ticks %||% FALSE) {
+                theme_mods <- theme_mods + ggplot2::theme(
+                    axis.ticks = ggplot2::element_line(color = axis_line_color)
+                )
+            } else {
+                theme_mods <- theme_mods + ggplot2::theme(
+                    axis.ticks = ggplot2::element_blank()
+                )
+            }
+
+            # Grid lines - remove all overrides everything
+            if (input$grid_remove_all %||% FALSE) {
+                theme_mods <- theme_mods + ggplot2::theme(
+                    panel.grid.major = ggplot2::element_blank(),
+                    panel.grid.minor = ggplot2::element_blank()
+                )
+            } else {
+                # Major grid
+                major_h <- if (grid_major %in% c("both", "h")) {
+                    ggplot2::element_line(color = grid_color, linewidth = 0.5)
+                } else ggplot2::element_blank()
+                major_v <- if (grid_major %in% c("both", "v")) {
+                    ggplot2::element_line(color = grid_color, linewidth = 0.5)
+                } else ggplot2::element_blank()
+
+                # Minor grid
+                minor_h <- if (grid_minor %in% c("both", "h")) {
+                    ggplot2::element_line(color = grid_color, linewidth = 0.25)
+                } else ggplot2::element_blank()
+                minor_v <- if (grid_minor %in% c("both", "v")) {
+                    ggplot2::element_line(color = grid_color, linewidth = 0.25)
+                } else ggplot2::element_blank()
+
+                theme_mods <- theme_mods + ggplot2::theme(
+                    panel.grid.major.y = major_h,
+                    panel.grid.major.x = major_v,
+                    panel.grid.minor.y = minor_h,
+                    panel.grid.minor.x = minor_v
+                )
+            }
+
+            p + base_theme + theme_mods
+        })
+
         # Dimensions label
         output$dimensions_label <- shiny::renderText({
             paste0(input$output_width, '" x ', input$output_height, '"')
@@ -447,6 +634,36 @@ What should the audience do?",
             shiny::updateNumericInput(session, "narrative_lineheight", value = 1.4)
             shiny::updateNumericInput(session, "narrative_padding", value = 10)
             shiny::updateTextInput(session, "caption_color", value = "#808080")
+            # Plot settings
+            shiny::updateSelectInput(session, "plot_theme", selected = "minimal")
+            shiny::updateSelectInput(session, "legend_position", selected = "right")
+            # X-Axis title
+            shiny::updateSliderInput(session, "axis_title_x_size", value = 11)
+            shiny::updateCheckboxInput(session, "axis_title_x_bold", value = FALSE)
+            shiny::updateSelectInput(session, "axis_title_x_align", selected = "0.5")
+            shiny::updateSelectInput(session, "axis_title_x_angle", selected = "0")
+            shiny::updateSliderInput(session, "axis_title_x_margin", value = 5)
+            shiny::updateTextInput(session, "axis_title_x_color", value = "#333333")
+            # Y-Axis title
+            shiny::updateSliderInput(session, "axis_title_y_size", value = 11)
+            shiny::updateCheckboxInput(session, "axis_title_y_bold", value = FALSE)
+            shiny::updateSelectInput(session, "axis_title_y_align", selected = "0.5")
+            shiny::updateSelectInput(session, "axis_title_y_angle", selected = "90")
+            shiny::updateSliderInput(session, "axis_title_y_margin", value = 5)
+            shiny::updateTextInput(session, "axis_title_y_color", value = "#333333")
+            # Axis text & lines
+            shiny::updateSliderInput(session, "axis_text_size", value = 10)
+            shiny::updateTextInput(session, "axis_text_color", value = "#666666")
+            shiny::updateCheckboxInput(session, "show_axis_line", value = FALSE)
+            shiny::updateCheckboxInput(session, "show_ticks", value = FALSE)
+            shiny::updateTextInput(session, "axis_line_color", value = "#333333")
+            shiny::updateSelectInput(session, "axis_text_x_angle", selected = "0")
+            shiny::updateSelectInput(session, "axis_text_y_angle", selected = "0")
+            # Grid
+            shiny::updateCheckboxInput(session, "grid_remove_all", value = FALSE)
+            shiny::updateSelectInput(session, "grid_major", selected = "both")
+            shiny::updateSelectInput(session, "grid_minor", selected = "none")
+            shiny::updateTextInput(session, "grid_color", value = "#E5E5E5")
         })
 
         # Preview with correct aspect ratio
@@ -561,7 +778,7 @@ What should the audience do?",
             )
 
             # Build content area (plot + narrative)
-            content <- user_plot
+            content <- styled_plot()
             plot_width <- 1 - input$narrative_width
             caption_under_chart <- (input$caption_position %||% "full_left") == "under_chart"
 
@@ -571,7 +788,7 @@ What should the audience do?",
             if (caption_under_chart && input$narrative_position %in% c("left", "right")) {
                 # Caption only under chart, not full width
                 # Nest caption with chart before combining with narrative
-                chart_with_caption <- user_plot / caption_plot +
+                chart_with_caption <- styled_plot() / caption_plot +
                     patchwork::plot_layout(heights = c(1 - h$caption / content_height, h$caption / content_height))
 
                 if (input$narrative_position == "right") {
@@ -731,7 +948,7 @@ What should the audience do?",
 
         # Component previews - with named color conversion
         output$preview_chart <- shiny::renderPlot({
-            user_plot
+            styled_plot()
         }, res = 96, bg = "white")
 
         output$preview_title <- shiny::renderPlot({
@@ -765,10 +982,96 @@ What should the audience do?",
             caption_halign <- switch(input$caption_position %||% "full_left",
                 "full_left" = "left", "full_center" = "center", "full_right" = "right", "under_chart" = "left", "left")
 
+            # Build plot theme code
+            theme_name <- input$plot_theme %||% "minimal"
+            theme_fn <- switch(theme_name,
+                "minimal" = "theme_minimal()",
+                "classic" = "theme_classic()",
+                "bw" = "theme_bw()",
+                "light" = "theme_light()",
+                "dark" = "theme_dark()",
+                "gray" = "theme_gray()",
+                "linedraw" = "theme_linedraw()",
+                "stwd" = "theme_stwd()",
+                "void" = "theme_void()",
+                "theme_minimal()"
+            )
+            # X-Axis title
+            x_title_face <- if (input$axis_title_x_bold %||% FALSE) "bold" else "plain"
+            x_title_angle <- input$axis_title_x_angle %||% "0"
+            x_title_margin <- input$axis_title_x_margin %||% 5
+            # Y-Axis title
+            y_title_face <- if (input$axis_title_y_bold %||% FALSE) "bold" else "plain"
+            y_title_angle <- input$axis_title_y_angle %||% "90"
+            y_title_margin <- input$axis_title_y_margin %||% 5
+            # Axis line and ticks code
+            axis_line_code <- ""
+            if (input$show_axis_line %||% FALSE) {
+                axis_line_code <- paste0(axis_line_code, ',\n        axis.line = element_line(color = "', input$axis_line_color %||% "#333333", '")')
+            }
+            if (input$show_ticks %||% FALSE) {
+                axis_line_code <- paste0(axis_line_code, ',\n        axis.ticks = element_line(color = "', input$axis_line_color %||% "#333333", '")')
+            } else {
+                axis_line_code <- paste0(axis_line_code, ',\n        axis.ticks = element_blank()')
+            }
+
+            # Grid code
+            grid_code <- if (input$grid_remove_all %||% FALSE) {
+                ',\n        panel.grid.major = element_blank(),\n        panel.grid.minor = element_blank()'
+            } else {
+                grid_major <- input$grid_major %||% "both"
+                grid_minor <- input$grid_minor %||% "none"
+                grid_color <- input$grid_color %||% "#E5E5E5"
+                grid_lines <- c()
+                # Major
+                if (grid_major == "none") {
+                    grid_lines <- c(grid_lines, 'panel.grid.major = element_blank()')
+                } else if (grid_major == "h") {
+                    grid_lines <- c(grid_lines, paste0('panel.grid.major.y = element_line(color = "', grid_color, '")'),
+                                    'panel.grid.major.x = element_blank()')
+                } else if (grid_major == "v") {
+                    grid_lines <- c(grid_lines, 'panel.grid.major.y = element_blank()',
+                                    paste0('panel.grid.major.x = element_line(color = "', grid_color, '")'))
+                }
+                # Minor
+                if (grid_minor == "none") {
+                    grid_lines <- c(grid_lines, 'panel.grid.minor = element_blank()')
+                } else if (grid_minor == "h") {
+                    grid_lines <- c(grid_lines, paste0('panel.grid.minor.y = element_line(color = "', grid_color, '")'),
+                                    'panel.grid.minor.x = element_blank()')
+                } else if (grid_minor == "v") {
+                    grid_lines <- c(grid_lines, 'panel.grid.minor.y = element_blank()',
+                                    paste0('panel.grid.minor.x = element_line(color = "', grid_color, '")'))
+                } else if (grid_minor == "both") {
+                    grid_lines <- c(grid_lines, paste0('panel.grid.minor = element_line(color = "', grid_color, '")'))
+                }
+                if (length(grid_lines) > 0) paste0(',\n        ', paste(grid_lines, collapse = ',\n        ')) else ""
+            }
+
             # Always show patchwork code so users can see all settings
             paste0(
                 'library(patchwork)\n',
                 '# Add ... args to pass extra options to marquee (e.g., family = "Arial")\n\n',
+                '# Style the plot\n',
+                'styled_plot <- my_plot +\n',
+                '    ', theme_fn, ' +\n',
+                '    theme(\n',
+                '        axis.title.x = element_text(\n',
+                '            size = ', input$axis_title_x_size %||% 11, ', face = "', x_title_face, '",\n',
+                '            hjust = ', input$axis_title_x_align %||% "0.5", ', angle = ', x_title_angle, ',\n',
+                '            color = "', input$axis_title_x_color %||% "#333333", '",\n',
+                '            margin = margin(t = ', x_title_margin, ')\n',
+                '        ),\n',
+                '        axis.title.y = element_text(\n',
+                '            size = ', input$axis_title_y_size %||% 11, ', face = "', y_title_face, '",\n',
+                '            hjust = ', input$axis_title_y_align %||% "0.5", ', angle = ', y_title_angle, ',\n',
+                '            color = "', input$axis_title_y_color %||% "#333333", '",\n',
+                '            margin = margin(r = ', y_title_margin, ')\n',
+                '        ),\n',
+                '        axis.text = element_text(size = ', input$axis_text_size %||% 10,
+                ', color = "', input$axis_text_color %||% "#666666", '"),\n',
+                '        legend.position = "', input$legend_position %||% "right", '"', axis_line_code, grid_code, '\n',
+                '    )\n\n',
                 'title_plot <- title_block(\n',
                 '    "', gsub('"', '\\"', input$title_text), '",\n',
                 '    title_size = ', input$title_size, ',\n',
@@ -797,8 +1100,8 @@ What should the audience do?",
                 '    halign = "', caption_halign, '",\n',
                 '    color = "', input$caption_color %||% "#808080", '"\n',
                 ')\n\n',
-                '# Combine plot + narrative\n',
-                'content <- my_plot + narrative_plot +\n',
+                '# Combine styled plot + narrative\n',
+                'content <- styled_plot + narrative_plot +\n',
                 '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
                 '# Stack everything\n',
                 'final <- title_plot / subtitle_plot / content / caption_plot +\n',
