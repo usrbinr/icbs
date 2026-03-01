@@ -160,11 +160,7 @@ story_designer <- function(plot = NULL,
                         shiny::textInput("legend_labels", "Categories (comma-separated)",
                                          value = "Category A, Category B, Category C", width = "100%"),
                         shiny::helpText(class = "text-muted small mt-1", "Colors for each category:"),
-                        shiny::fluidRow(
-                            shiny::column(4, shiny::textInput("legend_color_1", "Color 1", value = "#808080", width = "100%")),
-                            shiny::column(4, shiny::textInput("legend_color_2", "Color 2", value = "#B0B0B0", width = "100%")),
-                            shiny::column(4, shiny::textInput("legend_color_3", "Color 3", value = "#E69F00", width = "100%"))
-                        ),
+                        shiny::uiOutput("legend_color_inputs"),
                         shiny::selectInput("legend_sep", "Separator", width = "100%",
                             choices = c("Pipe ( | )" = " | ", "Bullet" = " \u2022 ",
                                         "Dash ( - )" = " - ", "None" = "  ")),
@@ -450,6 +446,34 @@ story_designer <- function(plot = NULL,
             }
             result
         }
+
+        # Default color palette for legend
+        default_colors <- c("#808080", "#B0B0B0", "#E69F00", "#56B4E9", "#009E73",
+                            "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
+
+        # Dynamic color inputs based on number of categories
+        output$legend_color_inputs <- shiny::renderUI({
+            labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
+            labels <- labels[labels != ""]
+            n <- length(labels)
+            if (n == 0) return(NULL)
+
+            # Create a color input for each label
+            color_inputs <- lapply(seq_len(n), function(i) {
+                input_id <- paste0("legend_color_", i)
+                # Get existing value or use default
+                current_val <- input[[input_id]]
+                default_val <- if (is.null(current_val)) default_colors[((i - 1) %% length(default_colors)) + 1] else current_val
+                shiny::div(
+                    class = "mb-2",
+                    shiny::fluidRow(
+                        shiny::column(6, shiny::tags$small(labels[i])),
+                        shiny::column(6, shiny::textInput(input_id, NULL, value = default_val, width = "100%"))
+                    )
+                )
+            })
+            shiny::tagList(color_inputs)
+        })
 
         # Calculate text metrics - simplified for better defaults
         calc_text_metrics <- function(text, font_size, output_width, is_narrative = FALSE) {
@@ -789,21 +813,14 @@ story_designer <- function(plot = NULL,
             legend_plot <- NULL
             if (input$legend_enabled %||% FALSE) {
                 # Parse comma-separated labels
-                labels <- trimws(strsplit(input$legend_labels %||% "A, B, C", ",")[[1]])
-                # Get colors for each label (up to 3)
-                colors <- c(
-                    input$legend_color_1 %||% "#808080",
-                    input$legend_color_2 %||% "#B0B0B0",
-                    input$legend_color_3 %||% "#E69F00"
-                )
-                # Match colors to labels
+                labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
+                labels <- labels[labels != ""]
                 n_labels <- length(labels)
                 if (n_labels > 0) {
-                    colors <- colors[seq_len(min(n_labels, 3))]
-                    if (n_labels > 3) {
-                        # Recycle colors if more than 3 labels
-                        colors <- rep(colors, length.out = n_labels)
-                    }
+                    # Get color for each label from dynamic inputs
+                    colors <- sapply(seq_len(n_labels), function(i) {
+                        input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
+                    })
                     names(colors) <- labels
                     legend_plot <- legend_block(
                         colors,
@@ -1167,21 +1184,25 @@ story_designer <- function(plot = NULL,
                 ')\n\n',
                 # Legend code if enabled
                 if (input$legend_enabled %||% FALSE) {
-                    labels <- trimws(strsplit(input$legend_labels %||% "A, B, C", ",")[[1]])
-                    colors <- c(input$legend_color_1 %||% "#808080",
-                                input$legend_color_2 %||% "#B0B0B0",
-                                input$legend_color_3 %||% "#E69F00")[seq_len(min(length(labels), 3))]
-                    color_vec <- paste0('c(', paste0('"', labels, '" = "', colors, '"', collapse = ', '), ')')
-                    paste0(
-                        'legend_plot <- legend_block(\n',
-                        '    ', color_vec, ',\n',
-                        '    halign = "', input$legend_halign %||% "right", '",\n',
-                        '    sep = "', input$legend_sep %||% " | ", '",\n',
-                        '    size = ', input$legend_size %||% 10, ',\n',
-                        '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
-                        '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE", '\n',
-                        ')\n\n'
-                    )
+                    labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
+                    labels <- labels[labels != ""]
+                    n_labels <- length(labels)
+                    if (n_labels > 0) {
+                        colors <- sapply(seq_len(n_labels), function(i) {
+                            input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
+                        })
+                        color_vec <- paste0('c(', paste0('"', labels, '" = "', colors, '"', collapse = ', '), ')')
+                        paste0(
+                            'legend_plot <- legend_block(\n',
+                            '    ', color_vec, ',\n',
+                            '    halign = "', input$legend_halign %||% "right", '",\n',
+                            '    sep = "', input$legend_sep %||% " | ", '",\n',
+                            '    size = ', input$legend_size %||% 10, ',\n',
+                            '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
+                            '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE", '\n',
+                            ')\n\n'
+                        )
+                    } else ""
                 } else "",
                 '# Combine styled plot + narrative\n',
                 'content <- styled_plot + narrative_plot +\n',
