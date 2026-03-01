@@ -20,3 +20,4 @@
 ^Rplots\.pdf$
 ^_brand\.yml$
 ^test\.R$
+^_qrtdown-styles\.css$
