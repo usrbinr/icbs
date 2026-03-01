@@ -238,9 +238,16 @@ story_designer <- function(plot = NULL,
                     shiny::hr(),
                     shiny::tags$label("Color Palette", class = "form-label"),
                     shiny::selectInput("palette_package", "Package", width = "100%",
-                        choices = c("None" = "none", "MetBrewer" = "MetBrewer",
-                                    "PNWColors" = "PNWColors", "RColorBrewer" = "RColorBrewer",
-                                    "viridis" = "viridis")),
+                        choices = c("None" = "none",
+                                    "ggsci (Scientific)" = "ggsci",
+                                    "MetBrewer (Art)" = "MetBrewer",
+                                    "nord (Arctic)" = "nord",
+                                    "PNWColors (Pacific NW)" = "PNWColors",
+                                    "rcartocolor (Carto)" = "rcartocolor",
+                                    "RColorBrewer (Classic)" = "RColorBrewer",
+                                    "scico (Scientific)" = "scico",
+                                    "viridis (Colorblind)" = "viridis",
+                                    "wesanderson (Films)" = "wesanderson")),
                     shiny::conditionalPanel(
                         condition = "input.palette_package != 'none'",
                         shiny::uiOutput("palette_choices"),
@@ -540,16 +547,33 @@ story_designer <- function(plot = NULL,
         # --- Color Palette Functions ---
         get_palette_names <- function(pkg) {
             switch(pkg,
+                "ggsci" = if (requireNamespace("ggsci", quietly = TRUE)) {
+                    c("npg", "aaas", "nejm", "lancet", "jama", "jco", "ucscgb",
+                      "d3", "locuszoom", "igv", "uchicago", "startrek", "tron",
+                      "futurama", "rickandmorty", "simpsons", "gsea", "material")
+                } else character(0),
                 "MetBrewer" = if (requireNamespace("MetBrewer", quietly = TRUE)) {
                     names(MetBrewer::MetPalettes)
+                } else character(0),
+                "nord" = if (requireNamespace("nord", quietly = TRUE)) {
+                    names(nord::nord_palettes)
                 } else character(0),
                 "PNWColors" = if (requireNamespace("PNWColors", quietly = TRUE)) {
                     names(PNWColors::pnw_palettes)
                 } else character(0),
+                "rcartocolor" = if (requireNamespace("rcartocolor", quietly = TRUE)) {
+                    rcartocolor::cartocolors$Name
+                } else character(0),
                 "RColorBrewer" = if (requireNamespace("RColorBrewer", quietly = TRUE)) {
                     rownames(RColorBrewer::brewer.pal.info)
                 } else character(0),
+                "scico" = if (requireNamespace("scico", quietly = TRUE)) {
+                    scico::scico_palette_names()
+                } else character(0),
                 "viridis" = c("viridis", "magma", "plasma", "inferno", "cividis", "mako", "rocket", "turbo"),
+                "wesanderson" = if (requireNamespace("wesanderson", quietly = TRUE)) {
+                    names(wesanderson::wes_palettes)
+                } else character(0),
                 character(0)
             )
         }
@@ -557,15 +581,24 @@ story_designer <- function(plot = NULL,
         get_palette_colors <- function(pkg, name, n = 8) {
             tryCatch({
                 switch(pkg,
+                    "ggsci" = {
+                        # ggsci uses pal_* functions that return color functions
+                        pal_fn <- get(paste0("pal_", name), envir = asNamespace("ggsci"))
+                        pal_fn()(n)
+                    },
                     "MetBrewer" = MetBrewer::met.brewer(name, n),
+                    "nord" = nord::nord(name, n),
                     "PNWColors" = PNWColors::pnw_palette(name, n),
+                    "rcartocolor" = rcartocolor::carto_pal(n, name),
                     "RColorBrewer" = {
                         max_n <- RColorBrewer::brewer.pal.info[name, "maxcolors"]
                         RColorBrewer::brewer.pal(min(n, max_n), name)
                     },
+                    "scico" = scico::scico(n, palette = name),
                     "viridis" = if (requireNamespace("viridis", quietly = TRUE)) {
                         viridis::viridis(n, option = name)
                     } else grDevices::hcl.colors(n, name),
+                    "wesanderson" = wesanderson::wes_palette(name, n, type = "continuous"),
                     grDevices::hcl.colors(n)
                 )
             }, error = function(e) grDevices::hcl.colors(n))
@@ -1477,10 +1510,15 @@ story_designer <- function(plot = NULL,
                     apply_to <- input$palette_apply %||% "fill"
 
                     pal_fn <- switch(pkg,
+                        "ggsci" = paste0('ggsci::pal_', pal_name, '()(8)'),
                         "MetBrewer" = paste0('MetBrewer::met.brewer("', pal_name, '")'),
+                        "nord" = paste0('nord::nord("', pal_name, '", 8)'),
                         "PNWColors" = paste0('PNWColors::pnw_palette("', pal_name, '", 8)'),
+                        "rcartocolor" = paste0('rcartocolor::carto_pal(8, "', pal_name, '")'),
                         "RColorBrewer" = paste0('RColorBrewer::brewer.pal(8, "', pal_name, '")'),
+                        "scico" = paste0('scico::scico(8, palette = "', pal_name, '")'),
                         "viridis" = paste0('viridis::viridis(8, option = "', pal_name, '")'),
+                        "wesanderson" = paste0('wesanderson::wes_palette("', pal_name, '", 8, type = "continuous")'),
                         'viridis::viridis(8)'
                     )
 

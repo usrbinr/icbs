@@ -23,15 +23,20 @@ Suggests:
     base64enc,
     bslib,
     clipr,
+    ggsci,
     knitr,
     marquee,
     MetBrewer,
+    nord,
     PNWColors,
+    rcartocolor,
     RColorBrewer,
     rmarkdown,
+    scico,
     shiny,
     testthat (>= 3.0.0),
-    viridis
+    viridis,
+    wesanderson
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
