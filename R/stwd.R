@@ -530,6 +530,7 @@ theme_stwd <- function(base_size = 11, base_family = "") {
 #'   (top, right, bottom, left). Default: 10 on all sides.
 #' @param lineheight Line height multiplier. Default: 1.4.
 #' @param width Maximum width for text wrapping. Default: 1 (full width).
+#' @param wrap_width Character width to wrap text at. Default: NULL (no wrapping).
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object.
@@ -557,12 +558,18 @@ text_narrative <- function(text,
                            padding = 10,
                            lineheight = 1.4,
                            width = 1,
+                           wrap_width = NULL,
                            ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
             "Package {.pkg marquee} is required for {.fn text_narrative}."
         )
+    }
+
+    # Wrap text if wrap_width specified
+    if (!is.null(wrap_width) && wrap_width > 0) {
+        text <- paste(strwrap(text, width = wrap_width), collapse = "\n")
     }
 
     # Convert alignment to numeric

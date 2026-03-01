@@ -12,6 +12,7 @@ text_narrative(
   padding = 10,
   lineheight = 1.4,
   width = 1,
+  wrap_width = NULL,
   ...
 )
 }
@@ -31,6 +32,8 @@ markdown: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 \item{lineheight}{Line height multiplier. Default: 1.4.}
 
 \item{width}{Maximum width for text wrapping. Default: 1 (full width).}
+
+\item{wrap_width}{Character width to wrap text at. Default: NULL (no wrapping).}
 
 \item{...}{Additional arguments passed to \code{\link[marquee:geom_marquee]{marquee::geom_marquee()}}.}
 }

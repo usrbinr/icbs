@@ -420,7 +420,8 @@ story_designer <- function(plot = NULL,
                             shiny::numericInput("narrative_lineheight", "Line height", value = 1.4, min = 0.8, max = 3, step = 0.1, width = "80%"),
                             bslib::tooltip(shiny::icon("circle-info", class = "text-muted mt-4"), "1.0 = single, 2.0 = double")
                         ),
-                        shiny::numericInput("narrative_padding", "Padding (pt)", value = 10, min = 0, max = 30, step = 1, width = "100%")
+                        shiny::numericInput("narrative_padding", "Padding (pt)", value = 10, min = 0, max = 30, step = 1, width = "100%"),
+                        shiny::sliderInput("narrative_wrap", "Wrap at chars (0=off)", min = 0, max = 80, value = 0, step = 5)
                     ),
                     # Caption settings
                     bslib::accordion_panel(
@@ -1151,7 +1152,8 @@ story_designer <- function(plot = NULL,
                 halign = input$narrative_halign %||% "left",
                 valign = input$narrative_valign %||% "top",
                 padding = input$narrative_padding %||% 10,
-                lineheight = input$narrative_lineheight %||% 1.4
+                lineheight = input$narrative_lineheight %||% 1.4,
+                wrap_width = if ((input$narrative_wrap %||% 0) > 0) input$narrative_wrap else NULL
             )
 
             # Create legend block if enabled
@@ -1564,7 +1566,8 @@ story_designer <- function(plot = NULL,
                 '    halign = "', input$narrative_halign %||% "left", '",\n',
                 '    valign = "', input$narrative_valign %||% "top", '",\n',
                 '    lineheight = ', input$narrative_lineheight %||% 1.4, ',\n',
-                '    padding = ', input$narrative_padding %||% 10, '\n',
+                '    padding = ', input$narrative_padding %||% 10,
+                if ((input$narrative_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$narrative_wrap) else '', '\n',
                 ')\n\n',
                 'caption_plot <- caption_block(\n',
                 '    "', gsub('"', '\\"', input$caption_text), '",\n',
