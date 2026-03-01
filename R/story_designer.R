@@ -108,6 +108,8 @@ What should the audience do?",
                     icon = shiny::icon("heading"),
                     shiny::textAreaInput("title_text", NULL, value = title, rows = 2, width = "100%",
                                          placeholder = "Use **bold** or {#E69F00 color}"),
+                    shiny::helpText(class = "text-muted small mt-1",
+                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {red text} or {#E69F00 text}")),
                     shiny::sliderInput("title_size", "Font size", min = 10, max = 24, value = 16, step = 1),
                     shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
                     shiny::uiOutput("title_metrics")
@@ -118,6 +120,8 @@ What should the audience do?",
                     value = "Subtitle",
                     icon = shiny::icon("font"),
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
+                    shiny::helpText(class = "text-muted small mt-1",
+                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {blue text}")),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
                     shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
                     shiny::uiOutput("subtitle_metrics")
@@ -128,13 +132,16 @@ What should the audience do?",
                     value = "Narrative",
                     icon = shiny::icon("align-left"),
                     shiny::textAreaInput("narrative_text", NULL, value = narrative, rows = 4, width = "100%"),
+                    shiny::helpText(class = "text-muted small mt-1",
+                        shiny::HTML("<b>**bold**</b> &bull; <i>*italic*</i> &bull; {green text}")),
                     shiny::selectInput("narrative_position", "Layout",
                                        choices = c("Chart LEFT | Narrative RIGHT" = "right",
                                                    "Narrative LEFT | Chart RIGHT" = "left",
                                                    "Chart TOP | Narrative BOTTOM" = "bottom",
                                                    "Narrative TOP | Chart BOTTOM" = "top"),
                                        selected = "right"),
-                    shiny::sliderInput("narrative_width", "Width", min = 0.15, max = 0.50, value = 0.35, step = 0.05),
+                    shiny::uiOutput("width_display"),
+                    shiny::sliderInput("narrative_width", NULL, min = 0.15, max = 0.50, value = 0.35, step = 0.05),
                     shiny::sliderInput("narrative_size", "Font size", min = 8, max = 14, value = 10, step = 1)
                 ),
 
@@ -143,8 +150,14 @@ What should the audience do?",
                     value = "Caption",
                     icon = shiny::icon("quote-right"),
                     shiny::textInput("caption_text", NULL, value = caption, width = "100%"),
+                    shiny::helpText(class = "text-muted small mt-1", "Source attribution"),
                     shiny::sliderInput("caption_size", "Font size", min = 7, max = 12, value = 9, step = 1)
                 )
+            ),
+            # Reset button
+            shiny::div(class = "mt-3",
+                shiny::actionButton("reset_defaults", "Reset to Defaults",
+                    class = "btn-outline-secondary btn-sm w-100", icon = shiny::icon("undo"))
             )
         ),
 
@@ -395,6 +408,45 @@ What should the audience do?",
         # Dimensions label
         output$dimensions_label <- shiny::renderText({
             paste0(input$output_width, '" x ', input$output_height, '"')
+        })
+
+        # Width display showing chart vs narrative percentages
+        output$width_display <- shiny::renderUI({
+            narr_pct <- round(input$narrative_width * 100)
+            chart_pct <- 100 - narr_pct
+            shiny::div(class = "d-flex justify-content-between small text-muted mb-1",
+                shiny::span(paste0("Chart: ", chart_pct, "%")),
+                shiny::span(paste0("Narrative: ", narr_pct, "%"))
+            )
+        })
+
+        # Reset to defaults
+        shiny::observeEvent(input$reset_defaults, {
+            shiny::updateTextAreaInput(session, "title_text", value = "**Your {#E69F00 title} here**")
+            shiny::updateTextAreaInput(session, "subtitle_text", value = "Supporting context for your visualization")
+            shiny::updateTextAreaInput(session, "narrative_text", value = "**KEY INSIGHT:**\nYour narrative text here.\n\n**ACTION:**\nWhat should the audience do?")
+            shiny::updateTextInput(session, "caption_text", value = "SOURCE: Your data source")
+            shiny::updateSliderInput(session, "title_size", value = 16)
+            shiny::updateSliderInput(session, "subtitle_size", value = 11)
+            shiny::updateSliderInput(session, "narrative_size", value = 10)
+            shiny::updateSliderInput(session, "caption_size", value = 9)
+            shiny::updateSliderInput(session, "title_margin_bottom", value = 5)
+            shiny::updateSliderInput(session, "subtitle_margin_bottom", value = 5)
+            shiny::updateSliderInput(session, "narrative_width", value = 0.35)
+            shiny::updateSliderInput(session, "title_height", value = 0.12)
+            shiny::updateSliderInput(session, "subtitle_height", value = 0.08)
+            shiny::updateSliderInput(session, "caption_height", value = 0.05)
+            shiny::updateSelectInput(session, "narrative_position", selected = "right")
+            shiny::updateSelectInput(session, "title_align", selected = "left")
+            shiny::updateSelectInput(session, "subtitle_align", selected = "left")
+            shiny::updateSelectInput(session, "narrative_halign", selected = "left")
+            shiny::updateSelectInput(session, "narrative_valign", selected = "top")
+            shiny::updateSelectInput(session, "caption_position", selected = "full_left")
+            shiny::updateNumericInput(session, "title_lineheight", value = 1.1)
+            shiny::updateNumericInput(session, "subtitle_lineheight", value = 1.2)
+            shiny::updateNumericInput(session, "narrative_lineheight", value = 1.4)
+            shiny::updateNumericInput(session, "narrative_padding", value = 10)
+            shiny::updateTextInput(session, "caption_color", value = "#808080")
         })
 
         # Preview with correct aspect ratio
@@ -710,59 +762,49 @@ What should the audience do?",
         # Generated code
         code_to_copy <- shiny::reactive({
             h <- current_heights()
+            caption_halign <- switch(input$caption_position %||% "full_left",
+                "full_left" = "left", "full_center" = "center", "full_right" = "right", "under_chart" = "left", "left")
 
-            # Check if using custom margins (non-default values)
-            uses_custom_margins <- input$title_margin_bottom != 5 || input$subtitle_margin_bottom != 5
-
-            if (uses_custom_margins) {
-                # Generate code using block functions for margin control
-                paste0(
-                    '# Custom margins require using block functions directly\n',
-                    'library(patchwork)\n\n',
-                    'title_plot <- title_block(\n',
-                    '    "', gsub('"', '\\"', input$title_text), '",\n',
-                    '    title_size = ', input$title_size, ',\n',
-                    '    margin_bottom = ', input$title_margin_bottom, '\n',
-                    ')\n\n',
-                    'subtitle_plot <- subtitle_block(\n',
-                    '    "', gsub('"', '\\"', input$subtitle_text), '",\n',
-                    '    subtitle_size = ', input$subtitle_size, ',\n',
-                    '    margin_bottom = ', input$subtitle_margin_bottom, '\n',
-                    ')\n\n',
-                    'narrative_plot <- text_narrative(\n',
-                    '    "', gsub('\n', '\\n', gsub('"', '\\"', input$narrative_text)), '",\n',
-                    '    size = ', input$narrative_size, '\n',
-                    ')\n\n',
-                    'caption_plot <- caption_block("', gsub('"', '\\"', input$caption_text), '")\n\n',
-                    '# Combine plot + narrative\n',
-                    'content <- my_plot + narrative_plot +\n',
-                    '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
-                    '# Stack everything\n',
-                    'final <- title_plot / subtitle_plot / content / caption_plot +\n',
-                    '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ',
-                    round(1 - h$title - h$subtitle - h$caption, 3), ', ', h$caption, '))'
-                )
-            } else {
-                # Standard story_layout code
-                paste0(
-                    'story_layout(\n',
-                    '    plot = my_plot,\n',
-                    '    title = "', gsub('"', '\\"', input$title_text), '",\n',
-                    '    subtitle = "', gsub('"', '\\"', input$subtitle_text), '",\n',
-                    '    narrative = "', gsub('\n', '\\n', gsub('"', '\\"', input$narrative_text)), '",\n',
-                    '    caption = "', gsub('"', '\\"', input$caption_text), '",\n',
-                    '    narrative_position = "', input$narrative_position, '",\n',
-                    '    narrative_width = ', input$narrative_width, ',\n',
-                    '    title_size = ', input$title_size, ',\n',
-                    '    subtitle_size = ', input$subtitle_size, ',\n',
-                    '    narrative_size = ', input$narrative_size, ',\n',
-                    '    caption_size = ', input$caption_size, ',\n',
-                    '    title_height = ', h$title, ',\n',
-                    '    subtitle_height = ', h$subtitle, ',\n',
-                    '    caption_height = ', h$caption, '\n',
-                    ')'
-                )
-            }
+            # Always show patchwork code so users can see all settings
+            paste0(
+                'library(patchwork)\n',
+                '# Add ... args to pass extra options to marquee (e.g., family = "Arial")\n\n',
+                'title_plot <- title_block(\n',
+                '    "', gsub('"', '\\"', input$title_text), '",\n',
+                '    title_size = ', input$title_size, ',\n',
+                '    halign = "', input$title_align %||% "left", '",\n',
+                '    lineheight = ', input$title_lineheight %||% 1.1, ',\n',
+                '    margin_bottom = ', input$title_margin_bottom, '\n',
+                ')\n\n',
+                'subtitle_plot <- subtitle_block(\n',
+                '    "', gsub('"', '\\"', input$subtitle_text), '",\n',
+                '    subtitle_size = ', input$subtitle_size, ',\n',
+                '    halign = "', input$subtitle_align %||% "left", '",\n',
+                '    lineheight = ', input$subtitle_lineheight %||% 1.2, ',\n',
+                '    margin_bottom = ', input$subtitle_margin_bottom, '\n',
+                ')\n\n',
+                'narrative_plot <- text_narrative(\n',
+                '    "', gsub('\n', '\\n', gsub('"', '\\"', input$narrative_text)), '",\n',
+                '    size = ', input$narrative_size, ',\n',
+                '    halign = "', input$narrative_halign %||% "left", '",\n',
+                '    valign = "', input$narrative_valign %||% "top", '",\n',
+                '    lineheight = ', input$narrative_lineheight %||% 1.4, ',\n',
+                '    padding = ', input$narrative_padding %||% 10, '\n',
+                ')\n\n',
+                'caption_plot <- caption_block(\n',
+                '    "', gsub('"', '\\"', input$caption_text), '",\n',
+                '    caption_size = ', input$caption_size, ',\n',
+                '    halign = "', caption_halign, '",\n',
+                '    color = "', input$caption_color %||% "#808080", '"\n',
+                ')\n\n',
+                '# Combine plot + narrative\n',
+                'content <- my_plot + narrative_plot +\n',
+                '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
+                '# Stack everything\n',
+                'final <- title_plot / subtitle_plot / content / caption_plot +\n',
+                '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ',
+                round(1 - h$title - h$subtitle - h$caption, 3), ', ', h$caption, '))'
+            )
         })
 
         output$generated_code <- shiny::renderUI({

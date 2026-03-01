@@ -485,7 +485,8 @@ text_narrative <- function(text,
                            valign = "top",
                            padding = 10,
                            lineheight = 1.4,
-                           width = 1) {
+                           width = 1,
+                           ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
@@ -511,7 +512,8 @@ text_narrative <- function(text,
             vjust = vjust,
             size = size,
             lineheight = lineheight,
-            width = text_width
+            width = text_width,
+            ...
         ) +
         scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
         scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
@@ -562,7 +564,8 @@ title_block <- function(title,
                         margin_bottom = 5,
                         margin_left = 5,
                         margin_right = 5,
-                        width = 0.95) {
+                        width = 0.95,
+                        ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
@@ -584,7 +587,8 @@ title_block <- function(title,
             vjust = 1,
             size = title_size,
             lineheight = lineheight,
-            width = width
+            width = width,
+            ...
         ) +
         scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
         scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0.1, 0.02))) +
@@ -634,7 +638,8 @@ subtitle_block <- function(subtitle,
                            margin_bottom = 5,
                            margin_left = 5,
                            margin_right = 5,
-                           width = 0.95) {
+                           width = 0.95,
+                           ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
@@ -653,7 +658,8 @@ subtitle_block <- function(subtitle,
             vjust = 1,
             size = subtitle_size,
             lineheight = lineheight,
-            width = width
+            width = width,
+            ...
         ) +
         scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
         scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0.1, 0.02))) +
@@ -697,7 +703,8 @@ caption_block <- function(caption,
                           margin_top = 10,
                           margin_bottom = 5,
                           margin_left = 5,
-                          margin_right = 5) {
+                          margin_right = 5,
+                          ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
@@ -718,7 +725,8 @@ caption_block <- function(caption,
             aes(x = x_pos, y = 0.5, label = caption),
             hjust = hjust,
             vjust = 0.5,
-            size = caption_size
+            size = caption_size,
+            ...
         ) +
         scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
         scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
