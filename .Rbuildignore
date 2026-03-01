@@ -1,4 +1,4 @@
-^icbs\.Rproj$
+^stwd\.Rproj$
 ^\.Rproj\.user$
 
 # qrtdown
@@ -18,3 +18,5 @@
 ^CLAUDE\.md$
 ^_freeze$
 ^Rplots\.pdf$
+^_brand\.yml$
+^test\.R$

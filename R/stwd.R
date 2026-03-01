@@ -88,7 +88,8 @@ utils::globalVariables(c(
     ".reference", ".scenario", ".type", ".value",
     ".variance_pct", ".variance_sign", ".x", ".y", ".ymax", ".ymin",
     "component", "height", "label",  # for story_designer
-    "x", "xend", "y", "yend"
+    "x", "xend", "y", "yend",
+    "ymin", "ymax", "ymid"  # for story_designer clipping visualization
 ))
 
 # ============================================================================
@@ -527,7 +528,9 @@ theme_stwd <- function(base_size = 11, base_family = "") {
 #' @param valign Vertical alignment: "top", "center", or "bottom". Default: "top".
 #' @param padding Padding around text as a margin() object or numeric vector
 #'   (top, right, bottom, left). Default: 10 on all sides.
+#' @param lineheight Line height multiplier. Default: 1.4.
 #' @param width Maximum width for text wrapping. Default: 1 (full width).
+#' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object.
 #' @export
@@ -608,6 +611,7 @@ text_narrative <- function(text,
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
+#' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
 #' @export
@@ -682,6 +686,7 @@ title_block <- function(title,
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
+#' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
 #' @export
@@ -751,6 +756,7 @@ subtitle_block <- function(subtitle,
 #' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
+#' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
 #' @export

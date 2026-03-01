@@ -1,40 +1,42 @@
-# icbs 3.0.10
+# stwd 3.1.0
 
-# icbs 3.0.9
+# stwd 3.0.10
 
-# icbs 3.0.8
+# stwd 3.0.9
 
-# icbs 3.0.7
+# stwd 3.0.8
 
-# icbs 3.0.6
+# stwd 3.0.7
 
-# icbs 3.0.5
+# stwd 3.0.6
 
-# icbs 3.0.4
+# stwd 3.0.5
 
-# icbs 3.0.3
+# stwd 3.0.4
 
-# icbs 3.0.2
+# stwd 3.0.3
 
-# icbs 3.0.1
+# stwd 3.0.2
 
-# icbs 3.0.0
+# stwd 3.0.1
 
-# icbs 2.0.4
+# stwd 3.0.0
 
-# icbs 2.0.3
+# stwd 2.0.4
 
-# icbs 2.0.2
+# stwd 2.0.3
 
-# icbs 2.0.1
+# stwd 2.0.2
 
-# icbs 2.0.0
+# stwd 2.0.1
 
-# icbs 1.0.1
+# stwd 2.0.0
 
-# icbs 1.0.0
+# stwd 1.0.1
 
-## icbs 0.0.0.9000
+# stwd 1.0.0
+
+## stwd 0.0.0.9000
 
 * Initial development version
 * Added `theme_ibcs()` for IBCS-compliant ggplot2 theme

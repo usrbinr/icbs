@@ -30,11 +30,7 @@
 story_designer <- function(plot = NULL,
                            title = "**Your {#E69F00 title} here**",
                            subtitle = "Supporting context for your visualization",
-                           narrative = "**KEY INSIGHT:**
-Your narrative text here.
-
-**ACTION:**
-What should the audience do?",
+                           narrative = "**KEY INSIGHT:**\nYour narrative here.",
                            caption = "SOURCE: Your data source") {
 
     if (!requireNamespace("shiny", quietly = TRUE)) {

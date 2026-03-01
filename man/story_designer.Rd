@@ -8,8 +8,7 @@ story_designer(
   plot = NULL,
   title = "**Your {#E69F00 title} here**",
   subtitle = "Supporting context for your visualization",
-  narrative =
-    "**KEY INSIGHT:**\\nYour narrative text here.\\n\\n**ACTION:**\\nWhat should the audience do?",
+  narrative = "**KEY INSIGHT:**\\nYour narrative here.",
   caption = "SOURCE: Your data source"
 )
 }

@@ -1,12 +1,13 @@
-Package: icbs
-Title: IBCS-Compliant Business Visualizations for ggplot2
-Version: 3.0.10
+Package: stwd
+Title: Storytelling with Data Visualizations for ggplot2
+Version: 3.1.0
 Authors@R:
     person("Alejandro", "Hagan", , "alejandro.hagan@outlook.com", role = c("aut", "cre"))
-Description: Create business visualizations following International Business
-    Communication Standards (IBCS). Provides themes, color scales, variance
-    charts, waterfall charts, scenario notation, and multi-panel layouts with
-    connectors. Integrates with the marquee package for colored text labels.
+Description: Create presentation-ready visualizations following Storytelling
+    with Data (SWD) principles. Provides story layouts that combine charts
+    with narrative text, colored titles, and supporting context. Includes an
+    interactive Shiny app for designing layouts, strategic color highlighting,
+    and integration with the marquee package for colored text labels.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
@@ -24,12 +25,10 @@ Suggests:
     clipr,
     knitr,
     marquee,
-    quarto,
     rmarkdown,
     shiny,
     testthat (>= 3.0.0)
-VignetteBuilder: quarto
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-URL: https://codeberg.org/usrbinr/icbs
+URL: https://codeberg.org/usrbinr/stwd
