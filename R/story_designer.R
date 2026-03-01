@@ -68,6 +68,12 @@ story_designer <- function(plot = NULL,
             ggplot2::labs(x = NULL, y = NULL, title = NULL)
     }
 
+    # Register resource path for CSS
+    css_path <- system.file("www", package = "stwd")
+    if (nzchar(css_path)) {
+        shiny::addResourcePath("stwd-assets", css_path)
+    }
+
     # UI
     ui <- bslib::page_sidebar(
         title = "Story Layout Designer",
@@ -75,6 +81,10 @@ story_designer <- function(plot = NULL,
             version = 5,
             bootswatch = "flatly",
             primary = "#2c3e50"
+        ),
+        # Include custom CSS
+        shiny::tags$head(
+            shiny::tags$link(rel = "stylesheet", type = "text/css", href = "stwd-assets/story_designer.css")
         ),
 
         # Sidebar with inputs
