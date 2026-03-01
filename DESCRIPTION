@@ -1,10 +1,10 @@
 Package: stwd
-Title: Storytelling with Data Visualizations for ggplot2
+Title: Storytelling with Data Visualizations for 'ggplot2'
 Version: 3.1.0
 Authors@R:
     person("Alejandro", "Hagan", , "alejandro.hagan@outlook.com", role = c("aut", "cre"))
 Description: Create presentation-ready visualizations following Storytelling
-    with Data (SWD) principles. Provides story layouts that combine charts
+    with Data ('SWD') principles. Provides story layouts that combine charts
     with narrative text, colored titles, and supporting context. Includes an
     interactive Shiny app for designing layouts, strategic color highlighting,
     and integration with the marquee package for colored text labels.
