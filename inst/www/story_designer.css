@@ -71,7 +71,25 @@
 
 .form-select, .shiny-input-container {
   position: relative;
-  z-index: 1;
+}
+
+/* Fix dropdown z-index so options appear above other elements */
+.form-select:focus,
+.selectize-dropdown,
+.selectize-input,
+select.form-select {
+  z-index: 1050 !important;
+}
+
+.selectize-dropdown {
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+/* Bootstrap select dropdown */
+select.form-select option {
+  background: white;
+  padding: 8px;
 }
 
 .accordion-button {
