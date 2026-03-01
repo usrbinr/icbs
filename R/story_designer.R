@@ -89,13 +89,24 @@ story_designer <- function(plot = NULL,
 
         # Sidebar with inputs
         sidebar = bslib::sidebar(
+            id = "main_sidebar",
             width = 320,
             open = TRUE,
 
             # Output dimensions - compact
             shiny::div(
                 class = "mb-3 p-2 bg-light rounded",
-                shiny::strong("Output Dimensions"),
+                shiny::div(
+                    class = "d-flex justify-content-between align-items-center mb-2",
+                    shiny::strong("Output Dimensions"),
+                    shiny::div(
+                        class = "d-flex align-items-center gap-1",
+                        shiny::tags$small("Sidebar:", class = "text-muted"),
+                        shiny::selectInput("sidebar_width", NULL, width = "70px",
+                            choices = c("280" = "280", "320" = "320", "380" = "380", "450" = "450", "520" = "520"),
+                            selected = "320")
+                    )
+                ),
                 bslib::layout_column_wrap(
                     width = 1/2,
                     shiny::numericInput("output_width", "W (in)", value = 12, min = 6, max = 20, step = 1),
@@ -259,12 +270,43 @@ story_designer <- function(plot = NULL,
                             shiny::actionButton("palette_random", "Random", icon = shiny::icon("shuffle"), class = "btn-sm btn-outline-secondary")
                         ),
                         shiny::uiOutput("palette_preview"),
+                        shiny::uiOutput("palette_warning"),
                         shiny::radioButtons("palette_apply", "Apply to:",
                             choices = c("Fill" = "fill", "Color" = "color", "Both" = "both"),
                             selected = "fill", inline = TRUE),
                         shiny::radioButtons("palette_scale", "Scale type:",
                             choices = c("Discrete" = "discrete", "Continuous" = "continuous"),
                             selected = "discrete", inline = TRUE)
+                    )
+                ),
+
+                bslib::accordion_panel(
+                    title = shiny::span(shiny::span(class = "badge bg-dark me-2", " "), "Manual Colors"),
+                    value = "Manual Colors",
+                    icon = shiny::icon("eye-dropper"),
+                    shiny::checkboxInput("manual_colors_enabled", "Enable manual coloring", value = FALSE),
+                    shiny::conditionalPanel(
+                        condition = "input.manual_colors_enabled",
+                        shiny::div(
+                            class = "mb-2",
+                            shiny::textInput("default_color", "Default color (unassigned)", value = "#808080", width = "100%"),
+                            bslib::tooltip(
+                                shiny::icon("circle-info", class = "text-muted"),
+                                "Categories without a specific color will use this"
+                            )
+                        ),
+                        shiny::radioButtons("manual_apply", "Apply to:",
+                            choices = c("Fill" = "fill", "Color" = "color", "Both" = "both"),
+                            selected = "fill", inline = TRUE),
+                        shiny::hr(class = "my-2"),
+                        shiny::div(
+                            class = "d-flex justify-content-between align-items-center mb-2",
+                            shiny::tags$small("Assign colors by:", class = "text-muted"),
+                            shiny::radioButtons("assign_mode", NULL,
+                                choices = c("#" = "number", "Name" = "name"),
+                                selected = "number", inline = TRUE)
+                        ),
+                        shiny::uiOutput("category_assignments")
                     )
                 ),
 
@@ -549,6 +591,67 @@ story_designer <- function(plot = NULL,
         default_colors <- c("#808080", "#B0B0B0", "#E69F00", "#56B4E9", "#009E73",
                             "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
 
+        # --- Sidebar Width Resize ---
+        shiny::observeEvent(input$sidebar_width, {
+            new_width <- paste0(input$sidebar_width, "px")
+            shiny::insertUI(
+                selector = "head",
+                where = "beforeEnd",
+                ui = shiny::tags$style(
+                    shiny::HTML(paste0(".bslib-sidebar-layout > .sidebar { width: ", new_width, " !important; }"))
+                ),
+                immediate = TRUE
+            )
+        })
+
+        # --- Detect Plot Categories ---
+        plot_categories <- shiny::reactive({
+            tryCatch({
+                plot_data <- user_plot$data
+                fill_aes <- rlang::quo_get_expr(user_plot$mapping$fill)
+                color_aes <- rlang::quo_get_expr(user_plot$mapping$colour)
+
+                fill_levels <- NULL
+                color_levels <- NULL
+
+                if (!is.null(fill_aes) && is.name(fill_aes)) {
+                    col_name <- as.character(fill_aes)
+                    if (col_name %in% names(plot_data)) {
+                        vals <- plot_data[[col_name]]
+                        if (is.factor(vals)) {
+                            fill_levels <- levels(vals)
+                        } else {
+                            fill_levels <- unique(as.character(vals))
+                        }
+                    }
+                }
+
+                if (!is.null(color_aes) && is.name(color_aes)) {
+                    col_name <- as.character(color_aes)
+                    if (col_name %in% names(plot_data)) {
+                        vals <- plot_data[[col_name]]
+                        if (is.factor(vals)) {
+                            color_levels <- levels(vals)
+                        } else {
+                            color_levels <- unique(as.character(vals))
+                        }
+                    }
+                }
+
+                list(
+                    fill_levels = fill_levels,
+                    color_levels = color_levels,
+                    n_fill = length(fill_levels),
+                    n_color = length(color_levels)
+                )
+            }, error = function(e) {
+                list(fill_levels = NULL, color_levels = NULL, n_fill = 0, n_color = 0)
+            })
+        })
+
+        # --- Manual Color Assignments Storage ---
+        manual_color_values <- shiny::reactiveVal(list())
+
         # --- Color Palette Functions ---
         get_palette_names <- function(pkg) {
             switch(pkg,
@@ -748,6 +851,27 @@ story_designer <- function(plot = NULL,
             shiny::div(swatches, selected_hex)
         })
 
+        # Render palette warning when categories > colors
+        output$palette_warning <- shiny::renderUI({
+            pkg <- input$palette_package %||% "none"
+            if (pkg == "none") return(NULL)
+
+            cats <- plot_categories()
+            palette_colors <- current_palette()
+            n_colors <- length(palette_colors)
+
+            apply_to <- input$palette_apply %||% "fill"
+            n_cats <- if (apply_to == "fill") cats$n_fill else if (apply_to == "color") cats$n_color else max(cats$n_fill, cats$n_color)
+
+            if (n_cats > 0 && n_cats > n_colors) {
+                shiny::div(
+                    class = "alert alert-warning py-1 px-2 small mb-2",
+                    shiny::icon("exclamation-triangle"),
+                    paste0(" ", n_cats, " categories but only ", n_colors, " colors. Consider Manual Colors section for precise control.")
+                )
+            } else NULL
+        })
+
         # Get current palette colors (use selected if any, otherwise all)
         current_palette <- shiny::reactive({
             pkg <- input$palette_package %||% "none"
@@ -766,6 +890,95 @@ story_designer <- function(plot = NULL,
         })
 
         # --- End Color Palette Functions ---
+
+        # --- Manual Colors Category Assignment UI ---
+        output$category_assignments <- shiny::renderUI({
+            cats <- plot_categories()
+            apply_to <- input$manual_apply %||% "fill"
+
+            # Get the appropriate levels based on apply_to
+            levels_to_use <- if (apply_to == "fill") {
+                cats$fill_levels
+            } else if (apply_to == "color") {
+                cats$color_levels
+            } else {
+                # Both - prefer fill levels
+                if (!is.null(cats$fill_levels)) cats$fill_levels else cats$color_levels
+            }
+
+            if (is.null(levels_to_use) || length(levels_to_use) == 0) {
+                return(shiny::div(
+                    class = "text-muted small",
+                    shiny::icon("info-circle"),
+                    " No discrete categories detected in plot"
+                ))
+            }
+
+            # Get available colors from current palette (or default palette)
+            palette_colors <- current_palette()
+            if (is.null(palette_colors) || length(palette_colors) == 0) {
+                palette_colors <- default_colors
+            }
+
+            # Create color choices: "default" + numbered colors
+            color_choices <- c("Default" = "default")
+            for (i in seq_along(palette_colors)) {
+                color_choices[paste0("#", i, " (", palette_colors[i], ")")] <- palette_colors[i]
+            }
+
+            assign_mode <- input$assign_mode %||% "number"
+
+            # Create assignment UI for each category
+            assignment_ui <- lapply(seq_along(levels_to_use), function(i) {
+                level_name <- levels_to_use[i]
+                input_id <- paste0("cat_color_", i)
+                label <- if (assign_mode == "number") {
+                    paste0("#", i)
+                } else {
+                    if (nchar(level_name) > 15) paste0(substr(level_name, 1, 12), "...") else level_name
+                }
+
+                shiny::div(
+                    class = "d-flex align-items-center gap-2 mb-1",
+                    shiny::span(label, class = "small", style = "width:80px;overflow:hidden;text-overflow:ellipsis;"),
+                    shiny::selectInput(input_id, NULL, width = "100%",
+                        choices = color_choices,
+                        selected = "default")
+                )
+            })
+
+            shiny::div(
+                shiny::div(class = "small text-muted mb-2",
+                    paste0(length(levels_to_use), " categories detected")),
+                assignment_ui
+            )
+        })
+
+        # Collect manual color assignments
+        shiny::observe({
+            cats <- plot_categories()
+            apply_to <- input$manual_apply %||% "fill"
+
+            levels_to_use <- if (apply_to == "fill") {
+                cats$fill_levels
+            } else if (apply_to == "color") {
+                cats$color_levels
+            } else {
+                if (!is.null(cats$fill_levels)) cats$fill_levels else cats$color_levels
+            }
+
+            if (is.null(levels_to_use)) return()
+
+            # Collect values from dynamic inputs
+            color_map <- list()
+            for (i in seq_along(levels_to_use)) {
+                val <- input[[paste0("cat_color_", i)]]
+                if (!is.null(val) && val != "default") {
+                    color_map[[levels_to_use[i]]] <- val
+                }
+            }
+            manual_color_values(color_map)
+        })
 
         # Dynamic color inputs based on number of categories
         output$legend_color_inputs <- shiny::renderUI({
@@ -983,6 +1196,45 @@ story_designer <- function(plot = NULL,
                     p
                 })
             }
+
+            # Apply manual colors if enabled (overrides palette)
+            if (input$manual_colors_enabled %||% FALSE) {
+                color_map <- manual_color_values()
+                default_col <- input$default_color %||% "#808080"
+                manual_apply <- input$manual_apply %||% "fill"
+
+                if (length(color_map) > 0 || default_col != "#808080") {
+                    cats <- plot_categories()
+                    levels_to_use <- if (manual_apply == "fill") {
+                        cats$fill_levels
+                    } else if (manual_apply == "color") {
+                        cats$color_levels
+                    } else {
+                        if (!is.null(cats$fill_levels)) cats$fill_levels else cats$color_levels
+                    }
+
+                    if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
+                        # Build color vector: assigned colors + default for unassigned
+                        final_colors <- sapply(levels_to_use, function(lvl) {
+                            if (lvl %in% names(color_map)) color_map[[lvl]] else default_col
+                        })
+                        names(final_colors) <- levels_to_use
+
+                        p <- tryCatch({
+                            p_new <- p
+                            if (manual_apply %in% c("fill", "both")) {
+                                p_new <- p_new + ggplot2::scale_fill_manual(values = final_colors)
+                            }
+                            if (manual_apply %in% c("color", "both")) {
+                                p_new <- p_new + ggplot2::scale_color_manual(values = final_colors)
+                            }
+                            ggplot2::ggplot_build(p_new)
+                            p_new
+                        }, error = function(e) p)
+                    }
+                }
+            }
+
             p
         })
 
@@ -1007,15 +1259,15 @@ story_designer <- function(plot = NULL,
             shiny::updateTextAreaInput(session, "subtitle_text", value = "Supporting context for your visualization")
             shiny::updateTextAreaInput(session, "narrative_text", value = "**KEY INSIGHT:**\nYour narrative text here.\n\n**ACTION:**\nWhat should the audience do?")
             shiny::updateTextInput(session, "caption_text", value = "SOURCE: Your data source")
-            shiny::updateSliderInput(session, "title_size", value = 16)
+            shiny::updateSliderInput(session, "title_size", value = 12)
             shiny::updateSliderInput(session, "subtitle_size", value = 11)
             shiny::updateSliderInput(session, "narrative_size", value = 10)
             shiny::updateSliderInput(session, "caption_size", value = 9)
             shiny::updateSliderInput(session, "title_margin_bottom", value = 5)
             shiny::updateSliderInput(session, "subtitle_margin_bottom", value = 5)
             shiny::updateSliderInput(session, "narrative_width", value = 0.35)
-            shiny::updateSliderInput(session, "title_height", value = 0.12)
-            shiny::updateSliderInput(session, "subtitle_height", value = 0.08)
+            shiny::updateSliderInput(session, "title_height", value = 0.08)
+            shiny::updateSliderInput(session, "subtitle_height", value = 0.06)
             shiny::updateSliderInput(session, "caption_height", value = 0.05)
             shiny::updateSelectInput(session, "narrative_position", selected = "right")
             shiny::updateSelectInput(session, "title_align", selected = "left")
