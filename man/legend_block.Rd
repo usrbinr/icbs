@@ -7,6 +7,8 @@
 legend_block(
   colors,
   halign = "right",
+  valign = "center",
+  orientation = "horizontal",
   sep = " | ",
   size = 10,
   bold = TRUE,
@@ -24,7 +26,13 @@ colors (hex codes or R color names).}
 
 \item{halign}{Horizontal alignment: "left", "center", or "right". Default: "right".}
 
-\item{sep}{Separator between category labels. Default: " | ".}
+\item{valign}{Vertical alignment (for vertical orientation): "top", "center",
+or "bottom". Default: "center".}
+
+\item{orientation}{Either "horizontal" (labels side by side) or "vertical"
+(labels stacked). Default: "horizontal".}
+
+\item{sep}{Separator between category labels (horizontal only). Default: " | ".}
 
 \item{size}{Text size in pts. Default: 10.}
 
@@ -47,8 +55,8 @@ A ggplot object that can be combined with other plots via patchwork.
 }
 \description{
 Creates a standalone inline legend as a ggplot, showing colored category
-labels separated by a delimiter. Use above charts in patchwork compositions
-to replace traditional legends with clean, in-line text.
+labels separated by a delimiter. Use above/below charts or beside them
+in patchwork compositions to replace traditional legends with clean text.
 }
 \examples{
 \dontrun{
@@ -56,7 +64,11 @@ library(patchwork)
 
 legend_colors <- c("ACCURATE" = "#808080", "NULL" = "#B0B0B0", "ERROR" = "#E69F00")
 
+# Horizontal above chart
 legend_plot <- legend_block(legend_colors, halign = "right")
+
+# Vertical beside chart
+legend_vert <- legend_block(legend_colors, orientation = "vertical", valign = "top")
 
 title_block("My Title") / legend_plot / my_chart +
     plot_layout(heights = c(0.08, 0.04, 0.88))

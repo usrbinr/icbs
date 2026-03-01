@@ -157,6 +157,9 @@ story_designer <- function(plot = NULL,
                     shiny::checkboxInput("legend_enabled", "Enable text legend", value = FALSE),
                     shiny::conditionalPanel(
                         condition = "input.legend_enabled",
+                        shiny::selectInput("legend_position", "Position", width = "100%",
+                            choices = c("Above chart" = "above", "Below chart" = "below",
+                                        "Right of chart (vertical)" = "right", "Left of chart (vertical)" = "left")),
                         shiny::textInput("legend_labels", "Categories (comma-separated)",
                                          value = "Category A, Category B, Category C", width = "100%"),
                         shiny::helpText(class = "text-muted small mt-1", "Colors for each category:"),
@@ -164,7 +167,7 @@ story_designer <- function(plot = NULL,
                         shiny::selectInput("legend_sep", "Separator", width = "100%",
                             choices = c("Pipe ( | )" = " | ", "Bullet" = " \u2022 ",
                                         "Dash ( - )" = " - ", "None" = "  ")),
-                        shiny::selectInput("legend_halign", "Alignment", width = "100%",
+                        shiny::selectInput("legend_halign", "Text alignment", width = "100%",
                             choices = c("Right" = "right", "Center" = "center", "Left" = "left")),
                         shiny::sliderInput("legend_size", "Font size", min = 8, max = 14, value = 10, step = 1),
                         shiny::checkboxInput("legend_bold", "Bold", value = TRUE),
@@ -811,6 +814,7 @@ story_designer <- function(plot = NULL,
 
             # Create legend block if enabled
             legend_plot <- NULL
+            legend_pos <- input$legend_position %||% "above"
             if (input$legend_enabled %||% FALSE) {
                 # Parse comma-separated labels
                 labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
@@ -822,9 +826,13 @@ story_designer <- function(plot = NULL,
                         input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
                     })
                     names(colors) <- labels
+                    # Determine orientation based on position
+                    orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
                     legend_plot <- legend_block(
                         colors,
                         halign = input$legend_halign %||% "right",
+                        valign = "top",
+                        orientation = orientation,
                         sep = input$legend_sep %||% " | ",
                         size = input$legend_size %||% 10,
                         bold = input$legend_bold %||% TRUE,
@@ -854,56 +862,52 @@ story_designer <- function(plot = NULL,
             plot_width <- 1 - input$narrative_width
             caption_under_chart <- (input$caption_position %||% "full_left") == "under_chart"
 
-            # Calculate content height (account for legend if enabled)
-            content_height <- 1 - h$title - h$subtitle - h$legend - h$caption
+            # Calculate content height (account for legend if above/below)
+            legend_h_above <- if (!is.null(legend_plot) && legend_pos %in% c("above", "below")) h$legend else 0
+            content_height <- 1 - h$title - h$subtitle - legend_h_above - h$caption
 
-            if (caption_under_chart && input$narrative_position %in% c("left", "right")) {
-                # Caption only under chart, not full width
-                # Nest caption with chart before combining with narrative
-                chart_with_caption <- styled_plot() / caption_plot +
-                    patchwork::plot_layout(heights = c(1 - h$caption / content_height, h$caption / content_height))
-
-                if (input$narrative_position == "right") {
-                    content <- chart_with_caption + narrative_plot +
-                        patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
-                } else {
-                    content <- narrative_plot + chart_with_caption +
-                        patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
-                }
-
-                # Stack without separate caption row (with optional legend)
-                if (!is.null(legend_plot)) {
-                    result <- title_plot / subtitle_plot / legend_plot / content +
-                        patchwork::plot_layout(heights = c(h$title, h$subtitle, h$legend, content_height + h$caption))
-                } else {
-                    result <- title_plot / subtitle_plot / content +
-                        patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height + h$caption))
-                }
+            # Combine narrative with chart
+            if (input$narrative_position == "right") {
+                content <- content + narrative_plot +
+                    patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
+            } else if (input$narrative_position == "left") {
+                content <- narrative_plot + content +
+                    patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
+            } else if (input$narrative_position == "top") {
+                content <- narrative_plot / content +
+                    patchwork::plot_layout(heights = c(input$narrative_width, plot_width))
             } else {
-                # Full-width caption (default)
-                if (input$narrative_position == "right") {
-                    content <- content + narrative_plot +
-                        patchwork::plot_layout(widths = c(plot_width, input$narrative_width))
-                } else if (input$narrative_position == "left") {
-                    content <- narrative_plot + content +
-                        patchwork::plot_layout(widths = c(input$narrative_width, plot_width))
-                } else if (input$narrative_position == "top") {
-                    content <- narrative_plot / content +
-                        patchwork::plot_layout(heights = c(input$narrative_width, plot_width))
-                } else {
-                    # bottom
-                    content <- content / narrative_plot +
-                        patchwork::plot_layout(heights = c(plot_width, input$narrative_width))
-                }
+                # bottom
+                content <- content / narrative_plot +
+                    patchwork::plot_layout(heights = c(plot_width, input$narrative_width))
+            }
 
-                # Stack everything vertically (with optional legend)
-                if (!is.null(legend_plot)) {
+            # Handle legend positioning
+            if (!is.null(legend_plot)) {
+                if (legend_pos == "above") {
+                    # Legend above chart (between subtitle and content)
                     result <- title_plot / subtitle_plot / legend_plot / content / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, h$legend, content_height, h$caption))
-                } else {
-                    result <- title_plot / subtitle_plot / content / caption_plot +
+                } else if (legend_pos == "below") {
+                    # Legend below chart (between content and caption)
+                    result <- title_plot / subtitle_plot / content / legend_plot / caption_plot +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$legend, h$caption))
+                } else if (legend_pos == "right") {
+                    # Legend to right of chart (vertical)
+                    content_with_legend <- content + legend_plot +
+                        patchwork::plot_layout(widths = c(0.92, 0.08))
+                    result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
+                        patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
+                } else if (legend_pos == "left") {
+                    # Legend to left of chart (vertical)
+                    content_with_legend <- legend_plot + content +
+                        patchwork::plot_layout(widths = c(0.08, 0.92))
+                    result <- title_plot / subtitle_plot / content_with_legend / caption_plot +
                         patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
                 }
+            } else {
+                result <- title_plot / subtitle_plot / content / caption_plot +
+                    patchwork::plot_layout(heights = c(h$title, h$subtitle, content_height, h$caption))
             }
 
             result

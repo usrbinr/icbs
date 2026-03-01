@@ -813,13 +813,17 @@ caption_block <- function(caption,
 #' Create a Legend Block Plot
 #'
 #' Creates a standalone inline legend as a ggplot, showing colored category
-#' labels separated by a delimiter. Use above charts in patchwork compositions
-#' to replace traditional legends with clean, in-line text.
+#' labels separated by a delimiter. Use above/below charts or beside them
+#' in patchwork compositions to replace traditional legends with clean text.
 #'
 #' @param colors Named vector where names are category labels and values are
 #'   colors (hex codes or R color names).
 #' @param halign Horizontal alignment: "left", "center", or "right". Default: "right".
-#' @param sep Separator between category labels. Default: " | ".
+#' @param valign Vertical alignment (for vertical orientation): "top", "center",
+#'   or "bottom". Default: "center".
+#' @param orientation Either "horizontal" (labels side by side) or "vertical"
+#'   (labels stacked). Default: "horizontal".
+#' @param sep Separator between category labels (horizontal only). Default: " | ".
 #' @param size Text size in pts. Default: 10.
 #' @param bold Logical; make labels bold? Default: TRUE.
 #' @param uppercase Logical; convert labels to uppercase? Default: FALSE.
@@ -838,7 +842,11 @@ caption_block <- function(caption,
 #'
 #' legend_colors <- c("ACCURATE" = "#808080", "NULL" = "#B0B0B0", "ERROR" = "#E69F00")
 #'
+#' # Horizontal above chart
 #' legend_plot <- legend_block(legend_colors, halign = "right")
+#'
+#' # Vertical beside chart
+#' legend_vert <- legend_block(legend_colors, orientation = "vertical", valign = "top")
 #'
 #' title_block("My Title") / legend_plot / my_chart +
 #'     plot_layout(heights = c(0.08, 0.04, 0.88))
@@ -846,6 +854,8 @@ caption_block <- function(caption,
 #'
 legend_block <- function(colors,
                          halign = "right",
+                         valign = "center",
+                         orientation = "horizontal",
                          sep = " | ",
                          size = 10,
                          bold = TRUE,
@@ -894,25 +904,45 @@ legend_block <- function(colors,
         }
     }, labels, colors, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 
-    # Combine with separator
-    legend_text <- paste(formatted, collapse = sep)
-
-    # Position
+    # Position settings
     hjust <- switch(halign, left = 0, center = 0.5, right = 1, 1)
     x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.98)
 
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = 0.5, label = legend_text),
-            hjust = hjust,
-            vjust = 0.5,
-            size = size,
-            ...
-        ) +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        theme_void() +
-        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
+    if (orientation == "vertical") {
+        # Vertical: stack labels with newlines
+        legend_text <- paste(formatted, collapse = "\n")
+        vjust_val <- switch(valign, top = 1, center = 0.5, bottom = 0, 0.5)
+        y_pos <- switch(valign, top = 0.95, center = 0.5, bottom = 0.05, 0.5)
+
+        p <- ggplot() +
+            marquee::geom_marquee(
+                aes(x = x_pos, y = y_pos, label = legend_text),
+                hjust = hjust,
+                vjust = vjust_val,
+                size = size,
+                ...
+            ) +
+            scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+            scale_y_continuous(limits = c(0, 1), expand = c(0.05, 0.05)) +
+            theme_void() +
+            theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
+    } else {
+        # Horizontal: combine with separator
+        legend_text <- paste(formatted, collapse = sep)
+
+        p <- ggplot() +
+            marquee::geom_marquee(
+                aes(x = x_pos, y = 0.5, label = legend_text),
+                hjust = hjust,
+                vjust = 0.5,
+                size = size,
+                ...
+            ) +
+            scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+            scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+            theme_void() +
+            theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
+    }
 
     p
 }
