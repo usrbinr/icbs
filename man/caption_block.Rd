@@ -13,6 +13,7 @@ caption_block(
   margin_bottom = 5,
   margin_left = 5,
   margin_right = 5,
+  wrap_width = NULL,
   ...
 )
 }
@@ -32,6 +33,8 @@ caption_block(
 \item{margin_left}{Left margin in pts. Default: 5.}
 
 \item{margin_right}{Right margin in pts. Default: 5.}
+
+\item{wrap_width}{Character width to wrap text at. Default: NULL (no wrapping).}
 
 \item{...}{Additional arguments passed to \code{\link[marquee:geom_marquee]{marquee::geom_marquee()}}.}
 }

@@ -14,6 +14,7 @@ title_block(
   margin_left = 5,
   margin_right = 5,
   width = 0.95,
+  wrap_width = NULL,
   ...
 )
 }
@@ -36,6 +37,8 @@ formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 \item{margin_right}{Right margin in pts. Default: 5.}
 
 \item{width}{Maximum width for text wrapping (0-1). Default: 0.95.}
+
+\item{wrap_width}{Character width to wrap text at. Default: NULL (no wrapping).}
 
 \item{...}{Additional arguments passed to \code{\link[marquee:geom_marquee]{marquee::geom_marquee()}}.}
 }

@@ -611,6 +611,7 @@ text_narrative <- function(text,
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
+#' @param wrap_width Character width to wrap text at. Default: NULL (no wrapping).
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
@@ -637,12 +638,18 @@ title_block <- function(title,
                         margin_left = 5,
                         margin_right = 5,
                         width = 0.95,
+                        wrap_width = NULL,
                         ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
             "Package {.pkg marquee} is required for {.fn title_block}."
         )
+    }
+
+    # Wrap text if wrap_width specified
+    if (!is.null(wrap_width) && wrap_width > 0) {
+        title <- paste(strwrap(title, width = wrap_width), collapse = "\n")
     }
 
     hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
@@ -686,6 +693,7 @@ title_block <- function(title,
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
+#' @param wrap_width Character width to wrap text at. Default: NULL (no wrapping).
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
@@ -712,12 +720,18 @@ subtitle_block <- function(subtitle,
                            margin_left = 5,
                            margin_right = 5,
                            width = 0.95,
+                           wrap_width = NULL,
                            ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
             "Package {.pkg marquee} is required for {.fn subtitle_block}."
         )
+    }
+
+    # Wrap text if wrap_width specified
+    if (!is.null(wrap_width) && wrap_width > 0) {
+        subtitle <- paste(strwrap(subtitle, width = wrap_width), collapse = "\n")
     }
 
     hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
@@ -756,6 +770,7 @@ subtitle_block <- function(subtitle,
 #' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
+#' @param wrap_width Character width to wrap text at. Default: NULL (no wrapping).
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
@@ -778,12 +793,18 @@ caption_block <- function(caption,
                           margin_bottom = 5,
                           margin_left = 5,
                           margin_right = 5,
+                          wrap_width = NULL,
                           ...) {
 
     if (!requireNamespace("marquee", quietly = TRUE)) {
         cli::cli_abort(
             "Package {.pkg marquee} is required for {.fn caption_block}."
         )
+    }
+
+    # Wrap text if wrap_width specified
+    if (!is.null(wrap_width) && wrap_width > 0) {
+        caption <- paste(strwrap(caption, width = wrap_width), collapse = "\n")
     }
 
     hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
