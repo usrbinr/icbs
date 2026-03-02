@@ -158,7 +158,7 @@
     "href": "index.html#overview",
     "title": "stwd",
     "section": "Overview",
-    "text": "Overview\nCreate presentation-ready visualizations following Storytelling with Data (SWD) principles. Provides story layouts that combine charts with narrative text, colored titles, and supporting context. Includes an interactive Shiny app for designing layouts, strategic color highlighting, and integration with the marquee package for colored text labels."
+    "text": "Overview\nCreate presentation-ready visualizations following Storytelling with Data (STWD) principles. Provides story layouts that combine charts with narrative text, colored titles, and supporting context. Includes an interactive Shiny app for designing layouts, strategic color highlighting, and integration with the marquee package for colored text labels."
   },
   {
     "objectID": "index.html#installation",
