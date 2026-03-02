@@ -22,47 +22,10 @@ utils::globalVariables(c(
 # Color Helper Functions
 # ============================================================================
 
-#' Color Text with Marquee Syntax
+#' List Available R Color Names
 #'
-#' A helper function to apply color to text using marquee syntax.
-#' Accepts both hex codes (e.g., "#191970") and named R colors
-#' (e.g., "midnightblue").
-#'
-#' @param color A color specified as hex code (e.g., "#E69F00") or
-#'   named R color (e.g., "midnightblue", "steelblue", "forestgreen").
-#' @param text The text to color.
-#' @param bold Logical; wrap text in bold? Default: FALSE.
-#'
-#' @returns A marquee-formatted string for use in title, subtitle, or narrative.
-#'
-#' @export
-#'
-#' @examples
-#' # Using hex code
-#' stwd_color("#E69F00", "highlighted text")
-#'
-#' # Using named color
-#' stwd_color("midnightblue", "North region")
-#'
-#' # With bold
-#' stwd_color("steelblue", "important", bold = TRUE)
-#'
-#' # In a title
-#' title <- paste0("Sales in ", stwd_color("forestgreen", "Q4"), " exceeded targets")
-#'
-stwd_color <- function(color, text, bold = FALSE) {
-    color <- color_to_hex(color)
-    result <- paste0("{", color, " ", text, "}")
-    if (bold) {
-        result <- paste0("**", result, "**")
-    }
-    result
-}
-
-#' List Available Color Names
-#'
-#' Shows common named colors with their hex equivalents for use with
-#' `stwd_color()` or direct marquee syntax.
+#' Browse named R colors with their hex equivalents. Useful for finding
+#' colors to use in story_designer or marquee syntax.
 #'
 #' @param pattern Optional regex pattern to filter color names.
 #' @param n Maximum number of colors to show. Default: 20.
@@ -74,24 +37,21 @@ stwd_color <- function(color, text, bold = FALSE) {
 #'
 #' @examples
 #' # Show common colors
-#' stwd_colors()
+#' list_colors()
 #'
 #' # Search for blue colors
-#' stwd_colors("blue")
+#' list_colors("blue")
 #'
 #' # Search for dark colors
-#' stwd_colors("dark")
+#' list_colors("dark")
 #'
-stwd_colors <- function(pattern = NULL, n = 20) {
-    # Get all R color names
+list_colors <- function(pattern = NULL, n = 20) {
     all_colors <- grDevices::colors(distinct = TRUE)
 
-    # Filter by pattern if provided
     if (!is.null(pattern)) {
         all_colors <- all_colors[grepl(pattern, all_colors, ignore.case = TRUE)]
     }
 
-    # Limit to n colors
     all_colors <- head(all_colors, n)
 
     if (length(all_colors) == 0) {
@@ -99,12 +59,9 @@ stwd_colors <- function(pattern = NULL, n = 20) {
         return(invisible(data.frame(name = character(), hex = character())))
     }
 
-    # Convert to hex
     hex_codes <- sapply(all_colors, color_to_hex)
-
     result <- data.frame(name = all_colors, hex = hex_codes, row.names = NULL)
 
-    # Print formatted output
     cli::cli_h2("Available Colors")
     for (i in seq_len(nrow(result))) {
         cli::cli_text("{.field {result$name[i]}} \u2192 {.val {result$hex[i]}}")
@@ -113,7 +70,7 @@ stwd_colors <- function(pattern = NULL, n = 20) {
     if (!is.null(pattern)) {
         cli::cli_text("{.emph Showing {nrow(result)} colors matching '{pattern}'}")
     } else {
-        cli::cli_text("{.emph Showing first {n} colors. Use pattern to search, e.g., stwd_colors('blue')}")
+        cli::cli_text("{.emph Showing first {n} colors. Use pattern to search, e.g., list_colors('blue')}")
     }
 
     invisible(result)

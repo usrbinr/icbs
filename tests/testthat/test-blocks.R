@@ -39,19 +39,11 @@ describe("theme functions", {
 })
 
 describe("helper functions", {
-    it("stwd_color formats text with color", {
-        result <- stwd_color("#FF0000", "text")
-        expect_equal(result, "{#FF0000 text}")
-    })
-
-    it("stwd_color converts named colors to hex", {
-        result <- stwd_color("red", "text")
-        expect_match(result, "^\\{#[A-F0-9]{6} text\\}$")
-    })
-
-    it("stwd_color supports bold", {
-        result <- stwd_color("#FF0000", "text", bold = TRUE)
-        expect_equal(result, "**{#FF0000 text}**")
+    it("list_colors returns data frame", {
+        result <- list_colors(n = 5)
+        expect_s3_class(result, "data.frame")
+        expect_true("name" %in% names(result))
+        expect_true("hex" %in% names(result))
     })
 
     it("highlight_colors returns named vector", {
