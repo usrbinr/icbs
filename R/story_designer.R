@@ -134,8 +134,7 @@ story_designer <- function(plot = NULL,
                     shiny::textAreaInput("title_text", NULL, value = title, rows = 2, width = "100%",
                                          placeholder = "Use **bold** or {#E69F00 color}"),
                     shiny::sliderInput("title_size", "Font size", min = 6, max = 24, value = 12, step = 1),
-                    shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
-                    shiny::uiOutput("title_metrics")
+                    shiny::sliderInput("title_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1)
                 ),
 
                 bslib::accordion_panel(
@@ -152,8 +151,7 @@ story_designer <- function(plot = NULL,
                     ),
                     shiny::textAreaInput("subtitle_text", NULL, value = subtitle, rows = 2, width = "100%"),
                     shiny::sliderInput("subtitle_size", "Font size", min = 8, max = 16, value = 11, step = 1),
-                    shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1),
-                    shiny::uiOutput("subtitle_metrics")
+                    shiny::sliderInput("subtitle_margin_bottom", "Space below (pt)", min = 0, max = 30, value = 5, step = 1)
                 ),
 
                 bslib::accordion_panel(
@@ -1104,14 +1102,6 @@ story_designer <- function(plot = NULL,
             list(chars = chars, est_lines = est_lines, required_height = round(required_height, 2))
         }
 
-        title_metrics <- shiny::reactive({
-            calc_text_metrics(title_text_d(), input$title_size, input$output_width)
-        })
-
-        subtitle_metrics <- shiny::reactive({
-            calc_text_metrics(subtitle_text_d(), input$subtitle_size, input$output_width)
-        })
-
         current_heights <- shiny::reactive({
             legend_h <- if (input$legend_enabled %||% FALSE) 0.04 else 0
             list(title = input$title_height %||% 0.12,
@@ -1389,8 +1379,6 @@ story_designer <- function(plot = NULL,
             shiny::updateCheckboxInput(session, "show_axis_line", value = FALSE)
             shiny::updateCheckboxInput(session, "show_ticks", value = FALSE)
             shiny::updateTextInput(session, "axis_line_color", value = "#333333")
-            shiny::updateSelectInput(session, "axis_text_x_angle", selected = "0")
-            shiny::updateSelectInput(session, "axis_text_y_angle", selected = "0")
             # Grid
             shiny::updateCheckboxInput(session, "grid_remove_all", value = FALSE)
             shiny::updateSelectInput(session, "grid_major", selected = "both")
@@ -1410,14 +1398,6 @@ story_designer <- function(plot = NULL,
             )
         })
 
-        # Metrics - simple inline badges (unused but kept for reference)
-        output$title_metrics <- shiny::renderUI({
-            NULL
-        })
-
-        output$subtitle_metrics <- shiny::renderUI({
-            NULL
-        })
 
 
         # Height diagram - vertical (top to bottom)
@@ -1460,27 +1440,25 @@ story_designer <- function(plot = NULL,
             caption_txt <- convert_named_colors(caption_text_d())
 
             # Create title block with fine tune settings
-            title_margin <- input$title_margin_lr %||% 5
             title_plot <- title_block(
                 title_txt,
                 title_size = input$title_size,
                 halign = input$title_align %||% "left",
                 lineheight = input$title_lineheight %||% 1.1,
-                margin_left = title_margin,
-                margin_right = title_margin,
+                margin_left = 5,
+                margin_right = 5,
                 margin_bottom = input$title_margin_bottom,
                 wrap_width = if ((input$title_wrap %||% 0) > 0) input$title_wrap else NULL
             )
 
             # Create subtitle block with fine tune settings
-            subtitle_margin <- input$subtitle_margin_lr %||% 5
             subtitle_plot <- subtitle_block(
                 subtitle_txt,
                 subtitle_size = input$subtitle_size,
                 halign = input$subtitle_align %||% "left",
                 lineheight = input$subtitle_lineheight %||% 1.2,
-                margin_left = subtitle_margin,
-                margin_right = subtitle_margin,
+                margin_left = 5,
+                margin_right = 5,
                 margin_bottom = input$subtitle_margin_bottom,
                 wrap_width = if ((input$subtitle_wrap %||% 0) > 0) input$subtitle_wrap else NULL
             )
