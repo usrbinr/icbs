@@ -143,7 +143,6 @@ caption_block("Source: Internal Analytics") +
 |----------|---------|
 | `highlight_colors()` | Gray out non-essential categories |
 | `theme_stwd()` | Clean SWD theme (horizontal grid only) |
-| `theme_marquee()` | Enable marquee for all text elements |
 
 ## Workflow
 

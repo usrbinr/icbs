@@ -36,12 +36,6 @@ describe("theme functions", {
         th <- theme_stwd()
         expect_s3_class(th, "theme")
     })
-
-    it("theme_marquee returns a theme", {
-        skip_if_not_installed("marquee")
-        th <- theme_marquee()
-        expect_s3_class(th, "theme")
-    })
 })
 
 describe("helper functions", {

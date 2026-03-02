@@ -225,31 +225,6 @@ inline_legend <- function(colors,
     }
 }
 
-#' Apply Marquee Styling to Common Text Elements
-#'
-#' A theme addition that enables marquee rendering for title, subtitle,
-#' caption, and legend text. Use after your base theme.
-#'
-#' @returns A ggplot2 theme object.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' ggplot(...) +
-#'     theme_minimal() +
-#'     theme_marquee()
-#' }
-#'
-theme_marquee <- function() {
-    check_marquee("theme_marquee")
-    theme(
-        plot.title = marquee::element_marquee(),
-        plot.subtitle = marquee::element_marquee(),
-        plot.caption = marquee::element_marquee(),
-        legend.text = marquee::element_marquee()
-    )
-}
-
 #' STWD Theme for Storytelling
 #'
 #' A clean, minimal theme optimized for data storytelling. Follows
@@ -739,60 +714,6 @@ legend_block <- function(colors,
             theme_void() +
             theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
     }
-
-    p
-}
-
-#' Create a Large Title Block (Deprecated)
-#'
-#' @description
-#' `r lifecycle::badge("deprecated")`
-#'
-#' Use [title_block()] and [subtitle_block()] instead for more control.
-#'
-#' @param title Main title text (marquee-formatted).
-#' @param subtitle Optional subtitle text (marquee-formatted).
-#' @param title_size Size for title. Default: 8.
-#' @param subtitle_size Size for subtitle. Default: 4.
-#' @param halign Horizontal alignment. Default: "left".
-#'
-#' @returns A ggplot object.
-#' @export
-#' @keywords internal
-#'
-title_header <- function(title,
-                         subtitle = NULL,
-                         title_size = 8,
-                         subtitle_size = 4,
-                         halign = "left") {
-    check_marquee("title_header")
-    hjust <- get_hjust(halign)
-    x_pos <- get_hjust(halign)
-    # Note: title_header uses hjust value for x_pos (0, 0.5, 1) not edge offset
-
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = 0.6, label = title),
-            hjust = hjust,
-            vjust = 0,
-            size = title_size
-        )
-
-    if (!is.null(subtitle)) {
-        p <- p +
-            marquee::geom_marquee(
-                aes(x = x_pos, y = 0.4, label = subtitle),
-                hjust = hjust,
-                vjust = 1,
-                size = subtitle_size
-            )
-    }
-
-    p <- p +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        theme_void() +
-        theme(plot.margin = margin(5, 10, 5, 10))
 
     p
 }
