@@ -1473,236 +1473,64 @@ story_designer <- function(plot = NULL,
                 margin_top = 2, margin_bottom = 2)
         }, res = 96, bg = "white")
 
-        # Generated code
+        # Generated code - using helper functions from story_designer_utils.R
         code_to_copy <- shiny::reactive({
             h <- current_heights()
             caption_halign <- switch(input$caption_position %||% "full_left",
                 "full_left" = "left", "full_center" = "center", "full_right" = "right", "under_chart" = "left", "left")
 
-            # Build plot theme code
-            theme_name <- input$plot_theme %||% "stwd"
-            theme_fn <- switch(theme_name,
-                "stwd" = "theme_stwd()",
-                "void" = "theme_void()",
-                "theme_stwd()"
-            )
-            # X-Axis title
-            x_title_face <- if (input$axis_title_x_bold %||% FALSE) "bold" else "plain"
-            x_title_angle <- input$axis_title_x_angle %||% "0"
-            x_title_margin <- input$axis_title_x_margin %||% 5
-            # Y-Axis title
-            y_title_face <- if (input$axis_title_y_bold %||% FALSE) "bold" else "plain"
-            y_title_angle <- input$axis_title_y_angle %||% "90"
-            y_title_margin <- input$axis_title_y_margin %||% 5
-            # Axis line and ticks code
-            axis_line_code <- ""
-            if (input$show_axis_line %||% FALSE) {
-                axis_line_code <- paste0(axis_line_code, ',\n        axis.line = element_line(color = "', input$axis_line_color %||% "#333333", '")')
-            }
-            if (input$show_ticks %||% FALSE) {
-                axis_line_code <- paste0(axis_line_code, ',\n        axis.ticks = element_line(color = "', input$axis_line_color %||% "#333333", '")')
-            } else {
-                axis_line_code <- paste0(axis_line_code, ',\n        axis.ticks = element_blank()')
+            # Get palette info for code generation
+            pkg <- input$palette_package %||% "none"
+            pal_name <- if (pkg != "none") {
+                palettes <- available_palettes()
+                if (length(palettes) > 0) palettes[min(palette_idx(), length(palettes))] else "viridis"
+            } else NULL
+
+            # Build legend code if enabled
+            legend_code <- ""
+            if (input$legend_enabled %||% FALSE) {
+                labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
+                labels <- labels[labels != ""]
+                if (length(labels) > 0) {
+                    colors <- sapply(seq_along(labels), function(i) {
+                        input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
+                    })
+                    legend_pos <- input$legend_position %||% "above"
+                    orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
+                    h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
+                    legend_code <- generate_legend_code(
+                        labels, colors, h_align, orientation, input$legend_sep %||% " | ",
+                        input$legend_size %||% 10, input$legend_bold %||% TRUE, input$legend_uppercase %||% FALSE,
+                        if (orientation == "vertical") input$legend_lineheight %||% 1.6 else NULL,
+                        input$legend_wrap %||% 0
+                    )
+                }
             }
 
-            # Grid code
-            grid_code <- if (input$grid_remove_all %||% FALSE) {
-                ',\n        panel.grid.major = element_blank(),\n        panel.grid.minor = element_blank()'
-            } else {
-                grid_major <- input$grid_major %||% "both"
-                grid_minor <- input$grid_minor %||% "none"
-                grid_color <- input$grid_color %||% "#E5E5E5"
-                grid_lines <- c()
-                # Major
-                if (grid_major == "none") {
-                    grid_lines <- c(grid_lines, 'panel.grid.major = element_blank()')
-                } else if (grid_major == "h") {
-                    grid_lines <- c(grid_lines, paste0('panel.grid.major.y = element_line(color = "', grid_color, '")'),
-                                    'panel.grid.major.x = element_blank()')
-                } else if (grid_major == "v") {
-                    grid_lines <- c(grid_lines, 'panel.grid.major.y = element_blank()',
-                                    paste0('panel.grid.major.x = element_line(color = "', grid_color, '")'))
-                }
-                # Minor
-                if (grid_minor == "none") {
-                    grid_lines <- c(grid_lines, 'panel.grid.minor = element_blank()')
-                } else if (grid_minor == "h") {
-                    grid_lines <- c(grid_lines, paste0('panel.grid.minor.y = element_line(color = "', grid_color, '")'),
-                                    'panel.grid.minor.x = element_blank()')
-                } else if (grid_minor == "v") {
-                    grid_lines <- c(grid_lines, 'panel.grid.minor.y = element_blank()',
-                                    paste0('panel.grid.minor.x = element_line(color = "', grid_color, '")'))
-                } else if (grid_minor == "both") {
-                    grid_lines <- c(grid_lines, paste0('panel.grid.minor = element_line(color = "', grid_color, '")'))
-                }
-                if (length(grid_lines) > 0) paste0(',\n        ', paste(grid_lines, collapse = ',\n        ')) else ""
-            }
-
-            # Always show patchwork code so users can see all settings
             paste0(
                 'library(patchwork)\n',
                 '# Add ... args to pass extra options to marquee (e.g., family = "Arial")\n\n',
                 '# Style the plot\n',
-                'styled_plot <- my_plot +\n',
-                '    ', theme_fn, ' +\n',
-                '    theme(\n',
-                '        axis.title.x = element_text(\n',
-                '            size = ', input$axis_title_x_size %||% 11, ', face = "', x_title_face, '",\n',
-                '            hjust = ', input$axis_title_x_align %||% "0.5", ', angle = ', x_title_angle, ',\n',
-                '            color = "', input$axis_title_x_color %||% "#333333", '",\n',
-                '            margin = margin(t = ', x_title_margin, ')\n',
-                '        ),\n',
-                '        axis.title.y = element_text(\n',
-                '            size = ', input$axis_title_y_size %||% 11, ', face = "', y_title_face, '",\n',
-                '            hjust = ', input$axis_title_y_align %||% "0.5", ', angle = ', y_title_angle, ',\n',
-                '            color = "', input$axis_title_y_color %||% "#333333", '",\n',
-                '            margin = margin(r = ', y_title_margin, ')\n',
-                '        ),\n',
-                '        axis.text = element_text(size = ', input$axis_text_size %||% 10,
-                ', color = "', input$axis_text_color %||% "#666666", '"),\n',
-                '        legend.position = "', input$plot_legend_pos %||% "right", '"', axis_line_code, grid_code, '\n',
-                '    )',
-                # Add palette code if selected
-                if ((input$palette_package %||% "none") != "none") {
-                    pkg <- input$palette_package
-                    palettes <- available_palettes()
-                    idx <- min(palette_idx(), length(palettes))
-                    pal_name <- if (length(palettes) > 0) palettes[idx] else "viridis"
-                    apply_to <- input$palette_apply %||% "fill"
-
-                    pal_fn <- switch(pkg,
-                        "ggsci" = paste0('ggsci::pal_', pal_name, '()(8)'),
-                        "MetBrewer" = paste0('MetBrewer::met.brewer("', pal_name, '")'),
-                        "nord" = paste0('nord::nord("', pal_name, '", 8)'),
-                        "PNWColors" = paste0('PNWColors::pnw_palette("', pal_name, '", 8)'),
-                        "rcartocolor" = paste0('rcartocolor::carto_pal(8, "', pal_name, '")'),
-                        "RColorBrewer" = paste0('RColorBrewer::brewer.pal(8, "', pal_name, '")'),
-                        "scico" = paste0('scico::scico(8, palette = "', pal_name, '")'),
-                        "viridis" = paste0('viridis::viridis(8, option = "', pal_name, '")'),
-                        "wesanderson" = paste0('wesanderson::wes_palette("', pal_name, '", 8, type = "continuous")'),
-                        'viridis::viridis(8)'
-                    )
-
-                    scale_code <- ""
-                    scale_type <- input$palette_scale %||% "discrete"
-                    if (scale_type == "discrete") {
-                        if (apply_to %in% c("fill", "both")) {
-                            scale_code <- paste0(scale_code, ' +\n    scale_fill_manual(values = ', pal_fn, ')')
-                        }
-                        if (apply_to %in% c("color", "both")) {
-                            scale_code <- paste0(scale_code, ' +\n    scale_color_manual(values = ', pal_fn, ')')
-                        }
-                    } else {
-                        if (apply_to %in% c("fill", "both")) {
-                            scale_code <- paste0(scale_code, ' +\n    scale_fill_gradientn(colors = ', pal_fn, ')')
-                        }
-                        if (apply_to %in% c("color", "both")) {
-                            scale_code <- paste0(scale_code, ' +\n    scale_color_gradientn(colors = ', pal_fn, ')')
-                        }
-                    }
-                    scale_code
-                } else "",
+                generate_theme_code(input, `%||%`),
+                generate_palette_code(pkg, pal_name, input$palette_apply %||% "fill", input$palette_scale %||% "discrete"),
                 '\n\n',
-                'title_plot <- title_block(\n',
-                '    "', gsub('"', '\\"', input$title_text), '",\n',
-                '    title_size = ', input$title_size, ',\n',
-                '    halign = "', input$title_align %||% "left", '",\n',
-                '    lineheight = ', input$title_lineheight %||% 1.1, ',\n',
-                '    margin_bottom = ', input$title_margin_bottom,
-                if ((input$title_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$title_wrap) else '', '\n',
-                ')\n\n',
-                'subtitle_plot <- subtitle_block(\n',
-                '    "', gsub('"', '\\"', input$subtitle_text), '",\n',
-                '    subtitle_size = ', input$subtitle_size, ',\n',
-                '    halign = "', input$subtitle_align %||% "left", '",\n',
-                '    lineheight = ', input$subtitle_lineheight %||% 1.2, ',\n',
-                '    margin_bottom = ', input$subtitle_margin_bottom,
-                if ((input$subtitle_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$subtitle_wrap) else '', '\n',
-                ')\n\n',
-                'narrative_plot <- text_narrative(\n',
-                '    "', gsub('\n', '\\n', gsub('"', '\\"', input$narrative_text)), '",\n',
-                '    size = ', input$narrative_size, ',\n',
-                '    halign = "', input$narrative_halign %||% "left", '",\n',
-                '    valign = "', input$narrative_valign %||% "top", '",\n',
-                '    lineheight = ', input$narrative_lineheight %||% 1.4, ',\n',
-                '    padding = ', input$narrative_padding %||% 10,
-                if ((input$narrative_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$narrative_wrap) else '', '\n',
-                ')\n\n',
-                'caption_plot <- caption_block(\n',
-                '    "', gsub('"', '\\"', input$caption_text), '",\n',
-                '    caption_size = ', input$caption_size, ',\n',
-                '    halign = "', caption_halign, '",\n',
-                '    color = "', input$caption_color %||% "#808080", '"',
-                if ((input$caption_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$caption_wrap) else '', '\n',
-                ')\n\n',
-                # Legend code if enabled
-                if (input$legend_enabled %||% FALSE) {
-                    labels <- trimws(strsplit(input$legend_labels %||% "", ",")[[1]])
-                    labels <- labels[labels != ""]
-                    n_labels <- length(labels)
-                    if (n_labels > 0) {
-                        colors <- sapply(seq_len(n_labels), function(i) {
-                            input[[paste0("legend_color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
-                        })
-                        color_vec <- paste0('c(', paste0('"', labels, '" = "', colors, '"', collapse = ', '), ')')
-                        legend_pos <- input$legend_position %||% "above"
-                        orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
-                        h_align <- if (legend_pos == "left") "left" else if (legend_pos == "right") "right" else (input$legend_halign %||% "right")
-                        lineheight_code <- if (orientation == "vertical") paste0(',\n    lineheight = ', input$legend_lineheight %||% 1.6) else ""
-                        wrap_code <- if ((input$legend_wrap %||% 0) > 0) paste0(',\n    wrap_width = ', input$legend_wrap) else ""
-                        paste0(
-                            'legend_plot <- legend_block(\n',
-                            '    ', color_vec, ',\n',
-                            '    halign = "', h_align, '",\n',
-                            '    orientation = "', orientation, '",\n',
-                            '    sep = "', input$legend_sep %||% " | ", '",\n',
-                            '    size = ', input$legend_size %||% 10, ',\n',
-                            '    bold = ', if (input$legend_bold %||% TRUE) "TRUE" else "FALSE", ',\n',
-                            '    uppercase = ', if (input$legend_uppercase %||% FALSE) "TRUE" else "FALSE",
-                            lineheight_code, wrap_code, '\n',
-                            ')\n\n'
-                        )
-                    } else ""
-                } else "",
-                '# Combine styled plot + narrative\n',
-                'content <- styled_plot + narrative_plot +\n',
-                '    plot_layout(widths = c(', round(1 - input$narrative_width, 2), ', ', input$narrative_width, '))\n\n',
-                '# Stack everything\n',
-                if (input$legend_enabled %||% FALSE) {
-                    legend_pos <- input$legend_position %||% "above"
-                    content_h <- round(1 - h$title - h$subtitle - (if (legend_pos %in% c("above", "below")) h$legend else 0) - h$caption, 3)
-                    if (legend_pos == "above") {
-                        paste0(
-                            'final <- title_plot / subtitle_plot / legend_plot / content / caption_plot +\n',
-                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', h$legend, ', ', content_h, ', ', h$caption, '))'
-                        )
-                    } else if (legend_pos == "below") {
-                        paste0(
-                            'final <- title_plot / subtitle_plot / content / legend_plot / caption_plot +\n',
-                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$legend, ', ', h$caption, '))'
-                        )
-                    } else if (legend_pos == "right") {
-                        legend_w <- input$legend_width %||% 0.12
-                        paste0(
-                            'content_with_legend <- patchwork::wrap_plots(content, legend_plot, widths = c(', round(1 - legend_w, 2), ', ', legend_w, '))\n',
-                            'final <- title_plot / subtitle_plot / content_with_legend / caption_plot +\n',
-                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$caption, '))'
-                        )
-                    } else {
-                        legend_w <- input$legend_width %||% 0.12
-                        paste0(
-                            'content_with_legend <- patchwork::wrap_plots(legend_plot, content, widths = c(', legend_w, ', ', round(1 - legend_w, 2), '))\n',
-                            'final <- title_plot / subtitle_plot / content_with_legend / caption_plot +\n',
-                            '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ', content_h, ', ', h$caption, '))'
-                        )
-                    }
-                } else {
-                    paste0(
-                        'final <- title_plot / subtitle_plot / content / caption_plot +\n',
-                        '    plot_layout(heights = c(', h$title, ', ', h$subtitle, ', ',
-                        round(1 - h$title - h$subtitle - h$caption, 3), ', ', h$caption, '))'
-                    )
-                }
+                generate_block_code("title", input$title_text, input$title_size,
+                    input$title_align %||% "left", input$title_lineheight %||% 1.1,
+                    input$title_margin_bottom, input$title_wrap %||% 0),
+                generate_block_code("subtitle", input$subtitle_text, input$subtitle_size,
+                    input$subtitle_align %||% "left", input$subtitle_lineheight %||% 1.2,
+                    input$subtitle_margin_bottom, input$subtitle_wrap %||% 0),
+                generate_block_code("narrative", input$narrative_text, input$narrative_size,
+                    input$narrative_halign %||% "left", input$narrative_lineheight %||% 1.4,
+                    wrap_width = input$narrative_wrap %||% 0,
+                    valign = input$narrative_valign %||% "top", padding = input$narrative_padding %||% 10),
+                generate_block_code("caption", input$caption_text, input$caption_size,
+                    caption_halign, lineheight = NULL, wrap_width = input$caption_wrap %||% 0,
+                    color = input$caption_color %||% "#808080"),
+                legend_code,
+                generate_composition_code(h, input$narrative_width,
+                    input$legend_enabled %||% FALSE, input$legend_position %||% "above",
+                    input$legend_width %||% 0.12)
             )
         })
 
