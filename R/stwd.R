@@ -339,32 +339,24 @@ text_narrative <- function(text,
                            wrap_width = NULL,
                            ...) {
     check_marquee("text_narrative")
-    text <- maybe_wrap_text(text, wrap_width)
-
-    hjust <- get_hjust(halign)
-    vjust <- get_vjust(valign)
-    x_pos <- get_x_pos(halign)
-    y_pos <- get_y_pos(valign)
 
     # Use narrower width to allow alignment to be visible
     text_width <- if (width == 1) 0.96 else width
 
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = y_pos, label = text),
-            hjust = hjust,
-            vjust = vjust,
-            size = size,
-            lineheight = lineheight,
-            width = text_width,
-            ...
-        ) +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        theme_void() +
-        theme(plot.margin = margin(padding, padding, padding, padding))
-
-    p
+    create_text_block(
+        text = text,
+        size = size,
+        halign = halign,
+        valign = valign,
+        lineheight = lineheight,
+        width = text_width,
+        wrap_width = wrap_width,
+        margin_top = padding,
+        margin_right = padding,
+        margin_bottom = padding,
+        margin_left = padding,
+        ...
+    )
 }
 
 #' Create a Title Block Plot
@@ -423,29 +415,23 @@ title_block <- function(title,
                         wrap_width = NULL,
                         ...) {
     check_marquee("title_block")
-    title <- maybe_wrap_text(title, wrap_width)
-    hjust <- get_hjust(halign)
-    x_pos <- get_x_pos(halign)
 
-    # Position text from top (y=0.95) flowing downward (vjust=1)
-    # This gives maximum room for wrapped text to expand downward
-    # The y-axis expansion adds buffer at the bottom
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = 0.95, label = title),
-            hjust = hjust,
-            vjust = 1,
-            size = title_size,
-            lineheight = lineheight,
-            width = width,
-            ...
-        ) +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0.1, 0.02))) +
-        theme_void() +
-        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
-
-    p
+    create_text_block(
+        text = title,
+        size = title_size,
+        halign = halign,
+        y_pos = 0.95,
+        vjust = 1,
+        lineheight = lineheight,
+        width = width,
+        wrap_width = wrap_width,
+        y_expand = expansion(mult = c(0.1, 0.02)),
+        margin_top = margin_top,
+        margin_right = margin_right,
+        margin_bottom = margin_bottom,
+        margin_left = margin_left,
+        ...
+    )
 }
 
 #' Create a Subtitle Block Plot
@@ -502,26 +488,23 @@ subtitle_block <- function(subtitle,
                            wrap_width = NULL,
                            ...) {
     check_marquee("subtitle_block")
-    subtitle <- maybe_wrap_text(subtitle, wrap_width)
-    hjust <- get_hjust(halign)
-    x_pos <- get_x_pos(halign)
 
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = 0.9, label = subtitle),
-            hjust = hjust,
-            vjust = 1,
-            size = subtitle_size,
-            lineheight = lineheight,
-            width = width,
-            ...
-        ) +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0.1, 0.02))) +
-        theme_void() +
-        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
-
-    p
+    create_text_block(
+        text = subtitle,
+        size = subtitle_size,
+        halign = halign,
+        y_pos = 0.9,
+        vjust = 1,
+        lineheight = lineheight,
+        width = width,
+        wrap_width = wrap_width,
+        y_expand = expansion(mult = c(0.1, 0.02)),
+        margin_top = margin_top,
+        margin_right = margin_right,
+        margin_bottom = margin_bottom,
+        margin_left = margin_left,
+        ...
+    )
 }
 
 #' Create a Caption Block Plot
@@ -572,29 +555,26 @@ caption_block <- function(caption,
                           wrap_width = NULL,
                           ...) {
     check_marquee("caption_block")
-    caption <- maybe_wrap_text(caption, wrap_width)
-    hjust <- get_hjust(halign)
-    x_pos <- get_x_pos(halign)
 
     # Wrap caption in color if not already formatted
-    if (!grepl("^\\{#", caption)) {
-        caption <- paste0("{", color, " ", caption, "}")
+    caption_text <- maybe_wrap_text(caption, wrap_width)
+    if (!grepl("^\\{#", caption_text)) {
+        caption_text <- paste0("{", color, " ", caption_text, "}")
     }
 
-    p <- ggplot() +
-        marquee::geom_marquee(
-            aes(x = x_pos, y = 0.5, label = caption),
-            hjust = hjust,
-            vjust = 0.5,
-            size = caption_size,
-            ...
-        ) +
-        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-        theme_void() +
-        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
-
-    p
+    create_text_block(
+        text = caption_text,
+        size = caption_size,
+        halign = halign,
+        y_pos = 0.5,
+        vjust = 0.5,
+        width = 0.95,
+        margin_top = margin_top,
+        margin_right = margin_right,
+        margin_bottom = margin_bottom,
+        margin_left = margin_left,
+        ...
+    )
 }
 
 #' Create a Legend Block Plot

@@ -79,3 +79,76 @@ maybe_wrap_text <- function(text, wrap_width) {
         text
     }
 }
+
+#' Create a text block plot (internal helper)
+#'
+#' Core function for creating marquee text blocks. Used by title_block,
+#' subtitle_block, caption_block, and text_narrative.
+#'
+#' @param text Text to display (marquee-formatted)
+#' @param size Text size in pts
+#' @param halign Horizontal alignment: "left", "center", "right"
+#' @param valign Vertical alignment: "top", "center", "bottom" (NULL to use fixed y/vjust)
+#' @param y_pos Fixed y position (used when valign is NULL)
+#' @param vjust Fixed vjust value (used when valign is NULL)
+#' @param lineheight Line height multiplier (NULL to omit)
+#' @param width Text width for marquee wrapping (0-1)
+#' @param wrap_width Character width for text wrapping (NULL to disable)
+#' @param y_expand Y-axis expansion (NULL for default c(0,0))
+#' @param margin_top,margin_right,margin_bottom,margin_left Margins in pts
+#' @param ... Additional arguments passed to marquee::geom_marquee()
+#' @return A ggplot object
+#' @noRd
+create_text_block <- function(text,
+                              size,
+                              halign = "left",
+                              valign = NULL,
+                              y_pos = NULL,
+                              vjust = NULL,
+                              lineheight = NULL,
+                              width = 0.95,
+                              wrap_width = NULL,
+                              y_expand = NULL,
+                              margin_top = 5,
+                              margin_right = 5,
+                              margin_bottom = 5,
+                              margin_left = 5,
+                              ...) {
+    text <- maybe_wrap_text(text, wrap_width)
+
+    hjust <- get_hjust(halign)
+    x_pos <- get_x_pos(halign)
+
+    # Use valign helpers if valign provided, otherwise use fixed values
+    if (!is.null(valign)) {
+        y_pos <- get_y_pos(valign)
+        vjust <- get_vjust(valign)
+    }
+
+    # Build geom_marquee arguments
+    marquee_args <- list(
+        mapping = aes(x = x_pos, y = y_pos, label = text),
+        hjust = hjust,
+        vjust = vjust,
+        size = size,
+        width = width
+    )
+    if (!is.null(lineheight)) {
+        marquee_args$lineheight <- lineheight
+    }
+    marquee_args <- c(marquee_args, list(...))
+
+    # Build y-axis scale
+    if (!is.null(y_expand)) {
+        y_scale <- scale_y_continuous(limits = c(0, 1), expand = y_expand)
+    } else {
+        y_scale <- scale_y_continuous(limits = c(0, 1), expand = c(0, 0))
+    }
+
+    ggplot() +
+        do.call(marquee::geom_marquee, marquee_args) +
+        scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+        y_scale +
+        theme_void() +
+        theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
+}
