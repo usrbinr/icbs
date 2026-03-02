@@ -2,7 +2,7 @@
 title: "legend_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L857)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L887)
 
 # `legend_block()`
 
@@ -22,6 +22,7 @@ legend_block(
   uppercase = FALSE,
   lineheight = 1.6,
   width = 0.95,
+  wrap_width = NULL,
   margin_top = 0,
   margin_bottom = 5,
   margin_left = 5,
@@ -44,6 +45,7 @@ legend_block(
 | `uppercase` | Logical; convert labels to uppercase? Default: FALSE. |
 | `lineheight` | Line height multiplier for vertical legends. Default: 1.6. |
 | `width` | Text width for wrapping (0-1). Default: 0.95. |
+| `wrap_width` | Character width to wrap labels at. Useful for long labels in vertical legends. Default: NULL (no wrapping). |
 | `margin_top` | Top margin in pts. Default: 0. |
 | `margin_bottom` | Bottom margin in pts. Default: 5. |
 | `margin_left` | Left margin in pts. Default: 5. |

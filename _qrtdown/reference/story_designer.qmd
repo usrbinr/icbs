@@ -2,7 +2,7 @@
 title: "story_designer"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L30)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L72)
 
 # `story_designer()`
 
@@ -25,21 +25,20 @@ story_designer(
 | Argument | Description |
 |----------|-------------|
 | `plot` | Optional ggplot object to include in the preview. If NULL, a placeholder chart is used. |
-| `title` | Initial title text. |
+| `title` | Initial title text. Supports marquee formatting: **bold**, *italic*, {#E69F00 colored text. |
 | `subtitle` | Initial subtitle text. |
-| `narrative` | Initial narrative text. |
-| `caption` | Initial caption text. |
+| `narrative` | Initial narrative text for the side panel. |
+| `caption` | Initial caption/source text. |
 
 ## Value
 
-Launches a Shiny app. When you click "Copy Code", the
-generated `story_layout()` call is copied to your clipboard.
+Launches a Shiny app. Returns NULL invisibly.
 
 ## Description
 
 Launches a Shiny app to interactively design story layouts with
-real-time clipping detection. Helps you find the right height
-allocations before exporting.
+real-time preview. Provides controls for text blocks, color palettes,
+themes, and exports ready-to-use patchwork code.
 
 ## Examples
 
@@ -50,8 +49,15 @@ story_designer()
 
 # Launch with your plot
 library(ggplot2)
-p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_col()
-story_designer(plot = p, title = "My Title")
+p <- ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+  geom_col()
+story_designer(
+  plot = p,
+  title = "**Fuel Economy** by {#E69F00 Cylinder Count}",
+  subtitle = "MPG varies significantly across engine sizes",
+  narrative = "**Key finding:** 4-cylinder cars have the best fuel economy.",
+  caption = "SOURCE: mtcars dataset"
+)
 
 ## End(Not run)
 ```

@@ -300,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../reference.qmd"> 
+    <a class="nav-link" href="../../_qrtdown/reference.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -309,16 +309,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
         <li>
-    <a class="dropdown-item" href="../../vignettes/articles/layouts.html">
- <span class="dropdown-text">Multi-Panel Layouts with Connectors</span></a>
-  </li>  
-        <li>
     <a class="dropdown-item" href="../../vignettes/articles/marquee.html">
  <span class="dropdown-text">Marquee Integration for Colored Labels</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../vignettes/articles/sitrep.html">
  <span class="dropdown-text">Debugging Layouts with story_sitrep()</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/sizing.html">
+ <span class="dropdown-text">Sizing Story Layouts for Quarto</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../vignettes/articles/storytelling.html">
@@ -337,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.ibcs.com/"> <i class="bi bi-code-square" role="img" aria-label="Source code">
+    <a class="nav-link" href="https://codeberg.org/usrbinr/stwd"> <i class="bi bi-code-square" role="img" aria-label="Source code">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -431,16 +431,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• subtitle [text] (11pt)</code></pre>
+<pre><code>• subtitle [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• narrative [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• caption [text] (9pt)</code></pre>
+<pre><code>• caption [text] (6pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not included: "plot"</code></pre>
@@ -497,6 +497,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Create visual hierarchy: title should be noticeably larger than subtitle</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ Use **bold** in narrative to emphasize key takeaways and action items</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -515,18 +521,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="understanding-the-layout-diagram">Understanding the Layout Diagram</h2>
 <p>The ASCII diagram shows how your layout will be structured. When you have both a plot and narrative, the diagram shows their arrangement:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a placeholder plot for demonstration</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(cyl), <span class="at">y =</span> mpg)) <span class="sc">+</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Layout with narrative on the RIGHT</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a placeholder plot for demonstration</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(cyl), <span class="at">y =</span> mpg)) <span class="sc">+</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Layout with narrative on the RIGHT</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -543,7 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• plot [ggplot]</code></pre>
@@ -604,6 +610,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ A subtitle can provide supporting context (time period, methodology, scope)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -618,12 +627,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Compare with narrative on the LEFT - notice how NARRATIVE and PLOT swap positions:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"left"</span></span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"left"</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -640,7 +649,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• plot [ggplot]</code></pre>
@@ -701,6 +710,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ A subtitle can provide supporting context (time period, methodology, scope)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -715,13 +727,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Or narrative at the BOTTOM (stacked vertically):</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
-<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
-<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"bottom"</span>,</span>
-<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.2</span></span>
-<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sales Analysis"</span>,</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Commentary here"</span>,</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.2</span></span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -738,7 +750,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• plot [ggplot]</code></pre>
@@ -800,6 +812,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ A subtitle can provide supporting context (time period, methodology, scope)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -817,12 +832,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="checking-proportions">Checking Proportions</h2>
 <p>The sitrep helps you verify that your height allocations make sense:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default proportions</span></span>
-<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Title"</span>,</span>
-<span id="cb112-4"><a href="#cb112-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Subtitle"</span>,</span>
-<span id="cb112-5"><a href="#cb112-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Caption"</span></span>
-<span id="cb112-6"><a href="#cb112-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default proportions</span></span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Title"</span>,</span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Subtitle"</span>,</span>
+<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Caption"</span></span>
+<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -839,13 +854,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• subtitle [text] (11pt)</code></pre>
+<pre><code>• subtitle [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• caption [text] (9pt)</code></pre>
+<pre><code>• caption [text] (6pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not included: "plot" and "narrative"</code></pre>
@@ -893,17 +908,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Create visual hierarchy: title should be noticeably larger than subtitle</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle</code></pre>
 </div>
 </div>
 <p>If you have a long title that wraps to multiple lines, you may need more height:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Increased title height for wrapping text</span></span>
-<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb135-3"><a href="#cb135-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"This is a Very Long Title That Will Wrap to Multiple Lines"</span>,</span>
-<span id="cb135-4"><a href="#cb135-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Subtitle"</span>,</span>
-<span id="cb135-5"><a href="#cb135-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_height =</span> <span class="fl">0.20</span></span>
-<span id="cb135-6"><a href="#cb135-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Increased title height for wrapping text</span></span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"This is a Very Long Title That Will Wrap to Multiple Lines"</span>,</span>
+<span id="cb142-4"><a href="#cb142-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Subtitle"</span>,</span>
+<span id="cb142-5"><a href="#cb142-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_height =</span> <span class="fl">0.20</span></span>
+<span id="cb142-6"><a href="#cb142-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -920,10 +941,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• subtitle [text] (11pt)</code></pre>
+<pre><code>• subtitle [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not included: "plot", "narrative", and "caption"</code></pre>
@@ -970,6 +991,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Create visual hierarchy: title should be noticeably larger than subtitle</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ Use auto_heights=TRUE in story_layout() to automatically size title/subtitle</code></pre>
 </div>
 </div>
@@ -978,11 +1005,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="swd-inspired-tips">SWD-Inspired Tips</h2>
 <p>The sitrep provides suggestions based on Storytelling with Data principles:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Small title - sitrep suggests larger for visual hierarchy</span></span>
-<span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb157-3"><a href="#cb157-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Small Title"</span>,</span>
-<span id="cb157-4"><a href="#cb157-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_size =</span> <span class="dv">10</span></span>
-<span id="cb157-5"><a href="#cb157-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Small title - sitrep suggests larger for visual hierarchy</span></span>
+<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Small Title"</span>,</span>
+<span id="cb166-4"><a href="#cb166-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_size =</span> <span class="dv">10</span></span>
+<span id="cb166-5"><a href="#cb166-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -1054,11 +1081,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb180"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot without narrative - sitrep suggests adding context</span></span>
-<span id="cb180-2"><a href="#cb180-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb180-3"><a href="#cb180-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb180-4"><a href="#cb180-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span></span>
-<span id="cb180-5"><a href="#cb180-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb189"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot without narrative - sitrep suggests adding context</span></span>
+<span id="cb189-2"><a href="#cb189-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb189-3"><a href="#cb189-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb189-4"><a href="#cb189-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span></span>
+<span id="cb189-5"><a href="#cb189-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -1075,7 +1102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• plot [ggplot]</code></pre>
@@ -1127,6 +1154,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ A subtitle can provide supporting context (time period, methodology, scope)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -1140,12 +1170,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb205"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot without source - sitrep suggests adding credibility</span></span>
-<span id="cb205-2"><a href="#cb205-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
-<span id="cb205-3"><a href="#cb205-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb205-4"><a href="#cb205-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span>,</span>
-<span id="cb205-5"><a href="#cb205-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Analysis"</span></span>
-<span id="cb205-6"><a href="#cb205-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb215"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot without source - sitrep suggests adding credibility</span></span>
+<span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_sitrep</span>(</span>
+<span id="cb215-3"><a href="#cb215-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb215-4"><a href="#cb215-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span>,</span>
+<span id="cb215-5"><a href="#cb215-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Analysis"</span></span>
+<span id="cb215-6"><a href="#cb215-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -1162,7 +1192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• plot [ggplot]</code></pre>
@@ -1223,6 +1253,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ A subtitle can provide supporting context (time period, methodology, scope)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -1240,17 +1273,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="workflow-sitrep-then-build">Workflow: Sitrep Then Build</h2>
 <p>A recommended workflow is to check your sitrep before rendering:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb233"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb233-1"><a href="#cb233-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Check the sitrep</span></span>
-<span id="cb233-2"><a href="#cb233-2" aria-hidden="true" tabindex="-1"></a>my_sitrep <span class="ot">&lt;-</span> <span class="fu">story_sitrep</span>(</span>
-<span id="cb233-3"><a href="#cb233-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**Q4 Results: {#E63946 Sales} Exceed Target**"</span>,</span>
-<span id="cb233-4"><a href="#cb233-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Regional performance summary"</span>,</span>
-<span id="cb233-5"><a href="#cb233-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Key findings go here"</span>,</span>
-<span id="cb233-6"><a href="#cb233-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span>,</span>
-<span id="cb233-7"><a href="#cb233-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.35</span>,</span>
-<span id="cb233-8"><a href="#cb233-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Finance"</span></span>
-<span id="cb233-9"><a href="#cb233-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb233-10"><a href="#cb233-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb233-11"><a href="#cb233-11" aria-hidden="true" tabindex="-1"></a>my_sitrep</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb244"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb244-1"><a href="#cb244-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Check the sitrep</span></span>
+<span id="cb244-2"><a href="#cb244-2" aria-hidden="true" tabindex="-1"></a>my_sitrep <span class="ot">&lt;-</span> <span class="fu">story_sitrep</span>(</span>
+<span id="cb244-3"><a href="#cb244-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**Q4 Results: {#E63946 Sales} Exceed Target**"</span>,</span>
+<span id="cb244-4"><a href="#cb244-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Regional performance summary"</span>,</span>
+<span id="cb244-5"><a href="#cb244-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Key findings go here"</span>,</span>
+<span id="cb244-6"><a href="#cb244-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span>,</span>
+<span id="cb244-7"><a href="#cb244-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb244-8"><a href="#cb244-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Finance"</span></span>
+<span id="cb244-9"><a href="#cb244-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb244-10"><a href="#cb244-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb244-11"><a href="#cb244-11" aria-hidden="true" tabindex="-1"></a>my_sitrep</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
 </div>
@@ -1267,16 +1300,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code></code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• title [text] (16pt)</code></pre>
+<pre><code>• title [text] (12pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• subtitle [text] (11pt)</code></pre>
+<pre><code>• subtitle [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>• narrative [text] (10pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>• caption [text] (9pt)</code></pre>
+<pre><code>• caption [text] (6pt)</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not included: "plot"</code></pre>
@@ -1333,6 +1366,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>── Tips ──</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>ℹ Larger titles (14pt+) create visual hierarchy and draw attention to your message</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Create visual hierarchy: title should be noticeably larger than subtitle</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>ℹ Colored text in title should match corresponding chart elements for consistency</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
@@ -1343,31 +1382,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb261"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb261-1"><a href="#cb261-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: If proportions look good, build the actual layout</span></span>
-<span id="cb261-2"><a href="#cb261-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb261-3"><a href="#cb261-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> <span class="fu">c</span>(<span class="st">"North"</span>, <span class="st">"South"</span>, <span class="st">"East"</span>, <span class="st">"West"</span>),</span>
-<span id="cb261-4"><a href="#cb261-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sales =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">95</span>, <span class="dv">110</span>, <span class="dv">85</span>)</span>
-<span id="cb261-5"><a href="#cb261-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb261-6"><a href="#cb261-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb261-7"><a href="#cb261-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(region, sales), <span class="at">y =</span> sales)) <span class="sc">+</span></span>
-<span id="cb261-8"><a href="#cb261-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#E63946"</span>) <span class="sc">+</span></span>
-<span id="cb261-9"><a href="#cb261-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb261-10"><a href="#cb261-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb261-11"><a href="#cb261-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Sales ($M)"</span>)</span>
-<span id="cb261-12"><a href="#cb261-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb261-13"><a href="#cb261-13" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
-<span id="cb261-14"><a href="#cb261-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb261-15"><a href="#cb261-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**Q4 Results: {#E63946 Sales} Exceed Target**"</span>,</span>
-<span id="cb261-16"><a href="#cb261-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Regional performance summary"</span>,</span>
-<span id="cb261-17"><a href="#cb261-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"**North region** led all markets</span></span>
-<span id="cb261-18"><a href="#cb261-18" aria-hidden="true" tabindex="-1"></a><span class="st">with $120M in sales.</span></span>
-<span id="cb261-19"><a href="#cb261-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb261-20"><a href="#cb261-20" aria-hidden="true" tabindex="-1"></a><span class="st">West underperformed at $85M,</span></span>
-<span id="cb261-21"><a href="#cb261-21" aria-hidden="true" tabindex="-1"></a><span class="st">requiring attention in Q1."</span>,</span>
-<span id="cb261-22"><a href="#cb261-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span>,</span>
-<span id="cb261-23"><a href="#cb261-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.35</span>,</span>
-<span id="cb261-24"><a href="#cb261-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Finance"</span></span>
-<span id="cb261-25"><a href="#cb261-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb274"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb274-1"><a href="#cb274-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: If proportions look good, build the actual layout</span></span>
+<span id="cb274-2"><a href="#cb274-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb274-3"><a href="#cb274-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> <span class="fu">c</span>(<span class="st">"North"</span>, <span class="st">"South"</span>, <span class="st">"East"</span>, <span class="st">"West"</span>),</span>
+<span id="cb274-4"><a href="#cb274-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sales =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">95</span>, <span class="dv">110</span>, <span class="dv">85</span>)</span>
+<span id="cb274-5"><a href="#cb274-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb274-6"><a href="#cb274-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb274-7"><a href="#cb274-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(region, sales), <span class="at">y =</span> sales)) <span class="sc">+</span></span>
+<span id="cb274-8"><a href="#cb274-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#E63946"</span>) <span class="sc">+</span></span>
+<span id="cb274-9"><a href="#cb274-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb274-10"><a href="#cb274-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb274-11"><a href="#cb274-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Sales ($M)"</span>)</span>
+<span id="cb274-12"><a href="#cb274-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb274-13"><a href="#cb274-13" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
+<span id="cb274-14"><a href="#cb274-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb274-15"><a href="#cb274-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**Q4 Results: {#E63946 Sales} Exceed Target**"</span>,</span>
+<span id="cb274-16"><a href="#cb274-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Regional performance summary"</span>,</span>
+<span id="cb274-17"><a href="#cb274-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"**North region** led all markets</span></span>
+<span id="cb274-18"><a href="#cb274-18" aria-hidden="true" tabindex="-1"></a><span class="st">with $120M in sales.</span></span>
+<span id="cb274-19"><a href="#cb274-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb274-20"><a href="#cb274-20" aria-hidden="true" tabindex="-1"></a><span class="st">West underperformed at $85M,</span></span>
+<span id="cb274-21"><a href="#cb274-21" aria-hidden="true" tabindex="-1"></a><span class="st">requiring attention in Q1."</span>,</span>
+<span id="cb274-22"><a href="#cb274-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_position =</span> <span class="st">"right"</span>,</span>
+<span id="cb274-23"><a href="#cb274-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative_width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb274-24"><a href="#cb274-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Finance"</span></span>
+<span id="cb274-25"><a href="#cb274-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1381,32 +1420,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="accessing-sitrep-data-programmatically">Accessing Sitrep Data Programmatically</h2>
 <p>The sitrep is an S7 object. You can access its properties directly:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb262"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb262-1"><a href="#cb262-1" aria-hidden="true" tabindex="-1"></a>sitrep <span class="ot">&lt;-</span> <span class="fu">story_sitrep</span>(</span>
-<span id="cb262-2"><a href="#cb262-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span>,</span>
-<span id="cb262-3"><a href="#cb262-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Details"</span>,</span>
-<span id="cb262-4"><a href="#cb262-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Analysis"</span></span>
-<span id="cb262-5"><a href="#cb262-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb262-6"><a href="#cb262-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb262-7"><a href="#cb262-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Access the components table</span></span>
-<span id="cb262-8"><a href="#cb262-8" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>components</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb275"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb275-1"><a href="#cb275-1" aria-hidden="true" tabindex="-1"></a>sitrep <span class="ot">&lt;-</span> <span class="fu">story_sitrep</span>(</span>
+<span id="cb275-2"><a href="#cb275-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Report"</span>,</span>
+<span id="cb275-3"><a href="#cb275-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Details"</span>,</span>
+<span id="cb275-4"><a href="#cb275-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"Analysis"</span></span>
+<span id="cb275-5"><a href="#cb275-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb275-6"><a href="#cb275-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb275-7"><a href="#cb275-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Access the components table</span></span>
+<span id="cb275-8"><a href="#cb275-8" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>components</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  component present type size_pt
-1     title    TRUE text      16
-2  subtitle    TRUE text      11
+1     title    TRUE text      12
+2  subtitle    TRUE text      10
 3      plot   FALSE &lt;NA&gt;      NA
 4 narrative    TRUE text      10
 5   caption   FALSE &lt;NA&gt;      NA</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb264"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb264-1"><a href="#cb264-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Access layout proportions</span></span>
-<span id="cb264-2"><a href="#cb264-2" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>layout<span class="sc">$</span>content_height</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb277"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb277-1"><a href="#cb277-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Access layout proportions</span></span>
+<span id="cb277-2"><a href="#cb277-2" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>layout<span class="sc">$</span>content_height</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.78</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb266"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb266-1"><a href="#cb266-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for tips</span></span>
-<span id="cb266-2"><a href="#cb266-2" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>tips</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb279"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb279-1"><a href="#cb279-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for tips</span></span>
+<span id="cb279-2"><a href="#cb279-2" aria-hidden="true" tabindex="-1"></a>sitrep<span class="sc">@</span>tips</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Use **bold** in narrative to emphasize key takeaways and action items"       
-[2] "Use auto_heights=TRUE in story_layout() to automatically size title/subtitle"</code></pre>
+<pre><code>[1] "Larger titles (14pt+) create visual hierarchy and draw attention to your message"
+[2] "Create visual hierarchy: title should be noticeably larger than subtitle"        
+[3] "Use **bold** in narrative to emphasize key takeaways and action items"           
+[4] "Use auto_heights=TRUE in story_layout() to automatically size title/subtitle"    </code></pre>
 </div>
 </div>
 </section>
@@ -1414,15 +1455,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="preventing-text-clipping-with-auto_heights">Preventing Text Clipping with auto_heights</h2>
 <p>A common issue is titles or subtitles getting clipped when they wrap to multiple lines. The <code>auto_heights</code> parameter (default <code>TRUE</code>) automatically calculates appropriate heights:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb268"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb268-1"><a href="#cb268-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Long title that wraps - auto_heights handles it automatically</span></span>
-<span id="cb268-2"><a href="#cb268-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
-<span id="cb268-3"><a href="#cb268-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb268-4"><a href="#cb268-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**{#E63946 10 warehouses} need immediate attention for error rates**"</span>,</span>
-<span id="cb268-5"><a href="#cb268-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"What are the next steps at our highest volume sites?"</span>,</span>
-<span id="cb268-6"><a href="#cb268-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Operations Dashboard"</span>,</span>
-<span id="cb268-7"><a href="#cb268-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">auto_heights =</span> <span class="cn">TRUE</span>,  <span class="co"># Default - calculates heights from text length</span></span>
-<span id="cb268-8"><a href="#cb268-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">output_width =</span> <span class="dv">12</span>     <span class="co"># Match your ggsave width for accurate estimates</span></span>
-<span id="cb268-9"><a href="#cb268-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb281"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb281-1"><a href="#cb281-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Long title that wraps - auto_heights handles it automatically</span></span>
+<span id="cb281-2"><a href="#cb281-2" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
+<span id="cb281-3"><a href="#cb281-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb281-4"><a href="#cb281-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**{#E63946 10 warehouses} need immediate attention for error rates**"</span>,</span>
+<span id="cb281-5"><a href="#cb281-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"What are the next steps at our highest volume sites?"</span>,</span>
+<span id="cb281-6"><a href="#cb281-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Operations Dashboard"</span>,</span>
+<span id="cb281-7"><a href="#cb281-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">auto_heights =</span> <span class="cn">TRUE</span>,  <span class="co"># Default - calculates heights from text length</span></span>
+<span id="cb281-8"><a href="#cb281-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">output_width =</span> <span class="dv">12</span>     <span class="co"># Match your ggsave width for accurate estimates</span></span>
+<span id="cb281-9"><a href="#cb281-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1433,13 +1474,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>For manual control, set <code>auto_heights = FALSE</code> and specify heights explicitly:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb269"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb269-1"><a href="#cb269-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
-<span id="cb269-2"><a href="#cb269-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb269-3"><a href="#cb269-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Short title"</span>,</span>
-<span id="cb269-4"><a href="#cb269-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">auto_heights =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb269-5"><a href="#cb269-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_height =</span> <span class="fl">0.10</span>,</span>
-<span id="cb269-6"><a href="#cb269-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle_height =</span> <span class="fl">0.06</span></span>
-<span id="cb269-7"><a href="#cb269-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb282"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb282-1"><a href="#cb282-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
+<span id="cb282-2"><a href="#cb282-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
+<span id="cb282-3"><a href="#cb282-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Short title"</span>,</span>
+<span id="cb282-4"><a href="#cb282-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">auto_heights =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb282-5"><a href="#cb282-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_height =</span> <span class="fl">0.10</span>,</span>
+<span id="cb282-6"><a href="#cb282-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle_height =</span> <span class="fl">0.06</span></span>
+<span id="cb282-7"><a href="#cb282-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Best practice:</strong> Keep titles under 60 characters. Concise, punchy titles are both easier to read AND less likely to have layout issues.</p>
 </section>

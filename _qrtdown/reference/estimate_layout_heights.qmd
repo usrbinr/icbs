@@ -2,7 +2,7 @@
 title: "estimate_layout_heights"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1041)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1079)
 
 # `estimate_layout_heights()`
 
@@ -15,8 +15,8 @@ estimate_layout_heights(
   title = NULL,
   subtitle = NULL,
   narrative = NULL,
-  title_size = 16,
-  subtitle_size = 11,
+  title_size = 12,
+  subtitle_size = 10,
   narrative_size = 10,
   caption = NULL,
   narrative_width = 0.35,

@@ -300,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../reference.qmd"> 
+    <a class="nav-link" href="../../_qrtdown/reference.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -309,16 +309,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
         <li>
-    <a class="dropdown-item" href="../../vignettes/articles/layouts.html">
- <span class="dropdown-text">Multi-Panel Layouts with Connectors</span></a>
-  </li>  
-        <li>
     <a class="dropdown-item" href="../../vignettes/articles/marquee.html">
  <span class="dropdown-text">Marquee Integration for Colored Labels</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../vignettes/articles/sitrep.html">
  <span class="dropdown-text">Debugging Layouts with story_sitrep()</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/sizing.html">
+ <span class="dropdown-text">Sizing Story Layouts for Quarto</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../vignettes/articles/storytelling.html">
@@ -337,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.ibcs.com/"> <i class="bi bi-code-square" role="img" aria-label="Source code">
+    <a class="nav-link" href="https://codeberg.org/usrbinr/stwd"> <i class="bi bi-code-square" role="img" aria-label="Source code">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -361,11 +361,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#what-is-stwd" id="toc-what-is-stwd" class="nav-link active" data-scroll-target="#what-is-stwd">What is stwd?</a></li>
   <li><a href="#key-features" id="toc-key-features" class="nav-link" data-scroll-target="#key-features">Key Features</a></li>
   <li><a href="#the-swd-approach" id="toc-the-swd-approach" class="nav-link" data-scroll-target="#the-swd-approach">The SWD Approach</a></li>
+  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a></li>
   <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
   <ul class="collapse">
-  <li><a href="#create-a-story-layout" id="toc-create-a-story-layout" class="nav-link" data-scroll-target="#create-a-story-layout">Create a Story Layout</a></li>
-  <li><a href="#use-the-interactive-designer" id="toc-use-the-interactive-designer" class="nav-link" data-scroll-target="#use-the-interactive-designer">Use the Interactive Designer</a></li>
+  <li><a href="#step-1-create-your-plot" id="toc-step-1-create-your-plot" class="nav-link" data-scroll-target="#step-1-create-your-plot">Step 1: Create Your Plot</a></li>
+  <li><a href="#step-2-launch-the-designer" id="toc-step-2-launch-the-designer" class="nav-link" data-scroll-target="#step-2-launch-the-designer">Step 2: Launch the Designer</a></li>
+  <li><a href="#step-3-use-the-generated-code" id="toc-step-3-use-the-generated-code" class="nav-link" data-scroll-target="#step-3-use-the-generated-code">Step 3: Use the Generated Code</a></li>
   </ul></li>
+  <li><a href="#story-designer-features" id="toc-story-designer-features" class="nav-link" data-scroll-target="#story-designer-features">Story Designer Features</a></li>
+  <li><a href="#inline-legends-with-legend_block" id="toc-inline-legends-with-legend_block" class="nav-link" data-scroll-target="#inline-legends-with-legend_block">Inline Legends with legend_block()</a></li>
   <li><a href="#learn-more" id="toc-learn-more" class="nav-link" data-scroll-target="#learn-more">Learn More</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -402,11 +406,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="key-features">Key Features</h2>
 <p>The package includes:</p>
 <ol type="1">
-<li><strong>Story Layouts</strong> - Combine charts with titles, subtitles, narratives, and captions</li>
-<li><strong>Story Designer</strong> - Interactive Shiny app for designing layouts</li>
+<li><strong>Story Designer</strong> - Interactive Shiny app for designing layouts with real-time preview</li>
+<li><strong>Block Functions</strong> - Modular components (title, subtitle, narrative, caption) for patchwork composition</li>
+<li><strong>Legend Block</strong> - Inline colored text legends embedded in the layout</li>
 <li><strong>Highlight Colors</strong> - Strategic color use (gray out noise, highlight signal)</li>
 <li><strong>Marquee Integration</strong> - Color-matched text in titles and labels</li>
-<li><strong>Multi-Panel Layouts</strong> - Connectors for showing relationships between plots</li>
 </ol>
 </section>
 <section id="the-swd-approach" class="level2">
@@ -419,10 +423,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Using a clear visual hierarchy</strong> - Big title, supporting chart, explanatory text</li>
 </ul>
 </section>
+<section id="workflow" class="level2">
+<h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
+<p>The stwd workflow is:</p>
+<ol type="1">
+<li><strong>Create your plot</strong> with ggplot2</li>
+<li><strong>Design interactively</strong> with <code>story_designer()</code></li>
+<li><strong>Copy the generated code</strong> from the Code tab</li>
+<li><strong>Paste into your Quarto document</strong></li>
+</ol>
+</section>
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
-<section id="create-a-story-layout" class="level3">
-<h3 class="anchored" data-anchor-id="create-a-story-layout">Create a Story Layout</h3>
+<section id="step-1-create-your-plot" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-create-your-plot">Step 1: Create Your Plot</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample data</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
@@ -442,51 +456,124 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> fill_colors, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>))) <span class="sc">+</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Units Sold"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose the full story</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">story_layout</span>(</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> p,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"**Q4 Sales: {#E63946 Apples} Take the Lead**"</span>,</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Fruit category performance, October-December 2024"</span>,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">narrative =</span> <span class="st">"**Key takeaway:**</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="st">{#E63946 Apples} outsold all other fruits</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="st">this quarter, driven by seasonal demand</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="st">and promotional pricing.</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="st">**Recommendation:** Increase apple</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">inventory for Q1."</span>,</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: Internal Sales Database"</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_stwd</span>() <span class="sc">+</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Units Sold"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-2-launch-the-designer" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-launch-the-designer">Step 2: Launch the Designer</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_designer</span>(<span class="at">plot =</span> p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The designer lets you:</p>
+<ul>
+<li>Add and customize title, subtitle, narrative, caption</li>
+<li>Adjust font sizes, alignment, spacing</li>
+<li>Apply color palettes or manual colors</li>
+<li>Preview at actual export size</li>
+<li>Copy the generated code</li>
+</ul>
+</section>
+<section id="step-3-use-the-generated-code" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-use-the-generated-code">Step 3: Use the Generated Code</h3>
+<p>The designer generates patchwork code like this:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Block components</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>title_plot <span class="ot">&lt;-</span> <span class="fu">title_block</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"**Q4 Sales: {#E63946 Apples} Take the Lead**"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title_size =</span> <span class="dv">12</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>subtitle_plot <span class="ot">&lt;-</span> <span class="fu">subtitle_block</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Fruit category performance, October-December 2024"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle_size =</span> <span class="dv">10</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>narrative_plot <span class="ot">&lt;-</span> <span class="fu">text_narrative</span>(</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"**Key takeaway:**</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">{#E63946 Apples} outsold all other fruits</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">this quarter, driven by seasonal demand</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">and promotional pricing.</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="st">**Recommendation:** Increase apple</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="st">inventory for Q1."</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">10</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>caption_plot <span class="ot">&lt;-</span> <span class="fu">caption_block</span>(</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Source: Internal Sales Database"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption_size =</span> <span class="dv">8</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine with patchwork</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>content <span class="ot">&lt;-</span> p <span class="sc">+</span> narrative_plot <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">0.65</span>, <span class="fl">0.35</span>))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>title_plot <span class="sc">/</span> subtitle_plot <span class="sc">/</span> content <span class="sc">/</span> caption_plot <span class="sc">+</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="fl">0.08</span>, <span class="fl">0.05</span>, <span class="fl">0.82</span>, <span class="fl">0.05</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="introduction_files/figure-html/story-example-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="introduction_files/figure-html/story-example-1.png" class="img-fluid figure-img" width="1500"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="use-the-interactive-designer" class="level3">
-<h3 class="anchored" data-anchor-id="use-the-interactive-designer">Use the Interactive Designer</h3>
-<p>Launch the Story Designer Shiny app to interactively design layouts:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">story_designer</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The app lets you:</p>
+</section>
+<section id="story-designer-features" class="level2">
+<h2 class="anchored" data-anchor-id="story-designer-features">Story Designer Features</h2>
+<p><strong>Text Controls:</strong></p>
 <ul>
-<li>Adjust text sizes and spacing</li>
-<li>Preview layouts at actual export size</li>
-<li>Detect text clipping issues</li>
-<li>Generate code for your final layout</li>
+<li>Title, subtitle, narrative, caption with marquee formatting</li>
+<li>Font size, alignment, line height, wrap width</li>
+</ul>
+<p><strong>Legend Block:</strong></p>
+<ul>
+<li>Inline colored text legend (e.g., “HIGH | MEDIUM | LOW”)</li>
+<li>Position above, below, left, or right of chart</li>
+</ul>
+<p><strong>Color Palettes:</strong></p>
+<ul>
+<li>9 palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor, RColorBrewer, scico, viridis, wesanderson</li>
+<li>Click swatches to select specific colors</li>
+<li>Apply to fill, color, or both</li>
+</ul>
+<p><strong>Manual Colors:</strong></p>
+<ul>
+<li>Set a default color (gray) for unassigned categories</li>
+<li>Assign specific colors to highlight key categories</li>
+<li>Perfect for the SWD approach: gray the noise, color the signal</li>
+</ul>
+<p><strong>Validate &amp; Export:</strong></p>
+<ul>
+<li>Preview at actual export dimensions</li>
+<li>PNG, PDF, or SVG export</li>
+<li>Copy generated patchwork code</li>
 </ul>
 </section>
+<section id="inline-legends-with-legend_block" class="level2">
+<h2 class="anchored" data-anchor-id="inline-legends-with-legend_block">Inline Legends with legend_block()</h2>
+<p>Instead of a separate legend box, embed the legend in your layout:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>legend_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"HIGH"</span> <span class="ot">=</span> <span class="st">"#E63946"</span>, <span class="st">"MEDIUM"</span> <span class="ot">=</span> <span class="st">"#808080"</span>, <span class="st">"LOW"</span> <span class="ot">=</span> <span class="st">"#457B9D"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">title_block</span>(<span class="st">"Performance by Category"</span>) <span class="sc">/</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend_block</span>(legend_colors, <span class="at">halign =</span> <span class="st">"right"</span>) <span class="sc">/</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  p <span class="sc">/</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">caption_block</span>(<span class="st">"SOURCE: Internal Data"</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="fl">0.08</span>, <span class="fl">0.04</span>, <span class="fl">0.83</span>, <span class="fl">0.05</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="introduction_files/figure-html/legend-example-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="learn-more" class="level2">
 <h2 class="anchored" data-anchor-id="learn-more">Learn More</h2>
 <ul>
 <li><a href="storytelling.html">Storytelling Layouts</a> - Complete guide to story layouts</li>
-<li><a href="layouts.html">Multi-Panel Layouts</a> - Connecting related charts</li>
+<li><a href="sizing.html">Sizing Guide</a> - Matching Quarto dimensions to Story Designer</li>
 <li><a href="marquee.html">Marquee Integration</a> - Colored text labels</li>
 </ul>
 </section>
