@@ -426,13 +426,9 @@ story_designer <- function(plot = NULL,
                         shiny::span(
                             shiny::span(class = "badge bg-warning text-dark me-2", "Scaled"),
                             shiny::textOutput("dimensions_label", inline = TRUE)
-                        ),
-                        shiny::actionButton("validate_actual", "Validate Actual Size",
-                                            class = "btn-sm btn-success",
-                                            icon = shiny::icon("search-plus"))
+                        )
                     ),
-                    shiny::uiOutput("preview_container"),
-                    shiny::uiOutput("actual_size_preview")
+                    shiny::uiOutput("preview_container")
                 )
             ),
 
@@ -527,9 +523,9 @@ story_designer <- function(plot = NULL,
                 )
             ),
 
-            # Export tab
+            # Validate Size & Export tab
             bslib::nav_panel(
-                title = shiny::span(shiny::icon("download"), " Export"),
+                title = shiny::span(shiny::icon("search-plus"), " Validate & Export"),
                 bslib::card_body(
                     class = "p-3",
                     shiny::div(
@@ -555,12 +551,14 @@ story_designer <- function(plot = NULL,
                     ),
                     shiny::div(
                         class = "d-flex gap-2 mb-3",
-                        shiny::actionButton("render_export", "Preview Export",
-                                            class = "btn-success", icon = shiny::icon("eye")),
+                        shiny::actionButton("validate_actual", "Validate Actual Size",
+                                            class = "btn-success", icon = shiny::icon("search-plus")),
+                        shiny::actionButton("popout_preview", "Pop Out",
+                                            class = "btn-outline-secondary", icon = shiny::icon("external-link-alt")),
                         shiny::downloadButton("download_export", "Download", class = "btn-primary")
                     ),
                     shiny::uiOutput("export_info"),
-                    shiny::uiOutput("export_preview")
+                    shiny::uiOutput("actual_size_preview")
                 )
             ),
 
@@ -1631,15 +1629,18 @@ story_designer <- function(plot = NULL,
 
         shiny::observeEvent(input$validate_actual, {
             shiny::withProgress(message = "Rendering at actual size...", {
+                w <- input$export_width %||% 12
+                h <- input$export_height %||% 9
+                dpi <- input$export_dpi %||% 150
                 temp_file <- tempfile(fileext = ".png")
                 ggplot2::ggsave(temp_file, build_layout(),
-                                width = input$output_width, height = input$output_height,
-                                dpi = 150, bg = "white")
+                                width = w, height = h,
+                                dpi = dpi, bg = "white")
                 img_data <- base64enc::base64encode(temp_file)
                 actual_size_data(list(
                     data = img_data,
-                    px_width = input$output_width * 150,
-                    px_height = input$output_height * 150
+                    px_width = w * dpi,
+                    px_height = h * dpi
                 ))
                 unlink(temp_file)
             })
@@ -1647,7 +1648,13 @@ story_designer <- function(plot = NULL,
 
         output$actual_size_preview <- shiny::renderUI({
             img_info <- actual_size_data()
-            if (is.null(img_info)) return(NULL)
+            if (is.null(img_info)) {
+                return(shiny::div(
+                    class = "mt-3 p-4 text-center text-muted border rounded bg-light",
+                    shiny::icon("search-plus", class = "fa-2x mb-2"),
+                    shiny::p("Click 'Validate Actual Size' to preview at true export dimensions")
+                ))
+            }
 
             shiny::div(
                 class = "mt-3 border rounded",
@@ -1662,20 +1669,54 @@ story_designer <- function(plot = NULL,
                 ),
                 shiny::div(
                     class = "p-1 text-center small text-muted bg-light",
-                    "This is EXACTLY what your PNG export will look like. Scroll to inspect."
+                    "This is EXACTLY what your export will look like. Scroll to inspect."
                 ),
                 shiny::div(
-                    style = "max-height: 400px; overflow: auto; border: 2px solid #28a745;",
-                    shiny::tags$img(src = paste0("data:image/png;base64,", img_info$data))
+                    style = "max-height: 600px; overflow: auto; border: 2px solid #28a745;",
+                    shiny::tags$img(src = paste0("data:image/png;base64,", img_info$data),
+                                    style = "max-width: none;")
                 )
             )
         })
 
         shiny::observeEvent(input$close_actual, { actual_size_data(NULL) })
 
-        # Export tab handlers
-        export_data <- shiny::reactiveVal(NULL)
+        # Pop out preview in new window
+        shiny::observeEvent(input$popout_preview, {
+            img_info <- actual_size_data()
+            if (is.null(img_info)) {
+                # Generate if not already done
+                shiny::withProgress(message = "Rendering at actual size...", {
+                    temp_file <- tempfile(fileext = ".png")
+                    ggplot2::ggsave(temp_file, build_layout(),
+                                    width = input$export_width %||% 12,
+                                    height = input$export_height %||% 9,
+                                    dpi = input$export_dpi %||% 150, bg = "white")
+                    img_data <- base64enc::base64encode(temp_file)
+                    actual_size_data(list(
+                        data = img_data,
+                        px_width = (input$export_width %||% 12) * (input$export_dpi %||% 150),
+                        px_height = (input$export_height %||% 9) * (input$export_dpi %||% 150)
+                    ))
+                    unlink(temp_file)
+                })
+                img_info <- actual_size_data()
+            }
+            # Open in new browser window via JavaScript
+            shiny::showModal(shiny::modalDialog(
+                title = paste0("Actual Size Preview (", img_info$px_width, "x", img_info$px_height, "px)"),
+                size = "xl",
+                easyClose = TRUE,
+                shiny::div(
+                    style = "overflow: auto; max-height: 70vh;",
+                    shiny::tags$img(src = paste0("data:image/png;base64,", img_info$data),
+                                    style = "max-width: none;")
+                ),
+                footer = shiny::modalButton("Close")
+            ))
+        })
 
+        # Export tab handlers
         output$export_info <- shiny::renderUI({
             w <- input$export_width %||% 12
             h <- input$export_height %||% 9
@@ -1688,40 +1729,6 @@ story_designer <- function(plot = NULL,
             )
         })
 
-        shiny::observeEvent(input$render_export, {
-            shiny::withProgress(message = "Rendering export preview...", {
-                w <- input$export_width %||% 12
-                h <- input$export_height %||% 9
-                dpi <- input$export_dpi %||% 150
-                temp_file <- tempfile(fileext = ".png")
-                ggplot2::ggsave(temp_file, build_layout(), width = w, height = h, dpi = dpi, bg = "white")
-                img_data <- base64enc::base64encode(temp_file)
-                export_data(list(data = img_data, px_width = round(w * dpi), px_height = round(h * dpi)))
-                unlink(temp_file)
-            })
-        })
-
-        output$export_preview <- shiny::renderUI({
-            img_info <- export_data()
-            if (is.null(img_info)) {
-                return(shiny::div(
-                    class = "text-center p-4 bg-light rounded",
-                    shiny::icon("image", class = "fa-2x text-muted mb-2"), shiny::br(),
-                    shiny::span(class = "text-muted", "Click 'Preview Export' to see output")
-                ))
-            }
-            shiny::div(
-                shiny::div(
-                    class = "bg-success text-white p-2 rounded-top",
-                    shiny::icon("check-circle"), " Preview: ",
-                    shiny::strong(img_info$px_width, " x ", img_info$px_height, " px")
-                ),
-                shiny::div(
-                    style = "max-height: 400px; overflow: auto; border: 2px solid #28a745; border-top: none;",
-                    shiny::tags$img(src = paste0("data:image/png;base64,", img_info$data), style = "display: block;")
-                )
-            )
-        })
 
         output$download_export <- shiny::downloadHandler(
             filename = function() {

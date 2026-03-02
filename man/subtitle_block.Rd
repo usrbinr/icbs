@@ -6,7 +6,7 @@
 \usage{
 subtitle_block(
   subtitle,
-  subtitle_size = 11,
+  subtitle_size = 10,
   halign = "left",
   lineheight = 1.2,
   margin_top = 0,

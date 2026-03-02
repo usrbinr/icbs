@@ -12,11 +12,11 @@ story_layout(
   caption = NULL,
   narrative_position = "right",
   narrative_width = 0.35,
-  title_size = 16,
-  subtitle_size = 11,
+  title_size = 12,
+  subtitle_size = 10,
   narrative_size = 10,
-  caption_size = 9,
-  title_height = NULL,
+  caption_size = 6,
+  title_height = 0.1,
   subtitle_height = NULL,
   caption_height = NULL,
   auto_heights = TRUE,
@@ -118,3 +118,4 @@ story_layout(
 }
 
 }
+\keyword{internal}

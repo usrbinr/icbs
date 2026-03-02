@@ -25,8 +25,8 @@ colored titles, and supporting context.
 
 The package includes:
 
-1. **Story Layouts** - Combine charts with titles, subtitles, narratives, and captions
-2. **Story Designer** - Interactive Shiny app with color palettes (9 packages) and manual color assignment
+1. **Story Designer** - Interactive Shiny app for designing layouts with real-time preview
+2. **Block Functions** - Modular components (title, subtitle, narrative, caption) for patchwork composition
 3. **Legend Block** - Inline colored text legends embedded in the layout
 4. **Highlight Colors** - Strategic color use (gray out noise, highlight signal)
 5. **Marquee Integration** - Color-matched text in titles and labels
@@ -41,14 +41,21 @@ Storytelling with Data (SWD) charts guide the reader by:
 - **Adding narrative context** - Explain the "so what?" alongside the chart
 - **Using a clear visual hierarchy** - Big title, supporting chart, explanatory text
 
+## Workflow
+
+The stwd workflow is:
+
+1. **Create your plot** with ggplot2
+2. **Design interactively** with `story_designer()`
+3. **Copy the generated code** from the Code tab
+4. **Paste into your Quarto document**
+
 ## Quick Start
 
-### Create a Story Layout
+### Step 1: Create Your Plot
 
 ```{r}
-#| label: story-example
-#| fig-width: 10
-#| fig-height: 7
+#| label: create-plot
 # Sample data
 df <- data.frame(
     product = c("Apples", "Oranges", "Bananas", "Grapes"),
@@ -67,15 +74,47 @@ p <- ggplot(df, aes(x = reorder(product, sales), y = sales, fill = product)) +
     coord_flip() +
     scale_fill_manual(values = fill_colors, guide = "none") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-    theme_minimal() +
+    theme_stwd() +
     labs(x = NULL, y = "Units Sold")
+```
 
-# Compose the full story
-story_layout(
-    plot = p,
-    title = "**Q4 Sales: {#E63946 Apples} Take the Lead**",
-    subtitle = "Fruit category performance, October-December 2024",
-    narrative = "**Key takeaway:**
+### Step 2: Launch the Designer
+
+```r
+story_designer(plot = p)
+```
+
+The designer lets you:
+
+- Add and customize title, subtitle, narrative, caption
+- Adjust font sizes, alignment, spacing
+- Apply color palettes or manual colors
+- Preview at actual export size
+- Copy the generated code
+
+### Step 3: Use the Generated Code
+
+The designer generates patchwork code like this:
+
+```{r}
+#| label: story-example
+#| fig-width: 10
+#| fig-height: 7
+#| fig-dpi: 150
+
+# Block components
+title_plot <- title_block(
+    "**Q4 Sales: {#E63946 Apples} Take the Lead**",
+    title_size = 12
+)
+
+subtitle_plot <- subtitle_block(
+    "Fruit category performance, October-December 2024",
+    subtitle_size = 10
+)
+
+narrative_plot <- text_narrative(
+    "**Key takeaway:**
 
 {#E63946 Apples} outsold all other fruits
 this quarter, driven by seasonal demand
@@ -83,19 +122,21 @@ and promotional pricing.
 
 **Recommendation:** Increase apple
 inventory for Q1.",
-    caption = "Source: Internal Sales Database"
+    size = 10
 )
+
+caption_plot <- caption_block(
+    "Source: Internal Sales Database",
+    caption_size = 8
+)
+
+# Combine with patchwork
+content <- p + narrative_plot + plot_layout(widths = c(0.65, 0.35))
+title_plot / subtitle_plot / content / caption_plot +
+    plot_layout(heights = c(0.08, 0.05, 0.82, 0.05))
 ```
 
-### Use the Interactive Designer
-
-Launch the Story Designer Shiny app to interactively design layouts:
-
-```r
-story_designer(plot = p)
-```
-
-The app provides:
+## Story Designer Features
 
 **Text Controls:**
 
@@ -119,31 +160,33 @@ The app provides:
 - Assign specific colors to highlight key categories
 - Perfect for the SWD approach: gray the noise, color the signal
 
-**Export:**
+**Validate & Export:**
 
-- PNG, PDF, or SVG at custom dimensions
+- Preview at actual export dimensions
+- PNG, PDF, or SVG export
 - Copy generated patchwork code
 
-### Create Inline Legends with legend_block()
+## Inline Legends with legend_block()
 
 Instead of a separate legend box, embed the legend in your layout:
 
-```r
-library(patchwork)
-
+```{r}
+#| label: legend-example
+#| fig-width: 10
+#| fig-height: 6
 legend_colors <- c("HIGH" = "#E63946", "MEDIUM" = "#808080", "LOW" = "#457B9D")
 
 title_block("Performance by Category") /
   legend_block(legend_colors, halign = "right") /
   p /
-  caption_block("SOURCE: Data") +
+  caption_block("SOURCE: Internal Data") +
   plot_layout(heights = c(0.08, 0.04, 0.83, 0.05))
 ```
 
 ## Learn More
 
 - [Storytelling Layouts](storytelling.html) - Complete guide to story layouts
-- [Multi-Panel Layouts](layouts.html) - Connecting related charts
+- [Sizing Guide](sizing.html) - Matching Quarto dimensions to Story Designer
 - [Marquee Integration](marquee.html) - Colored text labels
 
 ## References

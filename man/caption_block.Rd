@@ -6,7 +6,7 @@
 \usage{
 caption_block(
   caption,
-  caption_size = 9,
+  caption_size = 6,
   halign = "left",
   color = "#808080",
   margin_top = 10,

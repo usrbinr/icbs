@@ -637,7 +637,7 @@ text_narrative <- function(text,
 #' }
 #'
 title_block <- function(title,
-                        title_size = 16,
+                        title_size = 12,
                         halign = "left",
                         lineheight = 1.1,
                         margin_top = 5,
@@ -719,7 +719,7 @@ title_block <- function(title,
 #' }
 #'
 subtitle_block <- function(subtitle,
-                           subtitle_size = 11,
+                           subtitle_size = 10,
                            halign = "left",
                            lineheight = 1.2,
                            margin_top = 0,
@@ -793,7 +793,7 @@ subtitle_block <- function(subtitle,
 #' }
 #'
 caption_block <- function(caption,
-                          caption_size = 9,
+                          caption_size = 6,
                           halign = "left",
                           color = "#808080",
                           margin_top = 10,
@@ -1079,8 +1079,8 @@ title_header <- function(title,
 estimate_layout_heights <- function(title = NULL,
                                      subtitle = NULL,
                                      narrative = NULL,
-                                     title_size = 16,
-                                     subtitle_size = 11,
+                                     title_size = 12,
+                                     subtitle_size = 10,
                                      narrative_size = 10,
                                      caption = NULL,
                                      narrative_width = 0.35,
@@ -1112,7 +1112,7 @@ estimate_layout_heights <- function(title = NULL,
         # Height per line: at 16pt, each line needs ~0.07-0.08 of total height
         height_per_line <- 0.05 + (title_size / 250)
         # Add padding for margins
-        title_height <- max(0.12, est_lines * height_per_line + 0.04)
+        title_height <- max(0.10, est_lines * height_per_line + 0.02)
         # Cap at reasonable maximum - very long titles should be shortened
         title_height <- min(title_height, 0.40)
     }
@@ -1129,7 +1129,7 @@ estimate_layout_heights <- function(title = NULL,
         # Word wrapping adds overhead
         est_lines <- ceiling(nchar(clean_subtitle) / max(chars_per_line, 25) * 1.2)
         height_per_line <- 0.035 + (subtitle_size / 400)
-        subtitle_height <- max(0.06, est_lines * height_per_line + 0.02)
+        subtitle_height <- max(0.04, est_lines * height_per_line + 0.01)
         # Cap at reasonable max
         subtitle_height <- min(subtitle_height, 0.20)
     }
@@ -1196,10 +1196,10 @@ story_sitrep <- function(plot = NULL,
                          caption = NULL,
                          narrative_position = "right",
                          narrative_width = 0.35,
-                         title_size = 16,
-                         subtitle_size = 11,
+                         title_size = 12,
+                         subtitle_size = 10,
                          narrative_size = 10,
-                         caption_size = 9,
+                         caption_size = 6,
                          title_height = 0.15,
                          subtitle_height = 0.07,
                          caption_height = 0.05,
@@ -1494,7 +1494,7 @@ build_story_diagram <- function(has_title, has_subtitle, has_plot, has_narrative
 #'   Used by auto_heights to estimate how many lines text will wrap to.
 #'
 #' @returns A patchwork object.
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -1539,11 +1539,11 @@ story_layout <- function(plot,
                          caption = NULL,
                          narrative_position = "right",
                          narrative_width = 0.35,
-                         title_size = 16,
-                         subtitle_size = 11,
+                         title_size = 12,
+                         subtitle_size = 10,
                          narrative_size = 10,
-                         caption_size = 9,
-                         title_height = NULL,
+                         caption_size = 6,
+                         title_height = 0.10,
                          subtitle_height = NULL,
                          caption_height = NULL,
                          auto_heights = TRUE,

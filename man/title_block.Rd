@@ -6,7 +6,7 @@
 \usage{
 title_block(
   title,
-  title_size = 16,
+  title_size = 12,
   halign = "left",
   lineheight = 1.1,
   margin_top = 5,
