@@ -313,8 +313,13 @@ story_designer <- function(plot = NULL,
             narrative_txt <- convert_named_colors(narrative_text_d())
             caption_txt <- convert_named_colors(caption_text_d())
 
-            # Validate inputs
-            shiny::req(nchar(title_txt) > 0 || nchar(subtitle_txt) > 0)
+            # Validate inputs with user-friendly messages
+            shiny::validate(
+                shiny::need(
+                    nchar(title_txt) > 0 || nchar(subtitle_txt) > 0,
+                    "Enter a title or subtitle to see the preview"
+                )
+            )
 
             # Create blocks
             title_plot <- title_block(
@@ -415,7 +420,15 @@ story_designer <- function(plot = NULL,
 
         output$preview_plot <- shiny::renderPlot({
             build_layout()
-        }, res = 96, bg = "white")
+        }, res = 96, bg = "white") |>
+            shiny::bindCache(
+                title_text_d(), subtitle_text_d(), narrative_text_d(), caption_text_d(),
+                input$title_size, input$subtitle_size, input$narrative_size, input$caption_size,
+                input$title_height, input$subtitle_height, input$caption_height,
+                input$narrative_width, input$narrative_position,
+                input$plot_theme, legend$enabled(), legend$position(),
+                palette$current_palette(), palette$manual_enabled()
+            )
 
         output$height_diagram <- shiny::renderPlot({
             h <- current_heights()

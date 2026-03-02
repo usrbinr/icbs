@@ -109,7 +109,9 @@ mod_export_server <- function(id, build_layout) {
 
         # Validate actual size
         shiny::observeEvent(input$validate, {
-            shiny::req(build_layout)
+            shiny::validate(
+                shiny::need(build_layout, "Layout not ready - check your inputs")
+            )
 
             shiny::withProgress(message = "Rendering at actual size...", {
                 w <- input$width %||% 12
