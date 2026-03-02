@@ -26,10 +26,10 @@ colored titles, and supporting context.
 The package includes:
 
 1. **Story Layouts** - Combine charts with titles, subtitles, narratives, and captions
-2. **Story Designer** - Interactive Shiny app for designing layouts
-3. **Highlight Colors** - Strategic color use (gray out noise, highlight signal)
-4. **Marquee Integration** - Color-matched text in titles and labels
-5. **Multi-Panel Layouts** - Connectors for showing relationships between plots
+2. **Story Designer** - Interactive Shiny app with color palettes (9 packages) and manual color assignment
+3. **Legend Block** - Inline colored text legends embedded in the layout
+4. **Highlight Colors** - Strategic color use (gray out noise, highlight signal)
+5. **Marquee Integration** - Color-matched text in titles and labels
 
 ## The SWD Approach
 
@@ -92,15 +92,53 @@ inventory for Q1.",
 Launch the Story Designer Shiny app to interactively design layouts:
 
 ```r
-story_designer()
+story_designer(plot = p)
 ```
 
-The app lets you:
+The app provides:
 
-- Adjust text sizes and spacing
-- Preview layouts at actual export size
-- Detect text clipping issues
-- Generate code for your final layout
+**Text Controls:**
+
+- Title, subtitle, narrative, caption with marquee formatting
+- Font size, alignment, line height, wrap width
+
+**Legend Block:**
+
+- Inline colored text legend (e.g., "HIGH | MEDIUM | LOW")
+- Position above, below, left, or right of chart
+
+**Color Palettes:**
+
+- 9 palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor, RColorBrewer, scico, viridis, wesanderson
+- Click swatches to select specific colors
+- Apply to fill, color, or both
+
+**Manual Colors:**
+
+- Set a default color (gray) for unassigned categories
+- Assign specific colors to highlight key categories
+- Perfect for the SWD approach: gray the noise, color the signal
+
+**Export:**
+
+- PNG, PDF, or SVG at custom dimensions
+- Copy generated patchwork code
+
+### Create Inline Legends with legend_block()
+
+Instead of a separate legend box, embed the legend in your layout:
+
+```r
+library(patchwork)
+
+legend_colors <- c("HIGH" = "#E63946", "MEDIUM" = "#808080", "LOW" = "#457B9D")
+
+title_block("Performance by Category") /
+  legend_block(legend_colors, halign = "right") /
+  p /
+  caption_block("SOURCE: Data") +
+  plot_layout(heights = c(0.08, 0.04, 0.83, 0.05))
+```
 
 ## Learn More
 
