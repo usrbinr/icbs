@@ -28,7 +28,7 @@ Creates a large, prominent title. Supports marquee syntax for colored text.
 ```{r}
 #| label: title-block
 #| fig-width: 10
-#| fig-height: 0.8
+#| fig-height: 0.5
 title_block(
     "**Q4 Sales: {#E63946 Apples} Take the Lead**",
     title_size = 14
@@ -56,15 +56,11 @@ Creates a text panel for the "so what?" explanation.
 ```{r}
 #| label: text-narrative
 #| fig-width: 4
-#| fig-height: 2.5
+#| fig-height: 3
+
 text_narrative(
     text = "**Key insight:**
-
-{#E63946 Strong growth} in core markets.
-
-**Action items:**
-- Expand capacity
-- Hire additional staff",
+        {#E63946 Strong growth} in core markets.",
     size = 10
 )
 ```
@@ -76,8 +72,8 @@ Adds source attribution at the bottom.
 ```{r}
 #| label: caption-block
 #| fig-width: 10
-#| fig-height: 0.4
-caption_block("Source: Finance Department | Q4 2024", caption_size = 4)
+#| fig-height: .8
+caption_block("Source: Finance Department | Q4 2024", caption_size = 6)
 ```
 
 ### legend_block()
@@ -87,7 +83,7 @@ Creates an inline colored text legend instead of a traditional legend box.
 ```{r}
 #| label: legend-block
 #| fig-width: 10
-#| fig-height: 0.5
+#| fig-height: .8
 legend_colors <- c("HIGH" = "#E63946", "MEDIUM" = "#808080", "LOW" = "#457B9D")
 
 legend_block(legend_colors, halign = "right", sep = " | ")
@@ -123,21 +119,19 @@ Place chart and narrative side by side with `+` and set proportional widths:
 
 ```{r}
 #| label: with-narrative
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: 8
+#| fig-height: 10
 narrative <- text_narrative(
     "**Summary:**
 
-{#E63946 Category A} leads with 50 units.
-
-Categories B and C lag behind.",
-    size = 10
+{#E63946 Category A} leads with 50 units.",
+    size = 8
 )
 
 content <- chart + narrative + plot_layout(widths = c(0.65, 0.35))
 
-title_block("**{#E63946 Category A} Leads**", title_size = 14) /
-subtitle_block("Year-over-year comparison") /
+title_block("**{#E63946 Category A} Leads**", title_size = 12) /
+subtitle_block("Year-over-year comparison", subtitle_size = 10) /
 content /
 caption_block("Source: Internal Analytics") +
     plot_layout(heights = c(0.10, 0.06, 0.78, 0.06))
