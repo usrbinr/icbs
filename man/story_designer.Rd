@@ -16,23 +16,72 @@ story_designer(
 \item{plot}{Optional ggplot object to include in the preview.
 If NULL, a placeholder chart is used.}
 
-\item{title}{Initial title text.}
+\item{title}{Initial title text. Supports marquee formatting:
+\verb{**bold**}, \verb{*italic*}, \verb{\{#E69F00 colored text\}}.}
 
 \item{subtitle}{Initial subtitle text.}
 
-\item{narrative}{Initial narrative text.}
+\item{narrative}{Initial narrative text for the side panel.}
 
-\item{caption}{Initial caption text.}
+\item{caption}{Initial caption/source text.}
 }
 \value{
-Launches a Shiny app. When you click "Copy Code", the
-generated \code{story_layout()} call is copied to your clipboard.
+Launches a Shiny app. Returns NULL invisibly.
 }
 \description{
 Launches a Shiny app to interactively design story layouts with
-real-time clipping detection. Helps you find the right height
-allocations before exporting.
+real-time preview. Provides controls for text blocks, color palettes,
+themes, and exports ready-to-use patchwork code.
 }
+\section{App Features}{
+
+\strong{Text Blocks:}
+\itemize{
+\item Title, Subtitle, Narrative, Caption with marquee formatting
+\item Font size, alignment, line height, wrap width controls
+\item Section height allocation
+}
+
+\strong{Legend Block:}
+\itemize{
+\item Inline colored text legend (e.g., "ACCURATE | NULL | ERROR")
+\item Position: above, below, left, or right of chart
+\item Separator, size, bold, uppercase options
+}
+
+\strong{Color Palette:}
+\itemize{
+\item 9 palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor,
+RColorBrewer, scico, viridis, wesanderson
+\item Click swatches to select specific colors
+\item Discrete or continuous scale application
+\item Apply to fill, color, or both
+}
+
+\strong{Manual Colors:}
+\itemize{
+\item Set default color for unassigned categories (e.g., gray)
+\item Assign specific colors to individual categories by name or number
+\item Useful for highlighting specific data points
+}
+
+\strong{Plot Styling:}
+\itemize{
+\item Themes: STWD (clean SWD-style) or Void (minimal)
+\item Axis labels: size, bold, alignment, rotation, color
+\item Grid lines: major/minor, horizontal/vertical, color
+\item Axis lines and tick marks
+}
+
+\strong{Export:}
+\itemize{
+\item PNG, PDF, or SVG format
+\item Custom dimensions and DPI
+\item "Validate Actual Size" to preview true output
+\item Copy generated patchwork code
+}
+}
+
 \examples{
 \dontrun{
 # Launch with defaults
@@ -40,8 +89,15 @@ story_designer()
 
 # Launch with your plot
 library(ggplot2)
-p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_col()
-story_designer(plot = p, title = "My Title")
+p <- ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+  geom_col()
+story_designer(
+  plot = p,
+  title = "**Fuel Economy** by {#E69F00 Cylinder Count}",
+  subtitle = "MPG varies significantly across engine sizes",
+  narrative = "**Key finding:** 4-cylinder cars have the best fuel economy.",
+  caption = "SOURCE: mtcars dataset"
+)
 }
 
 }

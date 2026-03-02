@@ -1,18 +1,53 @@
 #' Interactive Story Layout Designer
 #'
 #' Launches a Shiny app to interactively design story layouts with
-#' real-time clipping detection. Helps you find the right height
-#' allocations before exporting.
+#' real-time preview. Provides controls for text blocks, color palettes,
+#' themes, and exports ready-to-use patchwork code.
 #'
 #' @param plot Optional ggplot object to include in the preview.
 #'   If NULL, a placeholder chart is used.
-#' @param title Initial title text.
+#' @param title Initial title text. Supports marquee formatting:
+#'   `**bold**`, `*italic*`, `{#E69F00 colored text}`.
 #' @param subtitle Initial subtitle text.
-#' @param narrative Initial narrative text.
-#' @param caption Initial caption text.
+#' @param narrative Initial narrative text for the side panel.
+#' @param caption Initial caption/source text.
 #'
-#' @returns Launches a Shiny app. When you click "Copy Code", the
-#'   generated `story_layout()` call is copied to your clipboard.
+#' @returns Launches a Shiny app. Returns NULL invisibly.
+#'
+#' @section App Features:
+#' **Text Blocks:**
+#' - Title, Subtitle, Narrative, Caption with marquee formatting
+#' - Font size, alignment, line height, wrap width controls
+#' - Section height allocation
+#'
+#' **Legend Block:**
+#' - Inline colored text legend (e.g., "ACCURATE | NULL | ERROR")
+#' - Position: above, below, left, or right of chart
+#' - Separator, size, bold, uppercase options
+#'
+#' **Color Palette:**
+#' - 9 palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor,
+#'   RColorBrewer, scico, viridis, wesanderson
+#' - Click swatches to select specific colors
+#' - Discrete or continuous scale application
+#' - Apply to fill, color, or both
+#'
+#' **Manual Colors:**
+#' - Set default color for unassigned categories (e.g., gray)
+#' - Assign specific colors to individual categories by name or number
+#' - Useful for highlighting specific data points
+#'
+#' **Plot Styling:**
+#' - Themes: STWD (clean SWD-style) or Void (minimal)
+#' - Axis labels: size, bold, alignment, rotation, color
+#' - Grid lines: major/minor, horizontal/vertical, color
+#' - Axis lines and tick marks
+#'
+#' **Export:**
+#' - PNG, PDF, or SVG format
+#' - Custom dimensions and DPI
+#' - "Validate Actual Size" to preview true output
+#' - Copy generated patchwork code
 #'
 #' @export
 #'
@@ -23,8 +58,15 @@
 #'
 #' # Launch with your plot
 #' library(ggplot2)
-#' p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_col()
-#' story_designer(plot = p, title = "My Title")
+#' p <- ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+#'   geom_col()
+#' story_designer(
+#'   plot = p,
+#'   title = "**Fuel Economy** by {#E69F00 Cylinder Count}",
+#'   subtitle = "MPG varies significantly across engine sizes",
+#'   narrative = "**Key finding:** 4-cylinder cars have the best fuel economy.",
+#'   caption = "SOURCE: mtcars dataset"
+#' )
 #' }
 #'
 story_designer <- function(plot = NULL,
