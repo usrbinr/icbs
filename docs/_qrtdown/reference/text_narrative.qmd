@@ -2,7 +2,7 @@
 title: "text_narrative"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L553)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L554)
 
 # `text_narrative()`
 
@@ -19,6 +19,7 @@ text_narrative(
   padding = 10,
   lineheight = 1.4,
   width = 1,
+  wrap_width = NULL,
   ...
 )
 ```
@@ -34,6 +35,7 @@ text_narrative(
 | `padding` | Padding around text as a margin() object or numeric vector (top, right, bottom, left). Default: 10 on all sides. |
 | `lineheight` | Line height multiplier. Default: 1.4. |
 | `width` | Maximum width for text wrapping. Default: 1 (full width). |
+| `wrap_width` | Character width to wrap text at. Default: NULL (no wrapping). |
 | `...` | Additional arguments passed to `marquee::geom_marquee()`. |
 
 ## Value

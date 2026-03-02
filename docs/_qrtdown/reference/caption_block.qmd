@@ -2,7 +2,7 @@
 title: "caption_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L773)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L795)
 
 # `caption_block()`
 
@@ -13,13 +13,14 @@ Create a Caption Block Plot
 ```r
 caption_block(
   caption,
-  caption_size = 9,
+  caption_size = 6,
   halign = "left",
   color = "#808080",
   margin_top = 10,
   margin_bottom = 5,
   margin_left = 5,
   margin_right = 5,
+  wrap_width = NULL,
   ...
 )
 ```
@@ -36,6 +37,7 @@ caption_block(
 | `margin_bottom` | Bottom margin in pts. Default: 5. |
 | `margin_left` | Left margin in pts. Default: 5. |
 | `margin_right` | Right margin in pts. Default: 5. |
+| `wrap_width` | Character width to wrap text at. Default: NULL (no wrapping). |
 | `...` | Additional arguments passed to `marquee::geom_marquee()`. |
 
 ## Value

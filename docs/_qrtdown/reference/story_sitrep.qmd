@@ -2,7 +2,7 @@
 title: "story_sitrep"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1154)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1192)
 
 # `story_sitrep()`
 
@@ -19,10 +19,10 @@ story_sitrep(
   caption = NULL,
   narrative_position = "right",
   narrative_width = 0.35,
-  title_size = 16,
-  subtitle_size = 11,
+  title_size = 12,
+  subtitle_size = 10,
   narrative_size = 10,
-  caption_size = 9,
+  caption_size = 6,
   title_height = 0.15,
   subtitle_height = 0.07,
   caption_height = 0.05,

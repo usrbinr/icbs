@@ -150,7 +150,6 @@ ggplot(variance_data, aes(x = category, y = value)) +
 #| label: variance-example
 #| fig-width: 9
 #| fig-height: 5
-#| eval: false
 library(marquee)
 
 #  Define colors for examples
@@ -202,11 +201,10 @@ ggplot(sales, aes(x = reorder(region, variance))) +
 #| label: waterfall-colored
 #| fig-width: 10
 #| fig-height: 5
-#| eval: false
 library(marquee)
 
 #  Define colors for examples
-cols <- list(actual = "#404040", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
+cols <- list(actual = "#404040", actual_light = "#808080", variance_positive = "#006400", variance_negative = "#8B0000", previous = "#A0A0A0")
 
 # Bridge data
 bridge <- data.frame(
