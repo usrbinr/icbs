@@ -153,6 +153,20 @@ create_text_block <- function(text,
         theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
 }
 
+#' Strip marquee formatting from text
+#'
+#' Removes marquee syntax (colors and bold/italic markers) to get plain text.
+#' Used for character counting in height estimation.
+#'
+#' @param text Text with marquee formatting
+#' @return Plain text without formatting
+#' @noRd
+strip_marquee_formatting <- function(text) {
+    if (is.null(text) || !is.character(text)) return("")
+    text <- gsub("\\{#[A-Fa-f0-9]+ ([^}]+)\\}", "\\1", text)
+    gsub("\\*+", "", text)
+}
+
 #' Convert text or ggplot to a block plot
 #'
 #' If input is already a ggplot, returns it unchanged.
