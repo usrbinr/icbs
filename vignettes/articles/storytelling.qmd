@@ -56,7 +56,7 @@ Creates a text panel for the "so what?" explanation.
 ```{r}
 #| label: text-narrative
 #| fig-width: 4
-#| fig-height: 2
+#| fig-height: 1.5
 
 text_narrative(
     text = "**Key insight:**
@@ -95,7 +95,7 @@ Stack blocks vertically with `/` and set proportional heights:
 
 ```{r}
 #| label: combined-example
-#| fig-width: 8.5
+#| fig-width: 8
 #| fig-height: 9    
 df <- data.frame(x = c("A", "B", "C"), y = c(30, 50, 20))
 
@@ -110,7 +110,7 @@ title_block("**{#E63946 Category A} Leads**", title_size = 8) /
 subtitle_block("Year-over-year comparison",subtitle_size = 6) /
 chart /
 caption_block("Source: Internal Analytics") +
-    plot_layout(heights = c(0.10, 0.06, 0.78, 0.06))
+    plot_layout(heights = c(0.08, 0.06, 0.78, 0.08))
 ```
 
 ## Adding a Narrative Panel
