@@ -1,7 +1,7 @@
 
 ## Overview
 
-Create presentation-ready visualizations following [Storytelling with Data](https://www.storytellingwithdata.com/) (SWD) principles. Provides story layouts that combine charts with narrative text, colored titles, and supporting context. Includes an interactive Shiny app for designing layouts, strategic color highlighting, and integration with the marquee package for colored text labels.
+Create presentation-ready visualizations following [Storytelling with Data](https://www.storytellingwithdata.com/) (STWD) principles. Provides story layouts that combine charts with narrative text, colored titles, and supporting context. Includes an interactive Shiny app for designing layouts, strategic color highlighting, and integration with the marquee package for colored text labels.
 
 ## Installation
 
