@@ -28,10 +28,10 @@ Creates a large, prominent title. Supports marquee syntax for colored text.
 ```{r}
 #| label: title-block
 #| fig-width: 10
-#| fig-height: 0.5
+#| fig-height: 1
 title_block(
     "**Q4 Sales: {#E63946 Apples} Take the Lead**",
-    title_size = 14
+    title_size = 10
 )
 ```
 
@@ -96,7 +96,7 @@ Stack blocks vertically with `/` and set proportional heights:
 ```{r}
 #| label: combined-example
 #| fig-width: 8.5
-#| fig-height: 10
+#| fig-height: 9
 df <- data.frame(x = c("A", "B", "C"), y = c(30, 50, 20))
 
 chart <- ggplot(df, aes(x, y, fill = x)) +
@@ -120,7 +120,7 @@ Place chart and narrative side by side with `+` and set proportional widths:
 ```{r}
 #| label: with-narrative
 #| fig-width: 8
-#| fig-height: 10
+#| fig-height: 9
 narrative <- text_narrative(
     "**Summary:**
 
