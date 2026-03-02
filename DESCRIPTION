@@ -16,8 +16,6 @@ Imports:
     grid,
     patchwork,
     rlang,
-    S7,
-    scales,
     stats
 Suggests:
     base64enc,

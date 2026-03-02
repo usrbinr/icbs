@@ -1,11 +1,9 @@
 #' @import ggplot2
-#' @import S7
-#' @importFrom cli cli_abort cli_h1 cli_h2 cli_text cli_bullets cli_alert_warning
-#' @importFrom patchwork plot_layout plot_annotation
+#' @importFrom cli cli_abort cli_alert_warning
+#' @importFrom patchwork plot_layout
 #' @importFrom grid gpar linesGrob grobTree rectGrob unit
-#' @importFrom rlang quo quo_get_expr %||%
-#' @importFrom scales percent
-#' @importFrom stats reorder setNames
+#' @importFrom rlang %||%
+#' @importFrom stats setNames
 #' @importFrom utils head tail
 NULL
 
@@ -53,27 +51,11 @@ utils::globalVariables(c(
 #' title <- paste0("Sales in ", stwd_color("forestgreen", "Q4"), " exceeded targets")
 #'
 stwd_color <- function(color, text, bold = FALSE) {
-    # Convert named color to hex if needed
-    if (!grepl("^#", color)) {
-        # Try to convert named color to hex
-        tryCatch({
-            rgb_vals <- grDevices::col2rgb(color)
-            color <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
-        }, error = function(e) {
-            cli::cli_abort(c(
-                "Invalid color: {.val {color}}",
-                "i" = "Use a hex code like {.val #E69F00} or an R color name like {.val midnightblue}"
-            ))
-        })
-    }
-
-    # Build marquee syntax
+    color <- color_to_hex(color)
     result <- paste0("{", color, " ", text, "}")
-
     if (bold) {
         result <- paste0("**", result, "**")
     }
-
     result
 }
 
@@ -118,10 +100,7 @@ stwd_colors <- function(pattern = NULL, n = 20) {
     }
 
     # Convert to hex
-    hex_codes <- sapply(all_colors, function(col) {
-        rgb_vals <- grDevices::col2rgb(col)
-        sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
-    })
+    hex_codes <- sapply(all_colors, color_to_hex)
 
     result <- data.frame(name = all_colors, hex = hex_codes, row.names = NULL)
 
@@ -143,97 +122,6 @@ stwd_colors <- function(pattern = NULL, n = 20) {
 # ============================================================================
 # Marquee Text Color Matching
 # ============================================================================
-
-#' Format Labels with Matching Colors
-#'
-#' Creates marquee-formatted text labels where the text color matches
-#' a specified fill or color value. Use with `marquee::geom_marquee()`.
-#'
-#' @param labels Character vector of labels to format.
-#' @param colors Character vector of colors (same length as labels).
-#'   Can be hex codes (e.g., "#FF0000") or named colors (e.g., "red").
-#' @param bold Logical, make text bold. Default: FALSE.
-#' @param italic Logical, make text italic. Default: FALSE.
-#'
-#' @returns Character vector of marquee-formatted labels.
-#' @export
-#'
-#' @examples
-#' labels <- c("Positive", "Negative")
-#' colors <- c("#006400", "#8B0000")
-#' marquee_color_labels(labels, colors)
-#' # Returns: c("{#006400 Positive}", "{#8B0000 Negative}")
-#'
-#' # With bold formatting:
-#' marquee_color_labels(labels, colors, bold = TRUE)
-#' # Returns: c("{#006400 **Positive**}", "{#8B0000 **Negative**}")
-#'
-marquee_color_labels <- function(labels, colors, bold = FALSE, italic = FALSE) {
-    if (length(labels) != length(colors)) {
-        stop("labels and colors must have the same length")
-    }
-
-    # Build format string
-    formatted <- mapply(function(label, color) {
-        text <- label
-        if (bold && italic) {
-            text <- paste0("***", text, "***")
-        } else if (bold) {
-            text <- paste0("**", text, "**")
-        } else if (italic) {
-            text <- paste0("*", text, "*")
-        }
-        paste0("{", color, " ", text, "}")
-    }, labels, colors, USE.NAMES = FALSE)
-
-    return(formatted)
-}
-
-# ============================================================================
-# Polished Chart Helpers (SWD Style)
-# ============================================================================
-
-#' Create a Title with Embedded Colored Category Names
-#'
-#' Builds a title string where category names are colored to match their
-#' fill colors. Useful for creating self-documenting titles that replace
-#' traditional legends.
-#'
-#' @param template A string with placeholders for categories. Use `{category_name}`
-#'   syntax for each category you want colored.
-#' @param colors Named vector of colors (names = category levels).
-#' @param bold Logical, make category names bold. Default: TRUE.
-#'
-#' @returns A marquee-formatted string for use in `labs(title = ...)` or
-#'   `labs(subtitle = ...)` with `theme(plot.title = element_marquee())`.
-#' @export
-#'
-#' @examples
-#' fill_colors <- c("Apples" = "#E63946", "Oranges" = "#F4A261")
-#'
-#' marquee_title(
-#'     "{Apples} outsold {Oranges} in Q4",
-#'     fill_colors
-#' )
-#' # Returns: "{#E63946 **Apples**} outsold {#F4A261 **Oranges**} in Q4"
-#'
-marquee_title <- function(template, colors, bold = TRUE) {
-    result <- template
-
-    for (name in names(colors)) {
-        color <- colors[[name]]
-        formatted <- if (bold) {
-            paste0("{", color, " **", name, "**}")
-        } else {
-            paste0("{", color, " ", name, "}")
-        }
-        # Replace {name} with formatted version
-        result <- gsub(paste0("\\{", name, "\\}"), formatted, result)
-    }
-
-    result
-}
-
 #' Create a Highlight Color Palette
 #'
 #' Creates a color vector where only specified categories are highlighted
@@ -316,22 +204,18 @@ inline_legend <- function(colors,
                           orientation = "horizontal",
                           sep = " \u2022 ",
                           bold = TRUE) {
+    # Format labels with marquee color syntax
+    labels <- names(colors)
+    cols <- unname(colors)
+    formatted <- mapply(function(label, color) {
+        text <- if (bold) paste0("**", label, "**") else label
+        paste0("{", color, " ", text, "}")
+    }, labels, cols, USE.NAMES = FALSE)
+
     if (orientation == "horizontal") {
-        # Single row with all items
-        formatted <- marquee_color_labels(
-            labels = names(colors),
-            colors = unname(colors),
-            bold = bold
-        )
         label <- paste(formatted, collapse = sep)
         data.frame(x = x, y = y, label = label)
     } else {
-        # Separate row for each item
-        formatted <- marquee_color_labels(
-            labels = names(colors),
-            colors = unname(colors),
-            bold = bold
-        )
         n <- length(colors)
         data.frame(
             x = rep(x, n),
@@ -357,12 +241,7 @@ inline_legend <- function(colors,
 #' }
 #'
 theme_marquee <- function() {
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn theme_marquee}."
-        )
-    }
-
+    check_marquee("theme_marquee")
     theme(
         plot.title = marquee::element_marquee(),
         plot.subtitle = marquee::element_marquee(),
@@ -488,25 +367,13 @@ text_narrative <- function(text,
                            width = 1,
                            wrap_width = NULL,
                            ...) {
+    check_marquee("text_narrative")
+    text <- maybe_wrap_text(text, wrap_width)
 
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn text_narrative}."
-        )
-    }
-
-    # Wrap text if wrap_width specified
-    if (!is.null(wrap_width) && wrap_width > 0) {
-        text <- paste(strwrap(text, width = wrap_width), collapse = "\n")
-    }
-
-    # Convert alignment to numeric
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
-    vjust <- switch(valign, top = 1, center = 0.5, bottom = 0, 1)
-
-    # X position based on alignment (offset from edges like title_block)
-    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.02)
-    y_pos <- switch(valign, top = 0.98, center = 0.5, bottom = 0.02, 0.98)
+    hjust <- get_hjust(halign)
+    vjust <- get_vjust(valign)
+    x_pos <- get_x_pos(halign)
+    y_pos <- get_y_pos(valign)
 
     # Use narrower width to allow alignment to be visible
     text_width <- if (width == 1) 0.96 else width
@@ -575,21 +442,10 @@ title_block <- function(title,
                         width = 0.95,
                         wrap_width = NULL,
                         ...) {
-
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn title_block}."
-        )
-    }
-
-    # Wrap text if wrap_width specified
-    if (!is.null(wrap_width) && wrap_width > 0) {
-        title <- paste(strwrap(title, width = wrap_width), collapse = "\n")
-    }
-
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
-    # Offset from edge to avoid clipping
-    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.02)
+    check_marquee("title_block")
+    title <- maybe_wrap_text(title, wrap_width)
+    hjust <- get_hjust(halign)
+    x_pos <- get_x_pos(halign)
 
     # Position text from top (y=0.95) flowing downward (vjust=1)
     # This gives maximum room for wrapped text to expand downward
@@ -657,22 +513,11 @@ subtitle_block <- function(subtitle,
                            width = 0.95,
                            wrap_width = NULL,
                            ...) {
+    check_marquee("subtitle_block")
+    subtitle <- maybe_wrap_text(subtitle, wrap_width)
+    hjust <- get_hjust(halign)
+    x_pos <- get_x_pos(halign)
 
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn subtitle_block}."
-        )
-    }
-
-    # Wrap text if wrap_width specified
-    if (!is.null(wrap_width) && wrap_width > 0) {
-        subtitle <- paste(strwrap(subtitle, width = wrap_width), collapse = "\n")
-    }
-
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
-    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.02)
-
-    # Position from top (y=0.9), flowing downward
     p <- ggplot() +
         marquee::geom_marquee(
             aes(x = x_pos, y = 0.9, label = subtitle),
@@ -730,20 +575,10 @@ caption_block <- function(caption,
                           margin_right = 5,
                           wrap_width = NULL,
                           ...) {
-
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn caption_block}."
-        )
-    }
-
-    # Wrap text if wrap_width specified
-    if (!is.null(wrap_width) && wrap_width > 0) {
-        caption <- paste(strwrap(caption, width = wrap_width), collapse = "\n")
-    }
-
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
-    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.02)
+    check_marquee("caption_block")
+    caption <- maybe_wrap_text(caption, wrap_width)
+    hjust <- get_hjust(halign)
+    x_pos <- get_x_pos(halign)
 
     # Wrap caption in color if not already formatted
     if (!grepl("^\\{#", caption)) {
@@ -828,12 +663,7 @@ legend_block <- function(colors,
                          margin_left = 5,
                          margin_right = 5,
                          ...) {
-
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn legend_block}."
-        )
-    }
+    check_marquee("legend_block")
 
     if (length(colors) == 0) {
         cli::cli_abort("At least one color must be provided.")
@@ -858,15 +688,7 @@ legend_block <- function(colors,
 
     # Format each label with its color using marquee syntax
     formatted <- mapply(function(label, color) {
-        # Convert named color to hex if needed
-        if (!grepl("^#", color)) {
-            tryCatch({
-                rgb_vals <- grDevices::col2rgb(color)
-                color <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
-            }, error = function(e) {
-                color <- "#000000"
-            })
-        }
+        color <- color_to_hex(color)
         if (bold) {
             paste0("**{", color, " ", label, "}**")
         } else {
@@ -874,14 +696,15 @@ legend_block <- function(colors,
         }
     }, labels, colors, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 
-    # Position settings
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 1)
-    x_pos <- switch(halign, left = 0.02, center = 0.5, right = 0.98, 0.98)
+    # Position settings (default to right alignment for legend)
+    hjust <- get_hjust(halign, default = 1)
+    x_pos <- get_x_pos(halign, default = 0.98)
 
     if (orientation == "vertical") {
         # Vertical: stack labels with newlines
         legend_text <- paste(formatted, collapse = "\n")
-        vjust_val <- switch(valign, top = 1, center = 0.5, bottom = 0, 0.5)
+        vjust_val <- get_vjust(valign, default = 0.5)
+        # Legend uses tighter margins (0.95/0.05) than standard blocks (0.98/0.02)
         y_pos <- switch(valign, top = 0.95, center = 0.5, bottom = 0.05, 0.5)
 
         p <- ggplot() +
@@ -942,15 +765,10 @@ title_header <- function(title,
                          title_size = 8,
                          subtitle_size = 4,
                          halign = "left") {
-
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn title_header}."
-        )
-    }
-
-    hjust <- switch(halign, left = 0, center = 0.5, right = 1, 0)
-    x_pos <- switch(halign, left = 0, center = 0.5, right = 1, 0)
+    check_marquee("title_header")
+    hjust <- get_hjust(halign)
+    x_pos <- get_hjust(halign)
+    # Note: title_header uses hjust value for x_pos (0, 0.5, 1) not edge offset
 
     p <- ggplot() +
         marquee::geom_marquee(
@@ -1172,12 +990,7 @@ story_layout <- function(plot,
                          caption_height = NULL,
                          auto_heights = TRUE,
                          output_width = 12) {
-
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        cli::cli_abort(
-            "Package {.pkg marquee} is required for {.fn story_layout}."
-        )
-    }
+    check_marquee("story_layout")
 
     # Auto-calculate heights if not provided
     if (auto_heights) {
@@ -1300,209 +1113,4 @@ story_layout <- function(plot,
 
     result
 }
-
-#' Create Marquee-Formatted Labels from a Color Vector
-#'
-#' Takes a named color vector and a vector of values, returning
-#' marquee-formatted labels where each value's text color matches
-#' its corresponding fill color. Useful for labeling bars with
-#' color-matched text.
-#'
-#' @param x Character vector of values to format (must match names in `colors`).
-#' @param colors Named vector of colors (names = category levels).
-#' @param bold Logical, make text bold. Default: FALSE.
-#' @param italic Logical, make text italic. Default: FALSE.
-#'
-#' @returns Character vector of marquee-formatted labels.
-#' @export
-#'
-#' @examples
-#' fill_colors <- c(
-#'     "Apples" = "#E63946",
-#'     "Oranges" = "#F4A261",
-#'     "Bananas" = "#E9C46A"
-#' )
-#'
-#' marquee_labels_from_colors(c("Apples", "Oranges"), fill_colors, bold = TRUE)
-#' # Returns: c("{#E63946 **Apples**}", "{#F4A261 **Oranges**}")
-#'
-marquee_labels_from_colors <- function(x, colors, bold = FALSE, italic = FALSE) {
-    # Look up color for each value
-    matched_colors <- colors[as.character(x)]
-
-    marquee_color_labels(
-        labels = as.character(x),
-        colors = unname(matched_colors),
-        bold = bold,
-        italic = italic
-    )
-}
-
-#' Create a Fill Scale with Color-Matched Legend Text
-#'
-#' Creates a `scale_fill_manual` where the legend text color matches
-#' the fill color of each category. Uses marquee for text rendering.
-#'
-#' @param values Named vector of fill colors (names = category levels).
-#' @param bold Logical, make legend text bold. Default: FALSE.
-#' @param italic Logical, make legend text italic. Default: FALSE.
-#' @param ... Additional arguments passed to `scale_fill_manual()`.
-#'
-#' @returns A ggplot2 scale object.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' library(ggplot2)
-#' library(marquee)
-#'
-#' df <- data.frame(
-#'     product = c("Apples", "Oranges", "Bananas", "Grapes"),
-#'     sales = c(120, 85, 95, 110)
-#' )
-#'
-#' fill_colors <- c(
-#'     "Apples" = "#E63946",
-#'     "Oranges" = "#F4A261",
-#'     "Bananas" = "#E9C46A",
-#'     "Grapes" = "#7B2D8E"
-#' )
-#'
-#' ggplot(df, aes(x = product, y = sales, fill = product)) +
-#'     geom_col() +
-#'     scale_fill_marquee(fill_colors, bold = TRUE) +
-#'     theme_minimal() +
-#'     theme(legend.text = marquee::element_marquee())
-#' }
-#'
-scale_fill_marquee <- function(values, bold = FALSE, italic = FALSE, ...) {
-
-    # Create marquee-formatted labels
-    formatted_labels <- marquee_color_labels(
-        labels = names(values),
-        colors = unname(values),
-        bold = bold,
-        italic = italic
-    )
-    names(formatted_labels) <- names(values)
-
-    scale_fill_manual(
-        values = values,
-        labels = formatted_labels,
-        ...
-    )
-}
-
-#' Create a Color Scale with Color-Matched Legend Text
-#'
-#' Creates a `scale_color_manual` where the legend text color matches
-#' the line/point color of each category. Uses marquee for text rendering.
-#'
-#' @param values Named vector of colors (names = category levels).
-#' @param bold Logical, make legend text bold. Default: FALSE.
-#' @param italic Logical, make legend text italic. Default: FALSE.
-#' @param ... Additional arguments passed to `scale_color_manual()`.
-#'
-#' @returns A ggplot2 scale object.
-#' @export
-#'
-scale_color_marquee <- function(values, bold = FALSE, italic = FALSE, ...) {
-
-    # Create marquee-formatted labels
-    formatted_labels <- marquee_color_labels(
-        labels = names(values),
-        colors = unname(values),
-        bold = bold,
-        italic = italic
-    )
-    names(formatted_labels) <- names(values)
-
-    scale_color_manual(
-        values = values,
-        labels = formatted_labels,
-        ...
-    )
-}
-
-#' Create a Color-Matched Label Layer
-#'
-#' A convenience function that adds colored text labels using marquee.
-#' Pre-formats labels with marquee color syntax before plotting.
-#'
-#' @param data Data frame containing the data.
-#' @param mapping Aesthetic mapping created by `aes()`. Must include `x`, `y`,
-#'   `label`, and `color` (the color to use for the text).
-#' @param ... Additional arguments passed to `marquee::geom_marquee()`.
-#' @param bold Make text bold. Default: FALSE.
-#' @param italic Make text italic. Default: FALSE.
-#'
-#' @returns A ggplot2 layer object.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' library(marquee)
-#' df <- data.frame(
-#'     x = c("A", "B", "C"),
-#'     y = c(10, -5, 8),
-#'     text_color = c("#006400", "#8B0000", "#006400"),
-#'     label = c("+10", "-5", "+8")
-#' )
-#' ggplot(df, aes(x = x, y = y)) +
-#'     geom_col(aes(fill = text_color)) +
-#'     geom_marquee_colored(
-#'         data = df,
-#'         mapping = aes(x = x, y = y, label = label, color = text_color),
-#'         vjust = -0.5
-#'     )
-#' }
-#'
-geom_marquee_colored <- function(data,
-                                  mapping,
-                                  ...,
-                                  bold = FALSE,
-                                  italic = FALSE) {
-
-    # Check if marquee is available
-    if (!requireNamespace("marquee", quietly = TRUE)) {
-        stop("Package 'marquee' is required for geom_marquee_colored(). ",
-             "Install it with: install.packages('marquee')")
-    }
-
-    # Extract column names from mapping
-    mapping_vars <- lapply(mapping, rlang::quo_get_expr)
-
-    label_col <- as.character(mapping_vars$label)
-    color_col <- as.character(mapping_vars$color %||% mapping_vars$colour)
-
-    if (length(label_col) == 0) {
-        stop("mapping must include 'label' aesthetic")
-    }
-    if (length(color_col) == 0) {
-        stop("mapping must include 'color' or 'colour' aesthetic for text color")
-    }
-
-    # Create formatted labels
-    formatted_data <- data
-    formatted_data$.marquee_label <- marquee_color_labels(
-        labels = as.character(data[[label_col]]),
-        colors = as.character(data[[color_col]]),
-        bold = bold,
-        italic = italic
-    )
-
-    # Create new mapping without color (it's now embedded in label)
-    new_mapping <- mapping
-    new_mapping$label <- rlang::quo(.marquee_label)
-    new_mapping$color <- NULL
-    new_mapping$colour <- NULL
-
-    marquee::geom_marquee(
-        data = formatted_data,
-        mapping = new_mapping,
-        ...
-    )
-}
-
-
 

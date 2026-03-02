@@ -328,6 +328,20 @@ story_designer <- function(plot = NULL,
                         shiny::downloadButton("download_export", "Download", class = "btn-primary")
                     ),
                     shiny::uiOutput("export_info"),
+                    shiny::div(
+                        class = "bg-light p-2 rounded mb-3",
+                        shiny::div(
+                            class = "d-flex justify-content-between align-items-center mb-1",
+                            shiny::tags$small(class = "text-muted fw-bold", "Quarto code chunk options:"),
+                            shiny::tags$button(
+                                id = "copy_quarto_opts",
+                                class = "btn btn-sm btn-outline-secondary py-0",
+                                onclick = "navigator.clipboard.writeText(document.getElementById('quarto-opts-text').innerText).then(function() { document.getElementById('copy_quarto_opts').innerHTML = '<i class=\"fa fa-check\"></i> Copied'; setTimeout(function() { document.getElementById('copy_quarto_opts').innerHTML = '<i class=\"fa fa-copy\"></i> Copy'; }, 1500); });",
+                                shiny::icon("copy"), " Copy"
+                            )
+                        ),
+                        shiny::uiOutput("quarto_chunk_opts")
+                    ),
                     shiny::uiOutput("actual_size_preview")
                 )
             ),
@@ -1215,6 +1229,17 @@ story_designer <- function(plot = NULL,
             )
         })
 
+        output$quarto_chunk_opts <- shiny::renderUI({
+            w <- input$export_width %||% 12
+            h <- input$export_height %||% 9
+            dpi <- input$export_dpi %||% 150
+            shiny::tags$pre(
+                id = "quarto-opts-text",
+                class = "mb-0 small",
+                style = "background: white; padding: 8px; border-radius: 4px; font-family: monospace;",
+                paste0("#| fig-width: ", w, "\n#| fig-height: ", h, "\n#| fig-dpi: ", dpi)
+            )
+        })
 
         output$download_export <- shiny::downloadHandler(
             filename = function() {
