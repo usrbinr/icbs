@@ -28,7 +28,6 @@ Creates a large, prominent title. Supports marquee syntax for colored text.
 ```{r}
 #| label: title-block
 #| fig-width: 10
-#| fig-height: 0.8
 title_block(
     "**Q4 Sales: {#E63946 Apples} Take the Lead**",
     title_size = 14
@@ -42,7 +41,6 @@ Adds supporting context below the title.
 ```{r}
 #| label: subtitle-block
 #| fig-width: 10
-#| fig-height: 0.5
 subtitle_block(
     "{#2A9D8F Revenue} up 15% | {#E63946 Costs} down 3%",
     subtitle_size = 10
@@ -56,7 +54,6 @@ Creates a text panel for the "so what?" explanation.
 ```{r}
 #| label: text-narrative
 #| fig-width: 4
-#| fig-height: 2.5
 text_narrative(
     text = "**Key insight:**
 
@@ -76,7 +73,6 @@ Adds source attribution at the bottom.
 ```{r}
 #| label: caption-block
 #| fig-width: 10
-#| fig-height: 0.4
 caption_block("Source: Finance Department | Q4 2024", caption_size = 4)
 ```
 
@@ -87,7 +83,6 @@ Creates an inline colored text legend instead of a traditional legend box.
 ```{r}
 #| label: legend-block
 #| fig-width: 10
-#| fig-height: 0.5
 legend_colors <- c("HIGH" = "#E63946", "MEDIUM" = "#808080", "LOW" = "#457B9D")
 
 legend_block(legend_colors, halign = "right", sep = " | ")
