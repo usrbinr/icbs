@@ -16,7 +16,8 @@ Imports:
     grid,
     patchwork,
     rlang,
-    stats
+    stats,
+    utils
 Suggests:
     base64enc,
     bslib,
@@ -39,3 +40,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 URL: https://codeberg.org/usrbinr/stwd
+BugReports: https://codeberg.org/usrbinr/stwd/issues
