@@ -21,6 +21,7 @@
 ^_brand\.yml$
 ^test\.R$
 ^_qrtdown-styles\.css$
+^index_files$
 
 # qrtdown
 ^_qrtdown$
