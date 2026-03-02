@@ -2,7 +2,7 @@
 title: "story_designer"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L72)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L86)
 
 # `story_designer()`
 
@@ -39,6 +39,20 @@ Launches a Shiny app. Returns NULL invisibly.
 Launches a Shiny app to interactively design story layouts with
 real-time preview. Provides controls for text blocks, color palettes,
 themes, and exports ready-to-use patchwork code.
+
+## Details
+
+The Story Designer is the primary interface for creating SWD-style
+visualizations. It provides a WYSIWYG editor with live preview,
+allowing you to adjust text, colors, and layout before copying the
+generated patchwork code into your Quarto document or R script.
+
+The workflow is: (1) create your base ggplot, (2) pass it to
+`story_designer()`, (3) customize using the sidebar controls,
+(4) copy the code from the Code tab, (5) paste into your document.
+
+Text inputs support marquee formatting syntax: **bold** for bold,
+*italic* for italics, and {#HEXCOLOR text for colored text.
 
 ## Examples
 

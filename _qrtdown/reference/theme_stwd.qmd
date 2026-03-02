@@ -2,7 +2,7 @@
 title: "theme_stwd"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L395)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L237)
 
 # `theme_stwd()`
 
@@ -27,9 +27,23 @@ A ggplot2 theme object.
 
 ## Description
 
-A clean, minimal theme optimized for data storytelling. Follows
-best practices from "Storytelling with Data" - removes distractions,
-emphasizes the data, and provides clean typography.
+A clean, minimal ggplot2 theme optimized for data storytelling.
+
+## Details
+
+Follows best practices from "Storytelling with Data":
+
+- White background with no chart border
+
+- Horizontal grid lines only (subtle gray)
+
+- No axis lines or ticks
+
+- Legend positioned at top-left
+
+- Clean typography with muted colors
+
+This theme removes visual distractions so the data takes center stage.
 
 ## Examples
 

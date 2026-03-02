@@ -2,7 +2,7 @@
 title: "subtitle_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L649)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L479)
 
 # `subtitle_block()`
 
@@ -31,11 +31,11 @@ subtitle_block(
 | Argument | Description |
 |----------|-------------|
 | `subtitle` | Subtitle text (marquee-formatted). Supports markdown formatting: **bold**, *italic*, {#color text. |
-| `subtitle_size` | Size for subtitle in pts. Default: 11 (matches SWD style). |
+| `subtitle_size` | Size for subtitle in pts. Default: 10. |
 | `halign` | Horizontal alignment: "left", "center", or "right". Default: "left". |
 | `lineheight` | Line height multiplier. Default: 1.2. |
 | `margin_top` | Top margin in pts. Default: 0. |
-| `margin_bottom` | Bottom margin in pts. Default: 10. |
+| `margin_bottom` | Bottom margin in pts. Default: 5. |
 | `margin_left` | Left margin in pts. Default: 5. |
 | `margin_right` | Right margin in pts. Default: 5. |
 | `width` | Maximum width for text wrapping (0-1). Default: 0.95. |
@@ -48,9 +48,16 @@ A ggplot object that can be combined with other plots via patchwork.
 
 ## Description
 
-Creates a standalone subtitle element as a ggplot, for use below
-a title block in a patchwork composition. Subtitles provide context
-and supporting information for the main title.
+Creates a standalone subtitle element as a ggplot for use in patchwork
+compositions.
+
+## Details
+
+Subtitles provide context and supporting information below the main title.
+Use for timeframes, data descriptions, or methodological notes. Supports
+marquee markdown: **bold**, *italic*, and {#hexcolor text.
+
+Place below `title_block()` using patchwork's `/` operator.
 
 ## Examples
 

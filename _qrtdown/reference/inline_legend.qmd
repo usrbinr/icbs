@@ -2,7 +2,7 @@
 title: "inline_legend"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L313)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L179)
 
 # `inline_legend()`
 
@@ -38,8 +38,16 @@ A data frame with columns `x`, `y`, and `label` (marquee-formatted).
 
 ## Description
 
-Creates a data frame suitable for adding colored text annotations
-as an inline legend replacement. Use with `geom_marquee()`.
+Creates a data frame for adding colored text annotations as an
+inline legend replacement.
+
+## Details
+
+Returns a data frame with marquee-formatted labels that can be added
+to a plot using `marquee::geom_marquee()`. This allows placing a
+color-coded legend directly within the plot area rather than using
+the standard ggplot2 legend. Consider using `legend_block()` instead
+for patchwork compositions.
 
 ## Examples
 

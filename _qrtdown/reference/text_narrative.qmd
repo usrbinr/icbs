@@ -2,7 +2,7 @@
 title: "text_narrative"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L482)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L332)
 
 # `text_narrative()`
 
@@ -32,7 +32,7 @@ text_narrative(
 | `size` | Text size. Default: 4. |
 | `halign` | Horizontal alignment: "left", "center", or "right". Default: "left". |
 | `valign` | Vertical alignment: "top", "center", or "bottom". Default: "top". |
-| `padding` | Padding around text as a margin() object or numeric vector (top, right, bottom, left). Default: 10 on all sides. |
+| `padding` | Padding around text. Default: 10 on all sides. |
 | `lineheight` | Line height multiplier. Default: 1.4. |
 | `width` | Maximum width for text wrapping. Default: 1 (full width). |
 | `wrap_width` | Character width to wrap text at. Default: NULL (no wrapping). |
@@ -44,9 +44,17 @@ A ggplot object.
 
 ## Description
 
-Creates a ggplot object containing formatted text, suitable for
-combining with charts via patchwork. Use for adding story context,
-callouts, or explanatory text alongside visualizations.
+Creates a ggplot object containing formatted text for combining
+with charts via patchwork.
+
+## Details
+
+Use for adding story context, callouts, or the "so what?" explanation
+alongside visualizations. Text supports marquee markdown formatting:
+**bold**, *italic*, and {#hexcolor text for colored text.
+
+Typically placed beside a chart using patchwork's `+` operator with
+`plot_layout(widths = c(0.6, 0.4))` to control proportions.
 
 ## Examples
 
