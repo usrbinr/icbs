@@ -106,8 +106,8 @@ chart <- ggplot(df, aes(x, y, fill = x)) +
     theme_minimal() +
     labs(x = NULL, y = NULL)
 
-title_block("**{#E63946 Category A} Leads**", title_size = 8) /
-subtitle_block("Year-over-year comparison",subtitle_size = 6) /
+title_block("**{#E63946 Category A} Leads**", title_size = 12) /
+subtitle_block("Year-over-year comparison", subtitle_size = 10) /
 chart /
 caption_block("Source: Internal Analytics") +
     plot_layout(heights = c(0.08, 0.06, 0.78, 0.08))

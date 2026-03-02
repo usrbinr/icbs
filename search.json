@@ -326,7 +326,7 @@
     "href": "vignettes/articles/storytelling.html#combining-blocks-with-patchwork",
     "title": "Storytelling with Data Layouts",
     "section": "Combining Blocks with Patchwork",
-    "text": "Combining Blocks with Patchwork\nStack blocks vertically with / and set proportional heights:\n\ndf &lt;- data.frame(x = c(\"A\", \"B\", \"C\"), y = c(30, 50, 20))\n\nchart &lt;- ggplot(df, aes(x, y, fill = x)) +\n    geom_col() +\n    scale_fill_manual(values = c(A = \"#E63946\", B = \"#CCCCCC\", C = \"#CCCCCC\"),\n                      guide = \"none\") +\n    theme_minimal() +\n    labs(x = NULL, y = NULL)\n\ntitle_block(\"**{#E63946 Category A} Leads**\", title_size = 8) /\nsubtitle_block(\"Year-over-year comparison\",subtitle_size = 6) /\nchart /\ncaption_block(\"Source: Internal Analytics\") +\n    plot_layout(heights = c(0.08, 0.06, 0.78, 0.08))"
+    "text": "Combining Blocks with Patchwork\nStack blocks vertically with / and set proportional heights:\n\ndf &lt;- data.frame(x = c(\"A\", \"B\", \"C\"), y = c(30, 50, 20))\n\nchart &lt;- ggplot(df, aes(x, y, fill = x)) +\n    geom_col() +\n    scale_fill_manual(values = c(A = \"#E63946\", B = \"#CCCCCC\", C = \"#CCCCCC\"),\n                      guide = \"none\") +\n    theme_minimal() +\n    labs(x = NULL, y = NULL)\n\ntitle_block(\"**{#E63946 Category A} Leads**\", title_size = 12) /\nsubtitle_block(\"Year-over-year comparison\", subtitle_size = 10) /\nchart /\ncaption_block(\"Source: Internal Analytics\") +\n    plot_layout(heights = c(0.08, 0.06, 0.78, 0.08))"
   },
   {
     "objectID": "vignettes/articles/storytelling.html#adding-a-narrative-panel",
