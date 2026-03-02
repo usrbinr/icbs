@@ -215,6 +215,21 @@ subtitle_block(
 caption_block("Source: Finance Department | Q4 2024")
 ```
 
+#### legend_block(): Inline Colored Legends
+
+Instead of a traditional legend box, embed colored category labels directly in your layout:
+
+```{r}
+#| label: legend-block
+#| fig-width: 10
+#| fig-height: 0.6
+legend_colors <- c("HIGH" = "#E63946", "MEDIUM" = "#808080", "LOW" = "#457B9D")
+
+legend_block(legend_colors, halign = "right", sep = " | ")
+```
+
+The legend can be positioned above, below, or beside the chart in your patchwork composition.
+
 #### Combining Blocks Manually
 
 For maximum control, combine blocks using patchwork:
@@ -461,8 +476,10 @@ optimistic with 8% growth target.",
 | Function | Purpose |
 |----------|---------|
 | `story_layout()` | One-call complete story composition |
-| `title_block()` | Create large, prominent title plots (16pt default) |
+| `story_designer()` | Interactive Shiny app with color palettes and manual colors |
+| `title_block()` | Create large, prominent title plots |
 | `subtitle_block()` | Create subtitle plots with context |
+| `legend_block()` | Create inline colored text legend (e.g., "HIGH \| MEDIUM \| LOW") |
 | `caption_block()` | Create caption/source plots |
 | `text_narrative()` | Create standalone text blocks |
 | `highlight_colors()` | Gray out non-essential categories |
@@ -470,3 +487,4 @@ optimistic with 8% growth target.",
 | `scale_fill_marquee()` | Match legend text to fill colors |
 | `marquee_labels_from_colors()` | Create colored bar labels |
 | `theme_marquee()` | Enable marquee for all text elements |
+| `theme_stwd()` | Clean SWD theme (horizontal grid only) |
