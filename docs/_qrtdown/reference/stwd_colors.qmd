@@ -2,7 +2,7 @@
 title: "stwd_colors"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L175)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L103)
 
 # `stwd_colors()`
 

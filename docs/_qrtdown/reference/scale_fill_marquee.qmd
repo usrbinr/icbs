@@ -2,7 +2,7 @@
 title: "scale_fill_marquee"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1754)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1378)
 
 # `scale_fill_marquee()`
 

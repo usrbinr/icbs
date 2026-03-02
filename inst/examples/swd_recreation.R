@@ -190,21 +190,3 @@ ggsave(
     bg = "white"
 )
 
-# =============================================================================
-# CHECK YOUR LAYOUT WITH SITREP
-# =============================================================================
-#
-# Before rendering, use story_sitrep() to preview the structure
-# and get SWD-inspired tips:
-
-story_sitrep(
-    plot = chart,
-    title = "**Action needed: 10 warehouses have {#E69F00 high error rates}**",
-    subtitle = "DISCUSS: what are next steps...",
-    narrative = "**OVERALL:** Error rate is 10%...",
-    caption = "SOURCE: ProTip Dashboard",
-    narrative_position = "right",
-    narrative_width = 0.35,
-    title_size = 16,
-    show_tips = TRUE
-)

@@ -2,7 +2,7 @@
 title: "marquee_color_labels"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L243)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L171)
 
 # `marquee_color_labels()`
 

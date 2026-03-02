@@ -2,7 +2,7 @@
 title: "estimate_layout_heights"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1079)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L1007)
 
 # `estimate_layout_heights()`
 
