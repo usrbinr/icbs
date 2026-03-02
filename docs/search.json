@@ -333,7 +333,7 @@
     "href": "vignettes/articles/storytelling.html#adding-a-narrative-panel",
     "title": "Storytelling with Data Layouts",
     "section": "Adding a Narrative Panel",
-    "text": "Adding a Narrative Panel\nPlace chart and narrative side by side with + and set proportional widths:\n\nnarrative &lt;- text_narrative(\n    \"**Summary:**\n\n{#E63946 Category A} leads with 50 units.\",\n    size = 8\n)\n\ncontent &lt;- chart + narrative + plot_layout(widths = c(0.65, 0.35))\n\ntitle_block(\"**{#E63946 Category A} Leads**\", title_size = 12) /\nsubtitle_block(\"Year-over-year comparison\", subtitle_size = 10) /\ncontent /\ncaption_block(\"Source: Internal Analytics\") +\n    plot_layout(heights = c(0.10, 0.06, 0.78, 0.06))"
+    "text": "Adding a Narrative Panel\nPlace chart and narrative side by side with + and set proportional widths:\n\nnarrative &lt;- text_narrative(\n    \"**Summary:**\n\n{#E63946 Category A} leads with 50 units.\",\n    size = 8\n)\n\ncontent &lt;- chart + narrative + plot_layout(widths = c(0.65, 0.35))\n\ntitle_block(\"**{#E63946 Category A} Leads**\", title_size = 12) /\nsubtitle_block(\"Year-over-year comparison\", subtitle_size = 10) /\ncontent /\ncaption_block(\"Source: Internal Analytics\") +\n    plot_layout(heights = c(0.08, 0.06, 0.78, 0.08))"
   },
   {
     "objectID": "vignettes/articles/storytelling.html#helper-functions",
