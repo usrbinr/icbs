@@ -843,166 +843,24 @@ story_designer <- function(plot = NULL,
                  caption = input$caption_height %||% 0.05)
         })
 
-        # Apply plot theme and axis settings
+        # Apply plot theme and axis settings (using helpers from story_designer_utils.R)
         styled_plot <- shiny::reactive({
-            p <- user_plot
-
-            # Get base theme
+            # Base theme
             base_theme <- switch(input$plot_theme %||% "stwd",
                 "stwd" = theme_stwd(),
                 "void" = ggplot2::theme_void(),
                 theme_stwd()
             )
 
-            # X-Axis title styling
-            x_title_face <- if (input$axis_title_x_bold %||% FALSE) "bold" else "plain"
-            x_title_hjust <- as.numeric(input$axis_title_x_align %||% "0.5")
-            x_title_angle <- as.numeric(input$axis_title_x_angle %||% "0")
-            x_title_margin <- input$axis_title_x_margin %||% 5
-            x_title_color <- input$axis_title_x_color %||% "#333333"
+            # Build theme modifications
+            theme_mods <- build_theme_mods(input, `%||%`)
 
-            # Y-Axis title styling
-            y_title_face <- if (input$axis_title_y_bold %||% FALSE) "bold" else "plain"
-            y_title_hjust <- as.numeric(input$axis_title_y_align %||% "0.5")
-            y_title_angle <- as.numeric(input$axis_title_y_angle %||% "90")
-            y_title_margin <- input$axis_title_y_margin %||% 5
-            y_title_color <- input$axis_title_y_color %||% "#333333"
+            # Apply base theme and modifications
+            p <- user_plot + base_theme + theme_mods
 
-            # Axis text styling (just size and color)
-            text_color <- input$axis_text_color %||% "#666666"
-            text_size <- input$axis_text_size %||% 10
-
-            # Grid settings
-            grid_color <- input$grid_color %||% "#E5E5E5"
-            grid_major <- input$grid_major %||% "both"
-            grid_minor <- input$grid_minor %||% "none"
-
-            # Build theme modifications (skip axis styling for void theme)
-            current_theme <- input$plot_theme %||% "minimal"
-            is_void <- current_theme == "void"
-
-            if (is_void) {
-                # For void theme, only set legend position
-                theme_mods <- ggplot2::theme(
-                    legend.position = input$plot_legend_pos %||% "right"
-                )
-            } else {
-                theme_mods <- ggplot2::theme(
-                    axis.title.x = ggplot2::element_text(
-                        size = input$axis_title_x_size %||% 11,
-                        face = x_title_face,
-                        hjust = x_title_hjust,
-                        angle = x_title_angle,
-                        color = x_title_color,
-                        margin = ggplot2::margin(t = x_title_margin)
-                    ),
-                    axis.title.y = ggplot2::element_text(
-                        size = input$axis_title_y_size %||% 11,
-                        face = y_title_face,
-                        hjust = if (y_title_angle == 0) 0.5 else y_title_hjust,
-                        vjust = if (y_title_angle == 0) y_title_hjust else 0.5,
-                        angle = y_title_angle,
-                        color = y_title_color,
-                        margin = ggplot2::margin(r = y_title_margin)
-                    ),
-                    axis.text = ggplot2::element_text(
-                        size = text_size,
-                        color = text_color
-                    ),
-                    legend.position = input$plot_legend_pos %||% "right"
-                )
-            }
-
-            # Axis line, ticks, and grid (skip for void theme)
-            if (!is_void) {
-                axis_line_color <- input$axis_line_color %||% "#333333"
-                if (input$show_axis_line %||% FALSE) {
-                    theme_mods <- theme_mods + ggplot2::theme(
-                        axis.line = ggplot2::element_line(color = axis_line_color)
-                    )
-                }
-                if (input$show_ticks %||% FALSE) {
-                    theme_mods <- theme_mods + ggplot2::theme(
-                        axis.ticks = ggplot2::element_line(color = axis_line_color)
-                    )
-                } else {
-                    theme_mods <- theme_mods + ggplot2::theme(
-                        axis.ticks = ggplot2::element_blank()
-                    )
-                }
-
-                # Grid lines - remove all overrides everything
-                if (input$grid_remove_all %||% FALSE) {
-                    theme_mods <- theme_mods + ggplot2::theme(
-                        panel.grid.major = ggplot2::element_blank(),
-                        panel.grid.major.x = ggplot2::element_blank(),
-                        panel.grid.major.y = ggplot2::element_blank(),
-                        panel.grid.minor = ggplot2::element_blank(),
-                        panel.grid.minor.x = ggplot2::element_blank(),
-                        panel.grid.minor.y = ggplot2::element_blank()
-                    )
-                } else {
-                    # Major grid
-                    major_h <- if (grid_major %in% c("both", "h")) {
-                        ggplot2::element_line(color = grid_color, linewidth = 0.5)
-                    } else ggplot2::element_blank()
-                    major_v <- if (grid_major %in% c("both", "v")) {
-                        ggplot2::element_line(color = grid_color, linewidth = 0.5)
-                    } else ggplot2::element_blank()
-
-                    # Minor grid
-                    minor_h <- if (grid_minor %in% c("both", "h")) {
-                        ggplot2::element_line(color = grid_color, linewidth = 0.25)
-                    } else ggplot2::element_blank()
-                    minor_v <- if (grid_minor %in% c("both", "v")) {
-                        ggplot2::element_line(color = grid_color, linewidth = 0.25)
-                    } else ggplot2::element_blank()
-
-                    theme_mods <- theme_mods + ggplot2::theme(
-                        panel.grid.major.y = major_h,
-                        panel.grid.major.x = major_v,
-                        panel.grid.minor.y = minor_h,
-                        panel.grid.minor.x = minor_v
-                    )
-                }
-            }
-
-            # Apply color palette if selected (with error handling)
-            p <- p + base_theme + theme_mods
-            palette_colors <- current_palette()
-            if (!is.null(palette_colors) && length(palette_colors) > 0) {
-                apply_to <- input$palette_apply %||% "fill"
-                scale_type <- input$palette_scale %||% "discrete"
-
-                # Try to apply the scale, silently fail if incompatible
-                p <- tryCatch({
-                    p_new <- p
-                    if (scale_type == "discrete") {
-                        if (apply_to %in% c("fill", "both")) {
-                            p_new <- p_new + ggplot2::scale_fill_manual(values = palette_colors)
-                        }
-                        if (apply_to %in% c("color", "both")) {
-                            p_new <- p_new + ggplot2::scale_color_manual(values = palette_colors)
-                        }
-                    } else {
-                        # Continuous scales - need at least 2 colors
-                        if (length(palette_colors) >= 2) {
-                            if (apply_to %in% c("fill", "both")) {
-                                p_new <- p_new + ggplot2::scale_fill_gradientn(colors = palette_colors)
-                            }
-                            if (apply_to %in% c("color", "both")) {
-                                p_new <- p_new + ggplot2::scale_color_gradientn(colors = palette_colors)
-                            }
-                        }
-                    }
-                    # Test if plot can be built (will error if scale incompatible)
-                    ggplot2::ggplot_build(p_new)
-                    p_new
-                }, error = function(e) {
-                    # Scale failed - return original plot without palette
-                    p
-                })
-            }
+            # Apply palette colors
+            p <- apply_color_scales(p, current_palette(),
+                input$palette_apply %||% "fill", input$palette_scale %||% "discrete")
 
             # Apply manual colors if enabled (overrides palette)
             if (input$manual_colors_enabled %||% FALSE) {
@@ -1021,23 +879,11 @@ story_designer <- function(plot = NULL,
                     }
 
                     if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
-                        # Build color vector: assigned colors + default for unassigned
                         final_colors <- sapply(levels_to_use, function(lvl) {
                             if (lvl %in% names(color_map)) color_map[[lvl]] else default_col
                         })
                         names(final_colors) <- levels_to_use
-
-                        p <- tryCatch({
-                            p_new <- p
-                            if (manual_apply %in% c("fill", "both")) {
-                                p_new <- p_new + ggplot2::scale_fill_manual(values = final_colors)
-                            }
-                            if (manual_apply %in% c("color", "both")) {
-                                p_new <- p_new + ggplot2::scale_color_manual(values = final_colors)
-                            }
-                            ggplot2::ggplot_build(p_new)
-                            p_new
-                        }, error = function(e) p)
+                        p <- apply_color_scales(p, final_colors, manual_apply, "discrete")
                     }
                 }
             }
@@ -1060,63 +906,10 @@ story_designer <- function(plot = NULL,
             )
         })
 
-        # Reset to defaults
+        # Reset to defaults (using helper from story_designer_utils.R)
         shiny::observeEvent(input$reset_defaults, {
-            shiny::updateTextAreaInput(session, "title_text", value = "**Your {#E69F00 title} here**")
-            shiny::updateTextAreaInput(session, "subtitle_text", value = "Supporting context for your visualization")
-            shiny::updateTextAreaInput(session, "narrative_text", value = "**KEY INSIGHT:**\nYour narrative text here.\n\n**ACTION:**\nWhat should the audience do?")
-            shiny::updateTextInput(session, "caption_text", value = "SOURCE: Your data source")
-            shiny::updateSliderInput(session, "title_size", value = 12)
-            shiny::updateSliderInput(session, "subtitle_size", value = 11)
-            shiny::updateSliderInput(session, "narrative_size", value = 10)
-            shiny::updateSliderInput(session, "caption_size", value = 9)
-            shiny::updateSliderInput(session, "title_margin_bottom", value = 5)
-            shiny::updateSliderInput(session, "subtitle_margin_bottom", value = 5)
-            shiny::updateSliderInput(session, "narrative_width", value = 0.35)
-            shiny::updateSliderInput(session, "title_height", value = 0.08)
-            shiny::updateSliderInput(session, "subtitle_height", value = 0.06)
-            shiny::updateSliderInput(session, "caption_height", value = 0.05)
-            shiny::updateSelectInput(session, "narrative_position", selected = "right")
-            shiny::updateSelectInput(session, "title_align", selected = "left")
-            shiny::updateSelectInput(session, "subtitle_align", selected = "left")
-            shiny::updateSelectInput(session, "narrative_halign", selected = "left")
-            shiny::updateSelectInput(session, "narrative_valign", selected = "top")
-            shiny::updateSelectInput(session, "caption_position", selected = "full_left")
-            shiny::updateNumericInput(session, "title_lineheight", value = 1.1)
-            shiny::updateNumericInput(session, "subtitle_lineheight", value = 1.2)
-            shiny::updateNumericInput(session, "narrative_lineheight", value = 1.4)
-            shiny::updateNumericInput(session, "narrative_padding", value = 10)
-            shiny::updateTextInput(session, "caption_color", value = "#808080")
-            # Plot settings
-            shiny::updateSelectInput(session, "plot_theme", selected = "stwd")
-            shiny::updateSelectInput(session, "plot_legend_pos", selected = "right")
-            shiny::updateSelectInput(session, "palette_package", selected = "none")
+            reset_all_inputs(session)
             palette_idx(1)
-            # X-Axis title
-            shiny::updateSliderInput(session, "axis_title_x_size", value = 11)
-            shiny::updateCheckboxInput(session, "axis_title_x_bold", value = FALSE)
-            shiny::updateSelectInput(session, "axis_title_x_align", selected = "0.5")
-            shiny::updateSelectInput(session, "axis_title_x_angle", selected = "0")
-            shiny::updateSliderInput(session, "axis_title_x_margin", value = 5)
-            shiny::updateTextInput(session, "axis_title_x_color", value = "#333333")
-            # Y-Axis title
-            shiny::updateSliderInput(session, "axis_title_y_size", value = 11)
-            shiny::updateCheckboxInput(session, "axis_title_y_bold", value = FALSE)
-            shiny::updateSelectInput(session, "axis_title_y_align", selected = "0.5")
-            shiny::updateSelectInput(session, "axis_title_y_angle", selected = "90")
-            shiny::updateSliderInput(session, "axis_title_y_margin", value = 5)
-            shiny::updateTextInput(session, "axis_title_y_color", value = "#333333")
-            # Axis text & lines
-            shiny::updateSliderInput(session, "axis_text_size", value = 10)
-            shiny::updateTextInput(session, "axis_text_color", value = "#666666")
-            shiny::updateCheckboxInput(session, "show_axis_line", value = FALSE)
-            shiny::updateCheckboxInput(session, "show_ticks", value = FALSE)
-            shiny::updateTextInput(session, "axis_line_color", value = "#333333")
-            # Grid
-            shiny::updateCheckboxInput(session, "grid_remove_all", value = FALSE)
-            shiny::updateSelectInput(session, "grid_major", selected = "both")
-            shiny::updateSelectInput(session, "grid_minor", selected = "none")
-            shiny::updateTextInput(session, "grid_color", value = "#E5E5E5")
         })
 
         # Preview with correct aspect ratio
