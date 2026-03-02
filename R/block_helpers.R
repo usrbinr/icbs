@@ -1,5 +1,5 @@
-# Internal helper functions for stwd package
-# These are not exported and used to reduce code duplication
+# Block Helper Functions
+# Internal functions that support the block functions (title_block, etc.)
 
 #' Check if marquee package is available
 #' @param fn_name Name of the function requiring marquee
@@ -46,38 +46,6 @@ get_vjust <- function(valign, default = 1) {
 #' @noRd
 get_y_pos <- function(valign, default = 0.98) {
     switch(valign, top = 0.98, center = 0.5, bottom = 0.02, default)
-}
-
-#' Convert named R color to hex code
-#' @param color Color name or hex code
-#' @return Hex color code (e.g., "#FF0000")
-#' @noRd
-color_to_hex <- function(color) {
-    if (grepl("^#", color)) {
-        return(color)
-    }
-    tryCatch({
-        rgb_vals <- grDevices::col2rgb(color)
-        sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
-    }, error = function(e) {
-        cli::cli_abort(c(
-            "Invalid color: {.val {color}}",
-            "i" = "Use a hex code like {.val #E69F00} or an R color name like {.val midnightblue}"
-        ))
-    })
-}
-
-#' Wrap text at specified width
-#' @param text Character string to wrap
-#' @param wrap_width Maximum width (NULL or 0 to disable)
-#' @return Wrapped text with newlines
-#' @noRd
-maybe_wrap_text <- function(text, wrap_width) {
-    if (!is.null(wrap_width) && wrap_width > 0) {
-        paste(strwrap(text, width = wrap_width), collapse = "\n")
-    } else {
-        text
-    }
 }
 
 #' Create a text block plot (internal helper)
@@ -151,20 +119,6 @@ create_text_block <- function(text,
         y_scale +
         theme_void() +
         theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
-}
-
-#' Strip marquee formatting from text
-#'
-#' Removes marquee syntax (colors and bold/italic markers) to get plain text.
-#' Used for character counting in height estimation.
-#'
-#' @param text Text with marquee formatting
-#' @return Plain text without formatting
-#' @noRd
-strip_marquee_formatting <- function(text) {
-    if (is.null(text) || !is.character(text)) return("")
-    text <- gsub("\\{#[A-Fa-f0-9]+ ([^}]+)\\}", "\\1", text)
-    gsub("\\*+", "", text)
 }
 
 #' Convert text or ggplot to a block plot
