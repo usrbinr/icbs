@@ -948,45 +948,10 @@ story_layout <- function(plot,
     }
 
     # Convert text to block plots if needed
-    title_plot <- NULL
-    if (!is.null(title)) {
-        if (inherits(title, "gg")) {
-            title_plot <- title
-        } else {
-            title_plot <- title_block(title, title_size = title_size)
-        }
-    }
-
-    subtitle_plot <- NULL
-    if (!is.null(subtitle)) {
-        if (inherits(subtitle, "gg")) {
-            subtitle_plot <- subtitle
-        } else {
-            subtitle_plot <- subtitle_block(subtitle, subtitle_size = subtitle_size)
-        }
-    }
-
-    narrative_plot <- NULL
-    if (!is.null(narrative)) {
-        if (inherits(narrative, "gg")) {
-            narrative_plot <- narrative
-        } else {
-            narrative_plot <- text_narrative(
-                text = narrative,
-                size = narrative_size,
-                valign = "top"
-            )
-        }
-    }
-
-    caption_plot <- NULL
-    if (!is.null(caption)) {
-        if (inherits(caption, "gg")) {
-            caption_plot <- caption
-        } else {
-            caption_plot <- caption_block(caption, caption_size = caption_size)
-        }
-    }
+    title_plot <- as_block(title, title_block, title_size = title_size)
+    subtitle_plot <- as_block(subtitle, subtitle_block, subtitle_size = subtitle_size)
+    narrative_plot <- as_block(narrative, text_narrative, size = narrative_size, valign = "top")
+    caption_plot <- as_block(caption, caption_block, caption_size = caption_size)
 
     # Build the main content area (plot + optional narrative)
     content <- plot

@@ -152,3 +152,19 @@ create_text_block <- function(text,
         theme_void() +
         theme(plot.margin = margin(margin_top, margin_right, margin_bottom, margin_left))
 }
+
+#' Convert text or ggplot to a block plot
+#'
+#' If input is already a ggplot, returns it unchanged.
+#' If input is text, converts it using the specified block function.
+#'
+#' @param x Text string or ggplot object (or NULL)
+#' @param block_fn Block function to use (e.g., title_block, subtitle_block)
+#' @param ... Additional arguments passed to block_fn
+#' @return A ggplot object or NULL
+#' @noRd
+as_block <- function(x, block_fn, ...) {
+    if (is.null(x)) return(NULL)
+    if (inherits(x, "gg")) return(x)
+    block_fn(x, ...)
+}
