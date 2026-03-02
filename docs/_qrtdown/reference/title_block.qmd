@@ -2,7 +2,7 @@
 title: "title_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L567)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L406)
 
 # `title_block()`
 
@@ -31,11 +31,11 @@ title_block(
 | Argument | Description |
 |----------|-------------|
 | `title` | Main title text (marquee-formatted). Supports markdown formatting: **bold**, *italic*, {#color text. |
-| `title_size` | Size for title in pts. Default: 16 (matches SWD style). |
+| `title_size` | Size for title in pts. Default: 12. |
 | `halign` | Horizontal alignment: "left", "center", or "right". Default: "left". |
 | `lineheight` | Line height multiplier. Default: 1.1. |
-| `margin_top` | Top margin in pts. Default: 10. |
-| `margin_bottom` | Bottom margin in pts. Default: 15. |
+| `margin_top` | Top margin in pts. Default: 5. |
+| `margin_bottom` | Bottom margin in pts. Default: 5. |
 | `margin_left` | Left margin in pts. Default: 5. |
 | `margin_right` | Right margin in pts. Default: 5. |
 | `width` | Maximum width for text wrapping (0-1). Default: 0.95. |
@@ -48,10 +48,18 @@ A ggplot object that can be combined with other plots via patchwork.
 
 ## Description
 
-Creates a standalone title element as a ggplot, for use as the
-top element in a patchwork composition. Allows for larger, more
-prominent titles than standard ggplot titles, matching the SWD style
-where titles are bold statements that draw the eye.
+Creates a standalone title element as a ggplot for use in patchwork
+compositions.
+
+## Details
+
+Allows for larger, more prominent titles than standard ggplot titles.
+Follows the SWD style where titles are bold statements that tell the
+story, not just describe the chart. Supports marquee markdown:
+**bold**, *italic*, and {#hexcolor text for colored text.
+
+Use with patchwork's `/` operator to stack above your chart, and
+`plot_layout(heights = ...)` to control proportions.
 
 ## Examples
 

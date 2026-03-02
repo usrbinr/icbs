@@ -2,7 +2,7 @@
 title: "caption_block"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L723)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L547)
 
 # `caption_block()`
 
@@ -30,7 +30,7 @@ caption_block(
 | Argument | Description |
 |----------|-------------|
 | `caption` | Caption text (marquee-formatted). |
-| `caption_size` | Size for caption in pts. Default: 9. |
+| `caption_size` | Size for caption in pts. Default: 6. |
 | `halign` | Horizontal alignment. Default: "left". |
 | `color` | Text color. Default: gray (#808080). |
 | `margin_top` | Top margin in pts. Default: 10. |
@@ -46,9 +46,16 @@ A ggplot object that can be combined with other plots via patchwork.
 
 ## Description
 
-Creates a standalone caption element as a ggplot, for use at the
-bottom of a patchwork composition. Captions typically contain source
-attributions and notes.
+Creates a standalone caption element as a ggplot for use at the
+bottom of patchwork compositions.
+
+## Details
+
+Captions typically contain source attributions, methodology notes, or
+data caveats. Displayed in muted gray by default to avoid competing
+with the main content. Supports marquee markdown formatting.
+
+Place at the bottom using patchwork's `/` operator.
 
 ## Examples
 

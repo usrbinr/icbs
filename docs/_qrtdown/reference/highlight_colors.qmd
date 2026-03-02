@@ -2,7 +2,7 @@
 title: "highlight_colors"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L262)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L119)
 
 # `highlight_colors()`
 
@@ -35,8 +35,14 @@ A named vector of colors.
 ## Description
 
 Creates a color vector where only specified categories are highlighted
-and all others are grayed out. Follows the SWD principle of using
-color strategically for emphasis.
+and all others are grayed out.
+
+## Details
+
+Follows the Storytelling with Data principle of using color strategically
+for emphasis. By graying out non-essential categories, the viewer's
+attention is drawn to the highlighted data points. Use with
+`scale_fill_manual()` or `scale_color_manual()`.
 
 ## Examples
 
