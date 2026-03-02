@@ -1,0 +1,201 @@
+---
+title: "Sizing Story Layouts for Quarto"
+format:
+  html:
+    toc: true
+    code-fold: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(stwd)
+library(ggplot2)
+library(patchwork)
+```
+
+## Overview
+
+Getting consistent sizing between `story_designer()` and Quarto documents requires matching the figure dimensions. This guide explains how to ensure your story layouts render identically in both environments.
+
+## The Sizing Challenge
+
+Text sizes in ggplot2 are absolute (points/mm), but plot dimensions are relative. When Quarto renders at different dimensions than you designed for, the text-to-plot ratio shifts, causing:
+
+- Titles that appear too large or too small
+- Clipped text that fit perfectly in the designer
+- Narrative panels with unexpected proportions
+
+## Matching Story Designer to Quarto
+
+### Step 1: Design in Story Designer
+
+Launch the designer and adjust your layout:
+
+```{r}
+#| eval: false
+library(stwd)
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot()
+story_designer(plot = p)
+```
+
+### Step 2: Note Your Export Dimensions
+
+In the **Validate & Export** tab, note the settings:
+
+- **Width (in)**: e.g., 12
+- **Height (in)**: e.g., 9
+- **DPI**: e.g., 150
+
+Click **Validate Actual Size** to preview exactly what your export will look like.
+
+### Step 3: Copy the Generated Code
+
+Go to the **Code** tab and copy the generated patchwork code.
+
+### Step 4: Match Quarto Chunk Options
+
+Use the same dimensions in your Quarto code chunk:
+
+```{r}
+#| eval: false
+#| fig-width: 12
+#| fig-height: 9
+#| fig-dpi: 150
+#| out-width: "100%"
+
+# Paste the generated code from story_designer()
+title_plot <- title_block("**Your Title**", title_size = 12)
+subtitle_plot <- subtitle_block("Subtitle", subtitle_size = 10)
+narrative_plot <- text_narrative("Your narrative...", size = 10)
+caption_plot <- caption_block("Source: Data", caption_size = 8)
+
+content <- p + narrative_plot + plot_layout(widths = c(0.65, 0.35))
+title_plot / subtitle_plot / content / caption_plot +
+    plot_layout(heights = c(0.08, 0.05, 0.82, 0.05))
+```
+
+## Quarto Chunk Options Reference
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `fig-width` | Plot width in inches | `12` |
+| `fig-height` | Plot height in inches | `9` |
+| `fig-dpi` | Resolution (dots per inch) | `150` |
+| `out-width` | Display width in document | `"100%"` |
+| `fig-format` | Output format | `"png"`, `"svg"` |
+
+### Document-Level Defaults
+
+Set defaults in your YAML header to avoid repeating options:
+
+```yaml
+---
+title: "My Report"
+format:
+  html:
+    fig-width: 12
+    fig-height: 9
+    fig-dpi: 150
+---
+```
+
+Then individual chunks inherit these defaults.
+
+## Alternative: Export as PNG
+
+For maximum control and consistency, export from R and embed the image:
+
+```{r}
+#| eval: false
+# Build the layout with block functions
+title_plot <- title_block("**Q4 Sales Report**", title_size = 12)
+content <- p + text_narrative("Key findings...", size = 10) +
+    plot_layout(widths = c(0.65, 0.35))
+layout <- title_plot / content + plot_layout(heights = c(0.1, 0.9))
+
+# Save with exact dimensions
+ggsave("figures/sales_report.png", layout,
+       width = 12, height = 9, dpi = 150, bg = "white")
+```
+
+Then embed in your Quarto document:
+
+```{r}
+#| eval: false
+#| echo: false
+knitr::include_graphics("figures/sales_report.png")
+```
+
+**Advantages:**
+
+- Guaranteed consistency with Story Designer preview
+- Faster document rendering (no R code execution)
+- Easy to version control the output
+
+**Disadvantages:**
+
+- Manual regeneration when data changes
+- Separate files to manage
+
+## Common Issues
+
+### Text appears larger/smaller than expected
+
+**Cause:** `fig-width` or `fig-height` doesn't match your design dimensions.
+
+**Fix:** Match the exact dimensions from Story Designer's export tab.
+
+### Title or narrative is clipped
+
+**Cause:** The height proportions were designed for different dimensions.
+
+**Fix:** Adjust the `plot_layout(heights = ...)` values:
+
+```{r}
+#| eval: false
+# Increase title height proportion
+title_plot / subtitle_plot / content / caption_plot +
+    plot_layout(heights = c(0.12, 0.06, 0.77, 0.05))
+```
+
+### Plot looks blurry
+
+**Cause:** Low DPI setting.
+
+**Fix:** Increase `fig-dpi` to 150 or 300:
+
+```{r}
+#| eval: false
+#| fig-dpi: 300
+# Your patchwork code...
+```
+
+### Inconsistent sizing across chunks
+
+**Cause:** Different chunks have different fig-width/fig-height.
+
+**Fix:** Set document-level defaults in YAML, or use consistent chunk options.
+
+## Recommended Dimensions
+
+| Use Case | Width | Height | Aspect |
+|----------|-------|--------|--------|
+| Presentation (16:9) | 12 | 6.75 | 1.78 |
+| Presentation (4:3) | 10 | 7.5 | 1.33 |
+| Report (full width) | 10 | 7 | 1.43 |
+| Report (half width) | 6 | 4.5 | 1.33 |
+| Square | 8 | 8 | 1.00 |
+
+## Summary
+
+1. Design your layout in `story_designer()`
+2. Use **Validate Actual Size** to confirm appearance
+3. Copy the Width, Height, and DPI values
+4. Copy the generated code from the Code tab
+5. Set matching `fig-width`, `fig-height`, `fig-dpi` in Quarto chunks
+6. Add `out-width: "100%"` for responsive display
+
+For critical presentations, export as PNG for guaranteed consistency.
