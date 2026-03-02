@@ -27,8 +27,13 @@ A named vector of colors.
 }
 \description{
 Creates a color vector where only specified categories are highlighted
-and all others are grayed out. Follows the SWD principle of using
-color strategically for emphasis.
+and all others are grayed out.
+}
+\details{
+Follows the Storytelling with Data principle of using color strategically
+for emphasis. By graying out non-essential categories, the viewer's
+attention is drawn to the highlighted data points. Use with
+\code{scale_fill_manual()} or \code{scale_color_manual()}.
 }
 \examples{
 categories <- c("A", "B", "C", "D", "E")

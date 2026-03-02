@@ -13,11 +13,15 @@ list_colors(pattern = NULL, n = 20)
 }
 \value{
 A data frame with color names and hex codes (invisibly).
-Prints a formatted list to the console.
 }
 \description{
-Browse named R colors with their hex equivalents. Useful for finding
-colors to use in story_designer or marquee syntax.
+Browse named R colors with their hex equivalents.
+}
+\details{
+Prints a formatted list of color names and hex codes to the console.
+Useful for finding colors to use in story_designer text fields or
+when writing marquee syntax manually. The hex codes can be copied
+directly into color inputs.
 }
 \examples{
 # Show common colors

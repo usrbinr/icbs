@@ -26,8 +26,7 @@ markdown: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 
 \item{valign}{Vertical alignment: "top", "center", or "bottom". Default: "top".}
 
-\item{padding}{Padding around text as a margin() object or numeric vector
-(top, right, bottom, left). Default: 10 on all sides.}
+\item{padding}{Padding around text. Default: 10 on all sides.}
 
 \item{lineheight}{Line height multiplier. Default: 1.4.}
 
@@ -41,9 +40,16 @@ markdown: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 A ggplot object.
 }
 \description{
-Creates a ggplot object containing formatted text, suitable for
-combining with charts via patchwork. Use for adding story context,
-callouts, or explanatory text alongside visualizations.
+Creates a ggplot object containing formatted text for combining
+with charts via patchwork.
+}
+\details{
+Use for adding story context, callouts, or the "so what?" explanation
+alongside visualizations. Text supports marquee markdown formatting:
+\verb{**bold**}, \verb{*italic*}, and \verb{\{#hexcolor text\}} for colored text.
+
+Typically placed beside a chart using patchwork's \code{+} operator with
+\code{plot_layout(widths = c(0.6, 0.4))} to control proportions.
 }
 \examples{
 \dontrun{

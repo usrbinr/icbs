@@ -1,8 +1,22 @@
 #' Interactive Story Layout Designer
 #'
+#' @description
 #' Launches a Shiny app to interactively design story layouts with
 #' real-time preview. Provides controls for text blocks, color palettes,
 #' themes, and exports ready-to-use patchwork code.
+#'
+#' @details
+#' The Story Designer is the primary interface for creating SWD-style
+#' visualizations. It provides a WYSIWYG editor with live preview,
+#' allowing you to adjust text, colors, and layout before copying the
+#' generated patchwork code into your Quarto document or R script.
+#'
+#' The workflow is: (1) create your base ggplot, (2) pass it to
+#' `story_designer()`, (3) customize using the sidebar controls,
+#' (4) copy the code from the Code tab, (5) paste into your document.
+#'
+#' Text inputs support marquee formatting syntax: `**bold**` for bold,
+#' `*italic*` for italics, and `{#HEXCOLOR text}` for colored text.
 #'
 #' @param plot Optional ggplot object to include in the preview.
 #'   If NULL, a placeholder chart is used.

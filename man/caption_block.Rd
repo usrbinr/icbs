@@ -20,7 +20,7 @@ caption_block(
 \arguments{
 \item{caption}{Caption text (marquee-formatted).}
 
-\item{caption_size}{Size for caption in pts. Default: 9.}
+\item{caption_size}{Size for caption in pts. Default: 6.}
 
 \item{halign}{Horizontal alignment. Default: "left".}
 
@@ -42,9 +42,15 @@ caption_block(
 A ggplot object that can be combined with other plots via patchwork.
 }
 \description{
-Creates a standalone caption element as a ggplot, for use at the
-bottom of a patchwork composition. Captions typically contain source
-attributions and notes.
+Creates a standalone caption element as a ggplot for use at the
+bottom of patchwork compositions.
+}
+\details{
+Captions typically contain source attributions, methodology notes, or
+data caveats. Displayed in muted gray by default to avoid competing
+with the main content. Supports marquee markdown formatting.
+
+Place at the bottom using patchwork's \code{/} operator.
 }
 \examples{
 \dontrun{

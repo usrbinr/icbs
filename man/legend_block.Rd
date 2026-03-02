@@ -68,6 +68,17 @@ Creates a standalone inline legend as a ggplot, showing colored category
 labels separated by a delimiter. Use above/below charts or beside them
 in patchwork compositions to replace traditional legends with clean text.
 }
+\details{
+Legend blocks follow SWD principles by embedding color meaning directly
+in text rather than requiring readers to cross-reference a separate legend.
+The colored labels can be positioned horizontally (as a row of labels
+with separators) or vertically (stacked labels). Combine with other
+block functions via patchwork to build complete story layouts.
+
+The function uses marquee syntax internally to render colored text.
+Each category label is wrapped in its assigned color, with optional
+bold formatting and case transformation.
+}
 \examples{
 \dontrun{
 library(patchwork)

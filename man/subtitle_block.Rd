@@ -22,7 +22,7 @@ subtitle_block(
 \item{subtitle}{Subtitle text (marquee-formatted). Supports markdown
 formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 
-\item{subtitle_size}{Size for subtitle in pts. Default: 11 (matches SWD style).}
+\item{subtitle_size}{Size for subtitle in pts. Default: 10.}
 
 \item{halign}{Horizontal alignment: "left", "center", or "right". Default: "left".}
 
@@ -30,7 +30,7 @@ formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 
 \item{margin_top}{Top margin in pts. Default: 0.}
 
-\item{margin_bottom}{Bottom margin in pts. Default: 10.}
+\item{margin_bottom}{Bottom margin in pts. Default: 5.}
 
 \item{margin_left}{Left margin in pts. Default: 5.}
 
@@ -46,9 +46,15 @@ formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 A ggplot object that can be combined with other plots via patchwork.
 }
 \description{
-Creates a standalone subtitle element as a ggplot, for use below
-a title block in a patchwork composition. Subtitles provide context
-and supporting information for the main title.
+Creates a standalone subtitle element as a ggplot for use in patchwork
+compositions.
+}
+\details{
+Subtitles provide context and supporting information below the main title.
+Use for timeframes, data descriptions, or methodological notes. Supports
+marquee markdown: \verb{**bold**}, \verb{*italic*}, and \verb{\{#hexcolor text\}}.
+
+Place below \code{title_block()} using patchwork's \code{/} operator.
 }
 \examples{
 \dontrun{

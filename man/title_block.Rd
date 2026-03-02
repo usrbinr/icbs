@@ -22,15 +22,15 @@ title_block(
 \item{title}{Main title text (marquee-formatted). Supports markdown
 formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 
-\item{title_size}{Size for title in pts. Default: 16 (matches SWD style).}
+\item{title_size}{Size for title in pts. Default: 12.}
 
 \item{halign}{Horizontal alignment: "left", "center", or "right". Default: "left".}
 
 \item{lineheight}{Line height multiplier. Default: 1.1.}
 
-\item{margin_top}{Top margin in pts. Default: 10.}
+\item{margin_top}{Top margin in pts. Default: 5.}
 
-\item{margin_bottom}{Bottom margin in pts. Default: 15.}
+\item{margin_bottom}{Bottom margin in pts. Default: 5.}
 
 \item{margin_left}{Left margin in pts. Default: 5.}
 
@@ -46,10 +46,17 @@ formatting: \verb{**bold**}, \verb{*italic*}, \verb{\{#color text\}}.}
 A ggplot object that can be combined with other plots via patchwork.
 }
 \description{
-Creates a standalone title element as a ggplot, for use as the
-top element in a patchwork composition. Allows for larger, more
-prominent titles than standard ggplot titles, matching the SWD style
-where titles are bold statements that draw the eye.
+Creates a standalone title element as a ggplot for use in patchwork
+compositions.
+}
+\details{
+Allows for larger, more prominent titles than standard ggplot titles.
+Follows the SWD style where titles are bold statements that tell the
+story, not just describe the chart. Supports marquee markdown:
+\verb{**bold**}, \verb{*italic*}, and \verb{\{#hexcolor text\}} for colored text.
+
+Use with patchwork's \code{/} operator to stack above your chart, and
+\code{plot_layout(heights = ...)} to control proportions.
 }
 \examples{
 \dontrun{

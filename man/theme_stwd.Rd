@@ -15,9 +15,19 @@ theme_stwd(base_size = 11, base_family = "")
 A ggplot2 theme object.
 }
 \description{
-A clean, minimal theme optimized for data storytelling. Follows
-best practices from "Storytelling with Data" - removes distractions,
-emphasizes the data, and provides clean typography.
+A clean, minimal ggplot2 theme optimized for data storytelling.
+}
+\details{
+Follows best practices from "Storytelling with Data":
+\itemize{
+\item White background with no chart border
+\item Horizontal grid lines only (subtle gray)
+\item No axis lines or ticks
+\item Legend positioned at top-left
+\item Clean typography with muted colors
+}
+
+This theme removes visual distractions so the data takes center stage.
 }
 \examples{
 \dontrun{

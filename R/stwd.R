@@ -24,14 +24,19 @@ utils::globalVariables(c(
 
 #' List Available R Color Names
 #'
-#' Browse named R colors with their hex equivalents. Useful for finding
-#' colors to use in story_designer or marquee syntax.
+#' @description
+#' Browse named R colors with their hex equivalents.
+#'
+#' @details
+#' Prints a formatted list of color names and hex codes to the console.
+#' Useful for finding colors to use in story_designer text fields or
+#' when writing marquee syntax manually. The hex codes can be copied
+#' directly into color inputs.
 #'
 #' @param pattern Optional regex pattern to filter color names.
 #' @param n Maximum number of colors to show. Default: 20.
 #'
 #' @returns A data frame with color names and hex codes (invisibly).
-#'   Prints a formatted list to the console.
 #'
 #' @export
 #'
@@ -81,9 +86,15 @@ list_colors <- function(pattern = NULL, n = 20) {
 # ============================================================================
 #' Create a Highlight Color Palette
 #'
+#' @description
 #' Creates a color vector where only specified categories are highlighted
-#' and all others are grayed out. Follows the SWD principle of using
-#' color strategically for emphasis.
+#' and all others are grayed out.
+#'
+#' @details
+#' Follows the Storytelling with Data principle of using color strategically
+#' for emphasis. By graying out non-essential categories, the viewer's
+#' attention is drawn to the highlighted data points. Use with
+#' `scale_fill_manual()` or `scale_color_manual()`.
 #'
 #' @param categories Character vector of all category names.
 #' @param highlight Character vector of categories to highlight, or a named
@@ -93,6 +104,7 @@ list_colors <- function(pattern = NULL, n = 20) {
 #' @param gray_color Color for non-highlighted categories. Default: light gray.
 #'
 #' @returns A named vector of colors.
+#'
 #' @export
 #'
 #' @examples
@@ -129,8 +141,16 @@ highlight_colors <- function(categories,
 
 #' Create an Inline Legend Annotation
 #'
-#' Creates a data frame suitable for adding colored text annotations
-#' as an inline legend replacement. Use with `geom_marquee()`.
+#' @description
+#' Creates a data frame for adding colored text annotations as an
+#' inline legend replacement.
+#'
+#' @details
+#' Returns a data frame with marquee-formatted labels that can be added
+#' to a plot using `marquee::geom_marquee()`. This allows placing a
+#' color-coded legend directly within the plot area rather than using
+#' the standard ggplot2 legend. Consider using `legend_block()` instead
+#' for patchwork compositions.
 #'
 #' @param colors Named vector of colors (names = category labels).
 #' @param x X position for the legend. Default: 0.
@@ -140,6 +160,7 @@ highlight_colors <- function(categories,
 #' @param bold Make text bold. Default: TRUE.
 #'
 #' @returns A data frame with columns `x`, `y`, and `label` (marquee-formatted).
+#'
 #' @export
 #'
 #' @examples
@@ -184,14 +205,24 @@ inline_legend <- function(colors,
 
 #' STWD Theme for Storytelling
 #'
-#' A clean, minimal theme optimized for data storytelling. Follows
-#' best practices from "Storytelling with Data" - removes distractions,
-#' emphasizes the data, and provides clean typography.
+#' @description
+#' A clean, minimal ggplot2 theme optimized for data storytelling.
+#'
+#' @details
+#' Follows best practices from "Storytelling with Data":
+#' - White background with no chart border
+#' - Horizontal grid lines only (subtle gray)
+#' - No axis lines or ticks
+#' - Legend positioned at top-left
+#' - Clean typography with muted colors
+#'
+#' This theme removes visual distractions so the data takes center stage.
 #'
 #' @param base_size Base font size. Default: 11.
 #' @param base_family Base font family. Default: "" (system default).
 #'
 #' @returns A ggplot2 theme object.
+#'
 #' @export
 #'
 #' @examples
@@ -256,23 +287,31 @@ theme_stwd <- function(base_size = 11, base_family = "") {
 
 #' Create a Text Narrative Block
 #'
-#' Creates a ggplot object containing formatted text, suitable for
-#' combining with charts via patchwork. Use for adding story context,
-#' callouts, or explanatory text alongside visualizations.
+#' @description
+#' Creates a ggplot object containing formatted text for combining
+#' with charts via patchwork.
+#'
+#' @details
+#' Use for adding story context, callouts, or the "so what?" explanation
+#' alongside visualizations. Text supports marquee markdown formatting:
+#' `**bold**`, `*italic*`, and `{#hexcolor text}` for colored text.
+#'
+#' Typically placed beside a chart using patchwork's `+` operator with
+#' `plot_layout(widths = c(0.6, 0.4))` to control proportions.
 #'
 #' @param text Character string with marquee-formatted text. Supports
 #'   markdown: `**bold**`, `*italic*`, `{#color text}`.
 #' @param size Text size. Default: 4.
 #' @param halign Horizontal alignment: "left", "center", or "right". Default: "left".
 #' @param valign Vertical alignment: "top", "center", or "bottom". Default: "top".
-#' @param padding Padding around text as a margin() object or numeric vector
-#'   (top, right, bottom, left). Default: 10 on all sides.
+#' @param padding Padding around text. Default: 10 on all sides.
 #' @param lineheight Line height multiplier. Default: 1.4.
 #' @param width Maximum width for text wrapping. Default: 1 (full width).
 #' @param wrap_width Character width to wrap text at. Default: NULL (no wrapping).
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object.
+#'
 #' @export
 #'
 #' @examples
@@ -330,18 +369,26 @@ text_narrative <- function(text,
 
 #' Create a Title Block Plot
 #'
-#' Creates a standalone title element as a ggplot, for use as the
-#' top element in a patchwork composition. Allows for larger, more
-#' prominent titles than standard ggplot titles, matching the SWD style
-#' where titles are bold statements that draw the eye.
+#' @description
+#' Creates a standalone title element as a ggplot for use in patchwork
+#' compositions.
+#'
+#' @details
+#' Allows for larger, more prominent titles than standard ggplot titles.
+#' Follows the SWD style where titles are bold statements that tell the
+#' story, not just describe the chart. Supports marquee markdown:
+#' `**bold**`, `*italic*`, and `{#hexcolor text}` for colored text.
+#'
+#' Use with patchwork's `/` operator to stack above your chart, and
+#' `plot_layout(heights = ...)` to control proportions.
 #'
 #' @param title Main title text (marquee-formatted). Supports markdown
 #'   formatting: `**bold**`, `*italic*`, `{#color text}`.
-#' @param title_size Size for title in pts. Default: 16 (matches SWD style).
+#' @param title_size Size for title in pts. Default: 12.
 #' @param halign Horizontal alignment: "left", "center", or "right". Default: "left".
 #' @param lineheight Line height multiplier. Default: 1.1.
-#' @param margin_top Top margin in pts. Default: 10.
-#' @param margin_bottom Bottom margin in pts. Default: 15.
+#' @param margin_top Top margin in pts. Default: 5.
+#' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
@@ -349,6 +396,7 @@ text_narrative <- function(text,
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
+#'
 #' @export
 #'
 #' @examples
@@ -402,17 +450,24 @@ title_block <- function(title,
 
 #' Create a Subtitle Block Plot
 #'
-#' Creates a standalone subtitle element as a ggplot, for use below
-#' a title block in a patchwork composition. Subtitles provide context
-#' and supporting information for the main title.
+#' @description
+#' Creates a standalone subtitle element as a ggplot for use in patchwork
+#' compositions.
+#'
+#' @details
+#' Subtitles provide context and supporting information below the main title.
+#' Use for timeframes, data descriptions, or methodological notes. Supports
+#' marquee markdown: `**bold**`, `*italic*`, and `{#hexcolor text}`.
+#'
+#' Place below `title_block()` using patchwork's `/` operator.
 #'
 #' @param subtitle Subtitle text (marquee-formatted). Supports markdown
 #'   formatting: `**bold**`, `*italic*`, `{#color text}`.
-#' @param subtitle_size Size for subtitle in pts. Default: 11 (matches SWD style).
+#' @param subtitle_size Size for subtitle in pts. Default: 10.
 #' @param halign Horizontal alignment: "left", "center", or "right". Default: "left".
 #' @param lineheight Line height multiplier. Default: 1.2.
 #' @param margin_top Top margin in pts. Default: 0.
-#' @param margin_bottom Bottom margin in pts. Default: 10.
+#' @param margin_bottom Bottom margin in pts. Default: 5.
 #' @param margin_left Left margin in pts. Default: 5.
 #' @param margin_right Right margin in pts. Default: 5.
 #' @param width Maximum width for text wrapping (0-1). Default: 0.95.
@@ -420,6 +475,7 @@ title_block <- function(title,
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
+#'
 #' @export
 #'
 #' @examples
@@ -470,12 +526,19 @@ subtitle_block <- function(subtitle,
 
 #' Create a Caption Block Plot
 #'
-#' Creates a standalone caption element as a ggplot, for use at the
-#' bottom of a patchwork composition. Captions typically contain source
-#' attributions and notes.
+#' @description
+#' Creates a standalone caption element as a ggplot for use at the
+#' bottom of patchwork compositions.
+#'
+#' @details
+#' Captions typically contain source attributions, methodology notes, or
+#' data caveats. Displayed in muted gray by default to avoid competing
+#' with the main content. Supports marquee markdown formatting.
+#'
+#' Place at the bottom using patchwork's `/` operator.
 #'
 #' @param caption Caption text (marquee-formatted).
-#' @param caption_size Size for caption in pts. Default: 9.
+#' @param caption_size Size for caption in pts. Default: 6.
 #' @param halign Horizontal alignment. Default: "left".
 #' @param color Text color. Default: gray (#808080).
 #' @param margin_top Top margin in pts. Default: 10.
@@ -486,6 +549,7 @@ subtitle_block <- function(subtitle,
 #' @param ... Additional arguments passed to [marquee::geom_marquee()].
 #'
 #' @returns A ggplot object that can be combined with other plots via patchwork.
+#'
 #' @export
 #'
 #' @examples
@@ -535,9 +599,21 @@ caption_block <- function(caption,
 
 #' Create a Legend Block Plot
 #'
+#' @description
 #' Creates a standalone inline legend as a ggplot, showing colored category
 #' labels separated by a delimiter. Use above/below charts or beside them
 #' in patchwork compositions to replace traditional legends with clean text.
+#'
+#' @details
+#' Legend blocks follow SWD principles by embedding color meaning directly
+#' in text rather than requiring readers to cross-reference a separate legend.
+#' The colored labels can be positioned horizontally (as a row of labels
+#' with separators) or vertically (stacked labels). Combine with other
+#' block functions via patchwork to build complete story layouts.
+#'
+#' The function uses marquee syntax internally to render colored text.
+#' Each category label is wrapped in its assigned color, with optional
+#' bold formatting and case transformation.
 #'
 #' @param colors Named vector where names are category labels and values are
 #'   colors (hex codes or R color names).

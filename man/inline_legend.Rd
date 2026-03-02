@@ -30,8 +30,15 @@ inline_legend(
 A data frame with columns \code{x}, \code{y}, and \code{label} (marquee-formatted).
 }
 \description{
-Creates a data frame suitable for adding colored text annotations
-as an inline legend replacement. Use with \code{geom_marquee()}.
+Creates a data frame for adding colored text annotations as an
+inline legend replacement.
+}
+\details{
+Returns a data frame with marquee-formatted labels that can be added
+to a plot using \code{marquee::geom_marquee()}. This allows placing a
+color-coded legend directly within the plot area rather than using
+the standard ggplot2 legend. Consider using \code{legend_block()} instead
+for patchwork compositions.
 }
 \examples{
 \dontrun{
