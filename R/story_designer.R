@@ -350,58 +350,86 @@ story_designer <- function(plot = NULL,
                     )
                 ),
 
+                # Consolidated Plot Styling panel (combines X-Axis, Y-Axis, Text, Grid)
                 bslib::accordion_panel(
-                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "X-Axis Label"),
-                    value = "X-Axis Label",
-                    icon = shiny::icon("arrows-left-right"),
-                    shiny::sliderInput("axis_title_x_size", "Size", min = 8, max = 16, value = 11, step = 1),
-                    shiny::checkboxInput("axis_title_x_bold", "Bold", value = FALSE),
-                    shiny::selectInput("axis_title_x_align", "Alignment", width = "100%",
-                        choices = c("Center" = "0.5", "Left" = "0", "Right" = "1")),
-                    shiny::selectInput("axis_title_x_angle", "Rotation", width = "100%",
-                        choices = c("Horizontal (0)" = "0", "Vertical (90)" = "90")),
-                    shiny::sliderInput("axis_title_x_margin", "Spacing from axis", min = 0, max = 20, value = 5, step = 1),
-                    shiny::textInput("axis_title_x_color", "Color", value = "#333333", width = "100%")
-                ),
+                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Axis & Grid"),
+                    value = "Axis & Grid",
+                    icon = shiny::icon("sliders-h"),
 
-                bslib::accordion_panel(
-                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Y-Axis Label"),
-                    value = "Y-Axis Label",
-                    icon = shiny::icon("arrows-up-down"),
-                    shiny::sliderInput("axis_title_y_size", "Size", min = 8, max = 16, value = 11, step = 1),
-                    shiny::checkboxInput("axis_title_y_bold", "Bold", value = FALSE),
-                    shiny::selectInput("axis_title_y_align", "Alignment", width = "100%",
-                        choices = c("Center" = "0.5", "Bottom" = "0", "Top" = "1")),
-                    shiny::selectInput("axis_title_y_angle", "Rotation", width = "100%",
-                        choices = c("Vertical (90)" = "90", "Horizontal (0)" = "0")),
-                    shiny::sliderInput("axis_title_y_margin", "Spacing from axis", min = 0, max = 20, value = 5, step = 1),
-                    shiny::textInput("axis_title_y_color", "Color", value = "#333333", width = "100%")
-                ),
+                    # X-Axis Title (compact)
+                    shiny::div(class = "d-flex justify-content-between align-items-center",
+                        shiny::strong(class = "small", "X-Axis Title"),
+                        shiny::checkboxInput("axis_title_x_bold", "Bold", value = FALSE, width = "auto")
+                    ),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::sliderInput("axis_title_x_size", "Size", min = 8, max = 16, value = 11, step = 1),
+                        shiny::selectInput("axis_title_x_align", "Align", width = "100%",
+                            choices = c("Center" = "0.5", "Left" = "0", "Right" = "1"))
+                    ),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::selectInput("axis_title_x_angle", "Rotate", width = "100%",
+                            choices = c("0\u00B0" = "0", "90\u00B0" = "90")),
+                        shiny::textInput("axis_title_x_color", "Color", value = "#333333", width = "100%")
+                    ),
+                    shiny::sliderInput("axis_title_x_margin", "Spacing", min = 0, max = 20, value = 5, step = 1),
 
-                bslib::accordion_panel(
-                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Axis Text & Lines"),
-                    value = "Axis Text & Lines",
-                    icon = shiny::icon("font"),
-                    shiny::strong(class = "small", "Axis Text"),
-                    shiny::sliderInput("axis_text_size", "Size", min = 7, max = 14, value = 10, step = 1),
-                    shiny::textInput("axis_text_color", "Color", value = "#666666", width = "100%"),
                     shiny::hr(class = "my-2"),
-                    shiny::strong(class = "small", "Axis Line & Ticks"),
-                    shiny::checkboxInput("show_axis_line", "Show axis line", value = FALSE),
-                    shiny::checkboxInput("show_ticks", "Show tick marks", value = FALSE),
-                    shiny::textInput("axis_line_color", "Line/tick color", value = "#333333", width = "100%")
-                ),
 
-                bslib::accordion_panel(
-                    title = shiny::span(shiny::span(class = "badge bg-warning me-2", " "), "Grid Lines"),
-                    value = "Grid Lines",
-                    icon = shiny::icon("border-all"),
-                    shiny::checkboxInput("grid_remove_all", "Remove all grid lines", value = FALSE),
-                    shiny::selectInput("grid_major", "Major grid", width = "100%",
-                        choices = c("Both" = "both", "Horizontal only" = "h", "Vertical only" = "v", "None" = "none")),
-                    shiny::selectInput("grid_minor", "Minor grid", width = "100%",
-                        choices = c("None" = "none", "Both" = "both", "Horizontal only" = "h", "Vertical only" = "v")),
-                    shiny::textInput("grid_color", "Grid color", value = "#E5E5E5", width = "100%")
+                    # Y-Axis Title (compact)
+                    shiny::div(class = "d-flex justify-content-between align-items-center",
+                        shiny::strong(class = "small", "Y-Axis Title"),
+                        shiny::checkboxInput("axis_title_y_bold", "Bold", value = FALSE, width = "auto")
+                    ),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::sliderInput("axis_title_y_size", "Size", min = 8, max = 16, value = 11, step = 1),
+                        shiny::selectInput("axis_title_y_align", "Align", width = "100%",
+                            choices = c("Center" = "0.5", "Bottom" = "0", "Top" = "1"))
+                    ),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::selectInput("axis_title_y_angle", "Rotate", width = "100%",
+                            choices = c("90\u00B0" = "90", "0\u00B0" = "0")),
+                        shiny::textInput("axis_title_y_color", "Color", value = "#333333", width = "100%")
+                    ),
+                    shiny::sliderInput("axis_title_y_margin", "Spacing", min = 0, max = 20, value = 5, step = 1),
+
+                    shiny::hr(class = "my-2"),
+
+                    # Axis Text & Lines (compact)
+                    shiny::strong(class = "small", "Axis Text"),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::sliderInput("axis_text_size", "Size", min = 7, max = 14, value = 10, step = 1),
+                        shiny::textInput("axis_text_color", "Color", value = "#666666", width = "100%")
+                    ),
+                    bslib::layout_column_wrap(
+                        width = 1/2,
+                        shiny::checkboxInput("show_axis_line", "Axis line", value = FALSE),
+                        shiny::checkboxInput("show_ticks", "Tick marks", value = FALSE)
+                    ),
+                    shiny::textInput("axis_line_color", "Line/tick color", value = "#333333", width = "100%"),
+
+                    shiny::hr(class = "my-2"),
+
+                    # Grid Lines (compact)
+                    shiny::div(class = "d-flex justify-content-between align-items-center",
+                        shiny::strong(class = "small", "Grid Lines"),
+                        shiny::checkboxInput("grid_remove_all", "Remove all", value = FALSE, width = "auto")
+                    ),
+                    shiny::conditionalPanel(
+                        condition = "!input.grid_remove_all",
+                        bslib::layout_column_wrap(
+                            width = 1/2,
+                            shiny::selectInput("grid_major", "Major", width = "100%",
+                                choices = c("Both" = "both", "H only" = "h", "V only" = "v", "None" = "none")),
+                            shiny::selectInput("grid_minor", "Minor", width = "100%",
+                                choices = c("None" = "none", "Both" = "both", "H only" = "h", "V only" = "v"))
+                        ),
+                        shiny::textInput("grid_color", "Grid color", value = "#E5E5E5", width = "100%")
+                    )
                 )
             ),
             # Reset button
@@ -602,32 +630,12 @@ story_designer <- function(plot = NULL,
         narrative_text_d <- shiny::debounce(shiny::reactive(input$narrative_text), 500)
         caption_text_d <- shiny::debounce(shiny::reactive(input$caption_text), 500)
 
-        # Convert named colors to hex in marquee syntax
-        # Supports {colorname text} in addition to {#hex text}
-        convert_named_colors <- function(text) {
-            if (is.null(text) || text == "") return(text)
-            pattern <- "\\{([a-zA-Z][a-zA-Z0-9]*)\\s+([^}]+)\\}"
-            matches <- gregexpr(pattern, text, perl = TRUE)
-            if (matches[[1]][1] == -1) return(text)
-            result <- text
-            all_matches <- regmatches(text, matches)[[1]]
-            for (match in all_matches) {
-                parts <- regmatches(match, regexec(pattern, match, perl = TRUE))[[1]]
-                color_name <- parts[2]
-                content <- parts[3]
-                tryCatch({
-                    rgb_vals <- grDevices::col2rgb(color_name)
-                    hex_code <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
-                    replacement <- paste0("{", hex_code, " ", content, "}")
-                    result <- sub(match, replacement, result, fixed = TRUE)
-                }, error = function(e) { })
-            }
-            result
-        }
+        # Use helper functions from story_designer_utils.R
+        # convert_named_colors(), get_palette_names(), get_palette_colors()
+        # are defined there and available in package namespace
 
-        # Default color palette for legend
-        default_colors <- c("#808080", "#B0B0B0", "#E69F00", "#56B4E9", "#009E73",
-                            "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
+        # Default color palette for legend (from utils)
+        default_colors <- default_legend_colors
 
         # --- Sidebar Width Resize ---
         shiny::observeEvent(input$sidebar_width, {
@@ -740,64 +748,7 @@ story_designer <- function(plot = NULL,
         manual_color_values <- shiny::reactiveVal(list())
 
         # --- Color Palette Functions ---
-        get_palette_names <- function(pkg) {
-            switch(pkg,
-                "ggsci" = if (requireNamespace("ggsci", quietly = TRUE)) {
-                    c("npg", "aaas", "nejm", "lancet", "jama", "jco", "ucscgb",
-                      "d3", "locuszoom", "igv", "uchicago", "startrek", "tron",
-                      "futurama", "rickandmorty", "simpsons", "gsea", "material")
-                } else character(0),
-                "MetBrewer" = if (requireNamespace("MetBrewer", quietly = TRUE)) {
-                    names(MetBrewer::MetPalettes)
-                } else character(0),
-                "nord" = if (requireNamespace("nord", quietly = TRUE)) {
-                    names(nord::nord_palettes)
-                } else character(0),
-                "PNWColors" = if (requireNamespace("PNWColors", quietly = TRUE)) {
-                    names(PNWColors::pnw_palettes)
-                } else character(0),
-                "rcartocolor" = if (requireNamespace("rcartocolor", quietly = TRUE)) {
-                    rcartocolor::cartocolors$Name
-                } else character(0),
-                "RColorBrewer" = if (requireNamespace("RColorBrewer", quietly = TRUE)) {
-                    rownames(RColorBrewer::brewer.pal.info)
-                } else character(0),
-                "scico" = if (requireNamespace("scico", quietly = TRUE)) {
-                    scico::scico_palette_names()
-                } else character(0),
-                "viridis" = c("viridis", "magma", "plasma", "inferno", "cividis", "mako", "rocket", "turbo"),
-                "wesanderson" = if (requireNamespace("wesanderson", quietly = TRUE)) {
-                    names(wesanderson::wes_palettes)
-                } else character(0),
-                character(0)
-            )
-        }
-
-        get_palette_colors <- function(pkg, name, n = 8) {
-            tryCatch({
-                switch(pkg,
-                    "ggsci" = {
-                        # ggsci uses pal_* functions that return color functions
-                        pal_fn <- get(paste0("pal_", name), envir = asNamespace("ggsci"))
-                        pal_fn()(n)
-                    },
-                    "MetBrewer" = MetBrewer::met.brewer(name, n),
-                    "nord" = nord::nord(name, n),
-                    "PNWColors" = PNWColors::pnw_palette(name, n),
-                    "rcartocolor" = rcartocolor::carto_pal(n, name),
-                    "RColorBrewer" = {
-                        max_n <- RColorBrewer::brewer.pal.info[name, "maxcolors"]
-                        RColorBrewer::brewer.pal(min(n, max_n), name)
-                    },
-                    "scico" = scico::scico(n, palette = name),
-                    "viridis" = if (requireNamespace("viridis", quietly = TRUE)) {
-                        viridis::viridis(n, option = name)
-                    } else grDevices::hcl.colors(n, name),
-                    "wesanderson" = wesanderson::wes_palette(name, n, type = "continuous"),
-                    grDevices::hcl.colors(n)
-                )
-            }, error = function(e) grDevices::hcl.colors(n))
-        }
+        # Using get_palette_names() and get_palette_colors() from story_designer_utils.R
 
         # Reactive: available palettes for selected package
         available_palettes <- shiny::reactive({
