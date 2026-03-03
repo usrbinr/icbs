@@ -77,11 +77,11 @@
     "text": "Key Features\nThe package includes:\n\nStory Designer - Interactive Shiny app for designing layouts with real-time preview\nBlock Functions - Modular components (title, subtitle, narrative, caption) for patchwork composition\nLegend Block - Inline colored text legends embedded in the layout\nHighlight Colors - Strategic color use (gray out noise, highlight signal)\nMarquee Integration - Color-matched text in titles and labels"
   },
   {
-    "objectID": "vignettes/articles/introduction.html#the-swd-approach",
-    "href": "vignettes/articles/introduction.html#the-swd-approach",
+    "objectID": "vignettes/articles/introduction.html#the-stwd-approach",
+    "href": "vignettes/articles/introduction.html#the-stwd-approach",
     "title": "Introduction to stwd",
-    "section": "The SWD Approach",
-    "text": "The SWD Approach\nTraditional charts put the burden on the reader to interpret meaning. Storytelling with Data (SWD) charts guide the reader by:\n\nHighlighting what matters - Gray out the noise, color the signal\nEmbedding the legend in the title - No separate legend box needed\nAdding narrative context - Explain the “so what?” alongside the chart\nUsing a clear visual hierarchy - Big title, supporting chart, explanatory text"
+    "section": "The STWD Approach",
+    "text": "The STWD Approach\nTraditional charts put the burden on the reader to interpret meaning. Storytelling with Data (SWD) charts guide the reader by:\n\nHighlighting what matters - Gray out the noise, color the signal\nEmbedding the legend in the title - No separate legend box needed\nAdding narrative context - Explain the “so what?” alongside the chart\nUsing a clear visual hierarchy - Big title, supporting chart, explanatory text"
   },
   {
     "objectID": "vignettes/articles/introduction.html#workflow",
@@ -126,11 +126,32 @@
     "text": "References\n\nStorytelling with Data\nRecreating the SWD Look"
   },
   {
-    "objectID": "_qrtdown/articles.html",
-    "href": "_qrtdown/articles.html",
-    "title": "Articles",
+    "objectID": "_qrtdown/citation.html",
+    "href": "_qrtdown/citation.html",
+    "title": "Citation",
     "section": "",
-    "text": "stwd Articles\nIn-depth guides and tutorials for using the package.\n\nIntroduction to stwd\nSizing Story Layouts for Quarto\nStorytelling with Data Layouts\nRecreating the SWD Look"
+    "text": "To cite this package in publications, use:\n\nHagan A (2026). stwd: Storytelling with Data Visualizations for ggplot2. R package version 3.2.1, https://codeberg.org/usrbinr/stwd.\n\n\n\n@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 3.2.1},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+  },
+  {
+    "objectID": "_qrtdown/citation.html#bibtex-entry",
+    "href": "_qrtdown/citation.html#bibtex-entry",
+    "title": "Citation",
+    "section": "",
+    "text": "@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 3.2.1},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+  },
+  {
+    "objectID": "_qrtdown/reference.html",
+    "href": "_qrtdown/reference.html",
+    "title": "Function reference",
+    "section": "",
+    "text": "All functions and classes exported by stwd."
+  },
+  {
+    "objectID": "_qrtdown/reference.html#functions",
+    "href": "_qrtdown/reference.html#functions",
+    "title": "Function reference",
+    "section": "Functions",
+    "text": "Functions\n\n\n\nFunction\nDescription\n\n\n\n\ncaption_block()\nCreate a Caption Block Plot\n\n\nestimate_layout_heights()\nEstimate Layout Heights for Text\n\n\nhighlight_colors()\nCreate a Highlight Color Palette\n\n\ninline_legend()\nCreate an Inline Legend Annotation\n\n\nlegend_block()\nCreate a Legend Block Plot\n\n\nlist_colors()\nList Available R Color Names\n\n\nstory_designer()\nInteractive Story Layout Designer\n\n\nstory_layout()\nCompose a Story Layout\n\n\nsubtitle_block()\nCreate a Subtitle Block Plot\n\n\ntext_narrative()\nCreate a Text Narrative Block\n\n\ntheme_stwd()\nSTWD Theme for Storytelling\n\n\ntitle_block()\nCreate a Title Block Plot"
   },
   {
     "objectID": "index.html",
@@ -203,32 +224,158 @@
     "text": "License\nMIT"
   },
   {
-    "objectID": "_qrtdown/reference.html",
-    "href": "_qrtdown/reference.html",
-    "title": "Function reference",
+    "objectID": "_qrtdown/articles.html",
+    "href": "_qrtdown/articles.html",
+    "title": "Articles",
     "section": "",
-    "text": "All functions and classes exported by stwd."
+    "text": "stwd Articles\nIn-depth guides and tutorials for using the package.\n\nDeveloper Guide\nIntroduction to stwd\nSizing Story Layouts for Quarto\nStorytelling with Data Layouts\nRecreating the STWD Look"
   },
   {
-    "objectID": "_qrtdown/reference.html#functions",
-    "href": "_qrtdown/reference.html#functions",
-    "title": "Function reference",
-    "section": "Functions",
-    "text": "Functions\n\n\n\nFunction\nDescription\n\n\n\n\ncaption_block()\nCreate a Caption Block Plot\n\n\nestimate_layout_heights()\nEstimate Layout Heights for Text\n\n\nhighlight_colors()\nCreate a Highlight Color Palette\n\n\ninline_legend()\nCreate an Inline Legend Annotation\n\n\nlegend_block()\nCreate a Legend Block Plot\n\n\nlist_colors()\nList Available R Color Names\n\n\nstory_designer()\nInteractive Story Layout Designer\n\n\nstory_layout()\nCompose a Story Layout\n\n\nsubtitle_block()\nCreate a Subtitle Block Plot\n\n\ntext_narrative()\nCreate a Text Narrative Block\n\n\ntheme_stwd()\nSTWD Theme for Storytelling\n\n\ntitle_block()\nCreate a Title Block Plot"
+    "objectID": "vignettes/articles/developer-guide.html",
+    "href": "vignettes/articles/developer-guide.html",
+    "title": "Developer Guide",
+    "section": "",
+    "text": "This guide documents the architecture, design decisions, and maintenance approach for the stwd package."
   },
   {
-    "objectID": "_qrtdown/citation.html",
-    "href": "_qrtdown/citation.html",
-    "title": "Citation",
-    "section": "",
-    "text": "To cite this package in publications, use:\n\nHagan A (2026). stwd: Storytelling with Data Visualizations for ggplot2. R package version 0.0.0.9000, https://codeberg.org/usrbinr/stwd.\n\n\n\n@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 0.0.0.9000},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+    "objectID": "vignettes/articles/developer-guide.html#package-overview",
+    "href": "vignettes/articles/developer-guide.html#package-overview",
+    "title": "Developer Guide",
+    "section": "Package Overview",
+    "text": "Package Overview\nstwd (Storytelling with Data) provides tools for creating presentation-ready visualizations following SWD principles. The main feature is story_designer(), a Shiny app for interactively designing story layouts."
   },
   {
-    "objectID": "_qrtdown/citation.html#bibtex-entry",
-    "href": "_qrtdown/citation.html#bibtex-entry",
-    "title": "Citation",
-    "section": "",
-    "text": "@Manual{,\n  title = {stwd: Storytelling with Data Visualizations for ggplot2},\n  author = {Alejandro Hagan},\n  year = {2026},\n  note = {R package version 0.0.0.9000},\n  url = {https://codeberg.org/usrbinr/stwd},\n}"
+    "objectID": "vignettes/articles/developer-guide.html#file-structure",
+    "href": "vignettes/articles/developer-guide.html#file-structure",
+    "title": "Developer Guide",
+    "section": "File Structure",
+    "text": "File Structure\nR/\n├── blocks.R              # 448 lines - Exported block functions\n├── block_helpers.R       # 138 lines - Internal helpers for blocks\n├── code_generation.R     # 273 lines - Generate R code strings\n├── colors.R              # 200 lines - Color utilities + package imports\n├── designer_defaults.R   # 160 lines - Default values, reset functions\n├── layout.R              # 275 lines - story_layout, estimate_layout_heights\n├── mod_export.R          # 258 lines - Shiny module: export/download\n├── mod_legend.R          # 175 lines - Shiny module: legend config\n├── mod_palette.R         # 384 lines - Shiny module: palette picker\n├── palette_helpers.R     # 130 lines - Palette lookup functions\n├── plot_analysis.R       # 169 lines - Extract info from ggplot objects\n├── story_designer.R      # 689 lines - Main Shiny app\n├── story_designer_ui.R   # 285 lines - UI builder functions\n├── text_helpers.R        #  76 lines - Text/marquee processing\n├── theme.R               #  80 lines - theme_stwd"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#function-dependency-map",
+    "href": "vignettes/articles/developer-guide.html#function-dependency-map",
+    "title": "Developer Guide",
+    "section": "Function Dependency Map",
+    "text": "Function Dependency Map\nstory_designer()\n├── mod_palette_server()\n│   ├── get_palette_names()\n│   ├── get_palette_colors()\n│   ├── get_levels_for_apply()\n│   └── default_legend_colors\n├── mod_legend_server()\n│   ├── legend_block()\n│   │   ├── check_marquee()\n│   │   ├── color_to_hex()\n│   │   └── get_hjust(), get_x_pos(), get_vjust()\n│   └── get_legend_orientation()\n├── mod_export_server()\n│   └── (uses build_layout reactive)\n├── build_layout() [reactive]\n│   ├── convert_named_colors()\n│   ├── title_block() ─────────┐\n│   ├── subtitle_block() ──────┤\n│   ├── text_narrative() ──────┼── All use create_text_block()\n│   ├── caption_block() ───────┤       └── maybe_wrap_text()\n│   └── legend_block() ────────┘\n├── styled_plot() [reactive]\n│   ├── theme_stwd()\n│   ├── build_theme_mods()\n│   ├── apply_color_scales()\n│   └── get_levels_for_apply()\n├── code_to_copy() [reactive]\n│   ├── generate_theme_code()\n│   │   └── generate_grid_code()\n│   ├── generate_palette_code()\n│   ├── generate_block_code()\n│   ├── generate_legend_code()\n│   ├── generate_composition_code()\n│   └── get_caption_halign()\n└── reset_all_inputs()\n    └── default_input_values\n\nstory_layout()  [standalone, not used by story_designer]\n├── check_marquee()\n├── estimate_layout_heights()\n│   └── strip_marquee_formatting()\n├── as_block()\n│   ├── title_block()\n│   ├── subtitle_block()\n│   ├── text_narrative()\n│   └── caption_block()\n└── purrr::reduce() for composition\n\nhighlight_colors()  [standalone utility]\ninline_legend()     [standalone utility]\nlist_colors()       [standalone utility]\n    └── color_to_hex()\n\nHelper Function Locations\n\n\n\n\n\n\n\n\nHelper\nFile\nUsed By\n\n\n\n\nget_levels_for_apply()\npalette_helpers.R\nmod_palette, story_designer\n\n\nget_caption_halign()\npalette_helpers.R\nstory_designer\n\n\nget_legend_orientation()\npalette_helpers.R\nmod_legend, story_designer\n\n\ncheck_marquee()\nblock_helpers.R\nall block functions\n\n\ncreate_text_block()\nblock_helpers.R\nall block functions\n\n\nconvert_named_colors()\ntext_helpers.R\nstory_designer\n\n\ncolor_to_hex()\ntext_helpers.R\nlegend_block, list_colors"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#architecture-principles",
+    "href": "vignettes/articles/developer-guide.html#architecture-principles",
+    "title": "Developer Guide",
+    "section": "Architecture Principles",
+    "text": "Architecture Principles\n\n1. Single Responsibility\nEach file has one purpose. No “utils” dumping grounds.\n\n\n2. Exported vs Internal\n\nExported functions: In blocks.R, colors.R, layout.R, theme.R\nInternal helpers: In *_helpers.R files, all marked @noRd\n\n\n\n3. Shiny Modularization\nThe Shiny app uses moduleServer() pattern: - mod_palette_server() - Color palette selection - mod_legend_server() - Inline legend configuration - mod_export_server() - Export settings and download"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#core-components",
+    "href": "vignettes/articles/developer-guide.html#core-components",
+    "title": "Developer Guide",
+    "section": "Core Components",
+    "text": "Core Components\n\nBlock Functions (blocks.R)\nBlock functions create ggplot objects for patchwork composition:\ntitle_block()     # Large title with marquee formatting\nsubtitle_block()  # Supporting context\ncaption_block()   # Source attribution (gray by default)\ntext_narrative()  # Side panel narrative text\nlegend_block()    # Inline colored text legend\nAll block functions: 1. Call check_marquee() to verify marquee is available 2. Use create_text_block() for consistent rendering 3. Return a ggplot object compatible with patchwork\nAdding a new block function:\nmy_block &lt;- function(text, size = 10, ...) {\n    check_marquee(\"my_block\")\n\n    create_text_block(\n        text = text,\n        size = size,\n        halign = \"left\",\n        y_pos = 0.5,\n        vjust = 0.5,\n        ...\n    )\n}\n\n\nBlock Helpers (block_helpers.R)\nInternal functions that support blocks:\n\n\n\nFunction\nPurpose\n\n\n\n\ncheck_marquee()\nAbort if marquee not installed\n\n\nget_hjust()\nConvert “left”/“center”/“right” to 0/0.5/1\n\n\nget_x_pos()\nConvert alignment to x coordinate\n\n\nget_vjust()\nConvert “top”/“center”/“bottom” to 1/0.5/0\n\n\nget_y_pos()\nConvert alignment to y coordinate\n\n\ncreate_text_block()\nCore function that builds the ggplot\n\n\nas_block()\nConvert text or ggplot to block (for story_layout)\n\n\n\n\n\nText Helpers (text_helpers.R)\nFunctions for processing marquee-formatted text:\n\n\n\n\n\n\n\nFunction\nPurpose\n\n\n\n\nconvert_named_colors()\n{red text} → {#FF0000 text}\n\n\nmaybe_wrap_text()\nApply strwrap if wrap_width specified\n\n\nstrip_marquee_formatting()\nRemove ** and {#hex ...} for char counting\n\n\ncolor_to_hex()\nConvert R color name to hex code\n\n\n\n\n\nLayout Functions (layout.R)\nestimate_layout_heights() - Calculates height proportions based on text length: - Strips marquee formatting to count actual characters - Estimates line wrapping based on font size and output width - Returns proportions that sum to 1.0\nstory_layout() - Composes a complete story layout: 1. Converts text to block plots using as_block() 2. Positions narrative (right/left/bottom) 3. Stacks components with patchwork 4. Applies height proportions\n\n\nColor Functions (colors.R)\nlist_colors() - Browse R color names with hex equivalents\nhighlight_colors() - Create strategic highlighting:\n# Gray out everything except highlighted categories\nhighlight_colors(c(\"A\", \"B\", \"C\"), highlight = \"B\")\n# Returns: A=\"#D3D3D3\", B=\"#1E90FF\", C=\"#D3D3D3\"\ninline_legend() - Create data frame for marquee legend annotation\n\n\nTheme (theme.R)\ntheme_stwd() - Clean SWD-style theme: - White background, no border - Horizontal grid lines only - No axis lines or ticks - Legend at top-left"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#shiny-app-architecture",
+    "href": "vignettes/articles/developer-guide.html#shiny-app-architecture",
+    "title": "Developer Guide",
+    "section": "Shiny App Architecture",
+    "text": "Shiny App Architecture\nThe story_designer() function is a complete Shiny application for interactively designing story layouts. Understanding its architecture is essential for maintenance.\n\nApplication Structure\nstory_designer()\n├── UI (bslib::page_sidebar)\n│   ├── Sidebar\n│   │   ├── Output Dimensions (width, height, sidebar width)\n│   │   ├── Accordion Panels\n│   │   │   ├── Title (text_panel)\n│   │   │   ├── Subtitle (text_panel)\n│   │   │   ├── Narrative (narrative_panel)\n│   │   │   ├── Caption (text_panel)\n│   │   │   ├── Legend Block (mod_legend_ui)\n│   │   │   ├── Plot (plot_panel)\n│   │   │   ├── Color Palette (mod_palette_ui)\n│   │   │   └── Axis & Grid (axis_grid_panel)\n│   │   └── Reset Button\n│   └── Main Content (navset_card_tab)\n│       ├── Preview Tab\n│       ├── Sections Tab (height sliders)\n│       ├── Fine Tune Tab (alignment, lineheight)\n│       ├── Validate & Export Tab (mod_export_ui)\n│       ├── Code Tab\n│       └── Components Tab (individual previews)\n└── Server\n    ├── Debounced text inputs\n    ├── Module servers (palette, legend, export)\n    ├── Core reactives (styled_plot, build_layout)\n    ├── Output renderers\n    └── Event handlers\n\n\nData Flow\nUser Input → Debounce → Module Processing → styled_plot() → build_layout() → Preview\n                                                                    ↓\n                                                              code_to_copy()\nKey reactives and their purposes:\n\n\n\n\n\n\n\n\nReactive\nPurpose\nDepends On\n\n\n\n\ntitle_text_d()\nDebounced title text (500ms)\ninput$title_text\n\n\nplot_categories()\nDetected fill/color levels from user’s plot\nuser_plot\n\n\nstyled_plot()\nUser plot + theme + palette colors\ninput$plot_theme, palette$*\n\n\ncurrent_heights()\nLayout proportions\nHeight sliders, legend$enabled()\n\n\nbuild_layout()\nComplete patchwork composition\nAll text, styled_plot(), legend$plot()\n\n\ncode_to_copy()\nGenerated R code string\nAll inputs\n\n\n\n\n\nModule Communication Pattern\nModules return named lists of reactives. The main server accesses these:\n# Initialize modules\npalette &lt;- mod_palette_server(\"palette\", plot_categories)\nlegend &lt;- mod_legend_server(\"legend\")\nexport &lt;- mod_export_server(\"export\", build_layout)\n\n# Access module values\nif (palette$manual_enabled()) {\n    colors &lt;- palette$manual_colors()\n}\n\nlegend_plot &lt;- legend$plot()  # Returns ggplot or NULL\nImportant: Always call module reactives as functions: palette$manual_enabled() not palette$manual_enabled."
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#module-palette-mod_palette.r",
+    "href": "vignettes/articles/developer-guide.html#module-palette-mod_palette.r",
+    "title": "Developer Guide",
+    "section": "Module: Palette (mod_palette.R)",
+    "text": "Module: Palette (mod_palette.R)\nThe palette module handles two distinct color systems: Color Palette (package-based) and Manual Colors (per-category assignment).\n\nUI Structure\nColor Palette Panel\n├── Package dropdown (ggsci, MetBrewer, viridis, etc.)\n├── Palette dropdown (dynamic based on package)\n├── Navigation buttons (prev, next, random)\n├── Swatch preview (clickable for selection)\n├── Warning (if categories &gt; colors)\n└── Apply to / Scale dropdowns\n\nManual Colors Panel\n├── Enable checkbox (with tooltip)\n├── Default color input\n├── Apply to dropdown\n├── Assign mode toggle (# or Name)\n└── Category assignment inputs (dynamic)\n\n\nInternal State\npalette_idx &lt;- shiny::reactiveVal(1)           # Current palette index\nselected_colors &lt;- shiny::reactiveVal(integer(0))  # Clicked swatch indices\nmanual_color_values &lt;- shiny::reactiveVal(list())  # Category → color map\nmanual_trigger &lt;- shiny::reactiveVal(0)        # Cache invalidation counter\n\n\nReturn Interface\nlist(\n    current_palette = reactive(...)   # Vector of hex colors (selected or all)\n    manual_colors = manual_color_values  # reactiveVal (NOT wrapped in reactive!)\n    manual_trigger = manual_trigger      # reactiveVal counter\n    palette_apply = reactive(...)     # \"fill\", \"color\", or \"both\"\n    palette_scale = reactive(...)     # \"discrete\" or \"continuous\"\n    manual_apply = reactive(...)      # \"fill\", \"color\", or \"both\"\n    manual_enabled = reactive(...)    # TRUE/FALSE\n    default_color = reactive(...)     # Hex color for unassigned categories\n    palette_package = reactive(...)   # Package name or \"none\"\n    palette_name = reactive(...)      # Selected palette name\n)\nNote: manual_colors and manual_trigger are passed as reactiveVal directly, not wrapped in reactive(). This is intentional for the polling pattern.\n\n\nColor Palette Flow\nPackage Selection → get_palette_names() → Palette Dropdown\n                                              ↓\n                        palette_idx ← Navigation Buttons\n                                              ↓\n                        get_palette_colors() → Swatch Preview\n                                              ↓\n                        Swatch Click → selected_colors update\n                                              ↓\n                        current_palette() returns selected or all colors\n\n\nManual Colors Flow (Polling Pattern)\nManual colors uses dynamic inputs created by renderUI(). These don’t create automatic dependencies, so we poll:\nshiny::observe({\n    if (!isTRUE(input$manual_enabled)) {\n        manual_color_values(list())\n        return()\n    }\n\n    shiny::invalidateLater(500)  # Poll every 500ms\n\n    # Read dynamic inputs\n    colors &lt;- purrr::map(seq_len(n), function(i) {\n        val &lt;- input[[paste0(\"cat_color_\", i)]]\n        # Validate hex or named color\n        if (is_valid_color(val)) val else NULL\n    })\n\n    new_result &lt;- stats::setNames(colors, levels_to_use) |&gt; purrr::compact()\n\n    # Only update if changed\n    if (!identical(new_result, manual_color_values())) {\n        manual_color_values(new_result)\n        manual_trigger(manual_trigger() + 1)  # Trigger cache invalidation\n    }\n})\n\n\nWhen Updating This Module\n\nAdding a new palette package: Update get_palette_names() and get_palette_colors() in palette_helpers.R\nChanging return values: Update all consumers in story_designer.R AND update bindCache() keys\nAdding new inputs: If static, no special handling. If dynamic (renderUI), use polling pattern\nCache issues: Ensure new reactives are in bindCache() keys in story_designer.R"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#module-legend-mod_legend.r",
+    "href": "vignettes/articles/developer-guide.html#module-legend-mod_legend.r",
+    "title": "Developer Guide",
+    "section": "Module: Legend (mod_legend.R)",
+    "text": "Module: Legend (mod_legend.R)\nThe legend module creates inline text legends using legend_block().\n\nUI Structure\nLegend Block Panel\n├── Enable checkbox\n├── Labels input (comma-separated)\n├── Color inputs (dynamic per label)\n├── Position dropdown\n├── Align dropdown\n├── Separator dropdown\n├── Size/Width sliders\n├── Bold/Uppercase checkboxes\n├── Line height (for vertical)\n└── Wrap width slider\n\n\nInternal State\nlegend_colors_val &lt;- shiny::reactiveVal(NULL)  # Named color vector\nlegend_trigger &lt;- shiny::reactiveVal(0)        # Cache invalidation counter\n\n\nReturn Interface\nlist(\n    enabled = reactive(...)    # TRUE/FALSE\n    plot = reactive(...)       # legend_block() output or NULL\n    colors = reactive(...)     # Named vector: c(\"Label\" = \"#hex\", ...)\n    trigger = legend_trigger   # reactiveVal counter for cache\n    position = reactive(...)   # \"above\", \"below\", \"left\", \"right\"\n    width = reactive(...)      # Width proportion for left/right position\n    halign = reactive(...)     # \"left\", \"center\", \"right\"\n    sep = reactive(...)        # Separator string\n    size = reactive(...)       # Font size\n    bold = reactive(...)       # TRUE/FALSE\n    uppercase = reactive(...)  # TRUE/FALSE\n    lineheight = reactive(...) # For vertical orientation\n    wrap = reactive(...)       # Wrap width (0 = off)\n    labels = reactive(...)     # Raw comma-separated string\n)\n\n\nColor Input Pattern\nLegend uses the same polling pattern as mod_palette for consistency:\nshiny::observe({\n    if (!isTRUE(input$enabled)) {\n        legend_colors_val(NULL)\n        return()\n    }\n\n    shiny::invalidateLater(500)  # Poll every 500ms\n\n    colors &lt;- purrr::map_chr(seq_len(n), function(i) {\n        input[[paste0(\"color_\", i)]] %||% default\n    }) |&gt; stats::setNames(labels)\n\n    if (!identical(colors, legend_colors_val())) {\n        legend_colors_val(colors)\n        legend_trigger(legend_trigger() + 1)\n    }\n})\n\n\nWhen Updating This Module\n\nAdding styling options: Add input to UI, add to return list, update legend_block() call in legend_plot reactive\nChanging color handling: Follow the polling pattern; ensure trigger is incremented on changes\nPosition changes: May affect compose_layout() in story_designer.R\nNew return values: Add to bindCache() keys in story_designer.R"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#module-export-mod_export.r",
+    "href": "vignettes/articles/developer-guide.html#module-export-mod_export.r",
+    "title": "Developer Guide",
+    "section": "Module: Export (mod_export.R)",
+    "text": "Module: Export (mod_export.R)\nThe export module handles validation preview and file download.\n\nUI Structure\nExport Panel\n├── Format/Width/Height/DPI inputs\n├── Validate/Popout/Download buttons\n├── Info display (calculated pixels)\n├── Quarto chunk options (with copy button)\n└── Actual size preview area\n\n\nInternal State\nactual_size_data &lt;- shiny::reactiveVal(NULL)  # Base64 image + dimensions\n\n\nKey Feature: Actual Size Validation\nThis renders the plot at true export dimensions so users can verify text sizes:\nshiny::observeEvent(input$validate, {\n    temp_file &lt;- tempfile(fileext = \".png\")\n    ggplot2::ggsave(temp_file, build_layout(),\n        width = w, height = h, dpi = dpi, bg = \"white\")\n    img_data &lt;- base64enc::base64encode(temp_file)\n    actual_size_data(list(data = img_data, px_width = w * dpi, px_height = h * dpi))\n})\n\n\nReturn Interface\nlist(\n    width = reactive(...)   # Export width in inches\n    height = reactive(...)  # Export height in inches\n    dpi = reactive(...)     # DPI setting\n    format = reactive(...)  # \"png\", \"pdf\", \"svg\"\n)\n\n\nWhen Updating This Module\n\nAdding export formats: Update downloadHandler() format handling\nChanging validation: The base64 approach works; consider memory for very large images\nDependencies: This module receives build_layout reactive as parameter; no direct input dependencies outside the module"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#critical-bindcache-and-cache-invalidation",
+    "href": "vignettes/articles/developer-guide.html#critical-bindcache-and-cache-invalidation",
+    "title": "Developer Guide",
+    "section": "Critical: bindCache() and Cache Invalidation",
+    "text": "Critical: bindCache() and Cache Invalidation\nThe preview plot uses caching for performance. This is the #1 source of bugs.\n\nCurrent Cache Keys\nThe cache keys are organized by category:\nshiny::bindCache(\n    # Text content (debounced)\n    title_text_d(), subtitle_text_d(), narrative_text_d(), caption_text_d(),\n    # Text sizes\n    input$title_size, input$subtitle_size, input$narrative_size, input$caption_size,\n    # Layout heights\n    input$title_height, input$subtitle_height, input$caption_height,\n    input$narrative_width, input$narrative_position,\n    # Fine tune: alignment, lineheight, wrap, margins\n    input$title_align, input$title_lineheight, input$title_wrap, input$title_margin_bottom,\n    input$subtitle_align, input$subtitle_lineheight, input$subtitle_wrap, input$subtitle_margin_bottom,\n    input$narrative_halign, input$narrative_valign, input$narrative_lineheight,\n    input$narrative_padding, input$narrative_wrap,\n    input$caption_position, input$caption_color, input$caption_wrap,\n    # Plot theme\n    input$plot_theme, input$plot_legend_pos,\n    # Axis titles (x and y)\n    input$axis_title_x_size, input$axis_title_x_bold, input$axis_title_x_align,\n    input$axis_title_x_angle, input$axis_title_x_color, input$axis_title_x_margin,\n    input$axis_title_y_size, input$axis_title_y_bold, input$axis_title_y_align,\n    input$axis_title_y_angle, input$axis_title_y_color, input$axis_title_y_margin,\n    # Axis text and lines\n    input$axis_text_size, input$axis_text_color,\n    input$show_axis_line, input$show_ticks, input$axis_line_color,\n    # Grid\n    input$grid_remove_all, input$grid_major, input$grid_minor, input$grid_color,\n    # Legend block module\n    legend$enabled(), legend$position(), legend$width(), legend$trigger(),\n    # Palette module\n    palette$current_palette(), palette$manual_enabled(),\n    palette$manual_colors(), palette$manual_trigger()\n)\n\n\nRules for Cache Keys\n\nEvery reactive that affects output MUST be a cache key\nMissing keys = stale cache = plot doesn’t update\nNo error is thrown - it silently serves old content\n\n\n\nDebugging Cache Issues\nSymptom: Feature works under some conditions but not others.\nExample: Manual colors work when a palette is selected, but not when palette is “none”.\nDebug process: 1. Identify what’s different between working/non-working states 2. Check if the differing reactive is in cache keys 3. Add missing reactive to bindCache() keys\n\n\nThe manual_trigger Pattern\nFor reactiveVal objects containing complex data (lists, vectors), the cache may not detect changes properly. Solution:\nmanual_trigger &lt;- shiny::reactiveVal(0)\n\n# When data changes\nif (!identical(new_data, my_reactive_val())) {\n    my_reactive_val(new_data)\n    manual_trigger(manual_trigger() + 1)  # Force cache invalidation\n}\n\n# In bindCache\nshiny::bindCache(..., my_reactive_val(), manual_trigger())"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#dynamic-inputs-pattern",
+    "href": "vignettes/articles/developer-guide.html#dynamic-inputs-pattern",
+    "title": "Developer Guide",
+    "section": "Dynamic Inputs Pattern",
+    "text": "Dynamic Inputs Pattern\n\nThe Problem\nInputs created by renderUI() don’t exist when reactives first evaluate:\noutput$dynamic_inputs &lt;- shiny::renderUI({\n    # Creates input$item_1, input$item_2, etc.\n    purrr::map(1:n, ~textInput(ns(paste0(\"item_\", .x)), ...))\n})\n\n# This WON'T work - inputs don't exist yet\nmy_reactive &lt;- shiny::reactive({\n    input$item_1  # NULL, and no dependency created\n})\n\n\nSolution: Polling (used in mod_palette and mod_legend)\nshiny::observe({\n    shiny::invalidateLater(500)  # Check every 500ms\n\n    values &lt;- purrr::map(1:n, ~input[[paste0(\"item_\", .x)]])\n\n    if (!identical(values, stored_values())) {\n        stored_values(values)\n        trigger(trigger() + 1)  # For cache invalidation\n    }\n})\nCharacteristics: - 500ms polling interval (responsive enough, not wasteful) - Requires a trigger counter for bindCache() invalidation - Provides consistent “live” user experience across all dynamic inputs"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#ui-helpers-story_designer_ui.r",
+    "href": "vignettes/articles/developer-guide.html#ui-helpers-story_designer_ui.r",
+    "title": "Developer Guide",
+    "section": "UI Helpers (story_designer_ui.R)",
+    "text": "UI Helpers (story_designer_ui.R)\nFunctions that reduce boilerplate in UI construction.\n\ntext_panel()\nCreates a standardized text input accordion panel:\ntext_panel(\n    id = \"title\",           # Input prefix (creates title_text, title_size, etc.)\n    label = \"Title\",        # Accordion header\n    badge_color = \"primary\",\n    icon_name = \"heading\",\n    default_text = \"...\",\n    rows = 2,               # 1 = textInput, &gt;1 = textAreaInput\n    size_min/max/default,\n    show_margin = TRUE      # Include margin_bottom slider\n)\n\n\nnarrative_panel()\nSpecial panel with position/width controls for narrative placement.\n\n\nplot_panel()\nTheme and legend position controls.\n\n\naxis_grid_panel()\nComprehensive axis and grid customization. This is the most complex panel with: - X/Y axis title controls (size, bold, align, angle, color, margin) - Axis text controls - Axis line and tick controls - Grid line controls (major/minor, horizontal/vertical)\n\n\nWhen Adding New Panels\n\nCreate helper function in story_designer_ui.R\nUse consistent input ID patterns: {section}_{property}\nAdd to accordion in story_designer.R\nAdd defaults to designer_defaults.R\nAdd reset logic to reset_all_inputs()"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#state-management-designer_defaults.r",
+    "href": "vignettes/articles/developer-guide.html#state-management-designer_defaults.r",
+    "title": "Developer Guide",
+    "section": "State Management (designer_defaults.R)",
+    "text": "State Management (designer_defaults.R)\n\ndefault_input_values\nNamed list of all default values. Used by reset_all_inputs() and for documentation.\nSections: - Text content (title_text, subtitle_text, etc.) - Sizes (title_size, subtitle_size, etc.) - Margins - Layout (narrative_width, heights) - Alignment - Line heights - Plot settings - Axis settings (x and y) - Grid settings\n\n\nreset_all_inputs()\nResets all inputs to defaults. Groups inputs by type for batch updates:\n# Sliders\npurrr::walk(slider_ids, ~shiny::updateSliderInput(session, .x, value = defaults[[.x]]))\n\n# Numeric inputs\npurrr::walk(numeric_ids, ~shiny::updateNumericInput(session, .x, value = defaults[[.x]]))\n\n# Select inputs\npurrr::walk(select_ids, ~shiny::updateSelectInput(session, .x, selected = defaults[[.x]]))\n\n\nbuild_theme_mods()\nConverts input values to a ggplot2::theme() object. Handles: - Void theme special case - Axis title styling (size, bold, align, angle, color, margin) - Axis text styling - Axis lines and ticks - Grid lines (major/minor, horizontal/vertical)\n\n\nWhen Adding New Inputs\n\nAdd to default_input_values\nAdd to appropriate section in reset_all_inputs()\nIf it affects the plot, add to build_theme_mods() or styled_plot()\nAdd to bindCache() keys if it affects preview"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#code-generation-code_generation.r",
+    "href": "vignettes/articles/developer-guide.html#code-generation-code_generation.r",
+    "title": "Developer Guide",
+    "section": "Code Generation (code_generation.R)",
+    "text": "Code Generation (code_generation.R)\nFunctions that generate R code strings for the Code tab:\n\n\n\n\n\n\n\nFunction\nGenerates\n\n\n\n\ngenerate_theme_code()\nstyled_plot &lt;- my_plot + theme_stwd() + theme(...)\n\n\ngenerate_grid_code()\nGrid line theme modifications\n\n\ngenerate_palette_code()\nscale_fill_manual(values = ...)\n\n\ngenerate_block_code()\ntitle_plot &lt;- title_block(...)\n\n\ngenerate_legend_code()\nlegend_plot &lt;- legend_block(...)\n\n\ngenerate_composition_code()\nFinal patchwork composition\n\n\n\nImportant: These generate strings, not code objects. All output should be parseable R code."
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#testing-approach",
+    "href": "vignettes/articles/developer-guide.html#testing-approach",
+    "title": "Developer Guide",
+    "section": "Testing Approach",
+    "text": "Testing Approach\n\nTest Files\ntests/testthat/\n├── test-blocks.R          # Block functions and theme\n├── test-code-generation.R # Code generation functions\n├── test-colors.R          # highlight_colors, inline_legend, list_colors\n├── test-layout.R          # story_layout, estimate_layout_heights\n├── test-modules.R         # Module helper functions\n\n\nTesting Strategy\n\nExported functions - Test all public API\nCode generation - Verify output is parseable R code\nHelper functions - Test edge cases (NULL, empty, etc.)\nSkip Shiny reactives - No shinytest2 (complex setup)\n\n\n\nRunning Tests\ndevtools::test()           # Run all tests\ndevtools::test_active_file() # Run current file\n\n\nAdding Tests\nUse describe()/it() pattern:\ndescribe(\"my_function\", {\n    it(\"handles normal input\", {\n        result &lt;- my_function(\"test\")\n        expect_equal(result, \"expected\")\n    })\n\n    it(\"handles NULL gracefully\", {\n        result &lt;- my_function(NULL)\n        expect_null(result)\n    })\n})"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#common-maintenance-tasks",
+    "href": "vignettes/articles/developer-guide.html#common-maintenance-tasks",
+    "title": "Developer Guide",
+    "section": "Common Maintenance Tasks",
+    "text": "Common Maintenance Tasks\n\nAdding a New Palette Package\n\nAdd to Suggests in DESCRIPTION\nUpdate get_palette_names() in palette_helpers.R\nUpdate get_palette_colors() in palette_helpers.R\nUpdate generate_palette_code() in code_generation.R\nAdd tests\n\n\n\nAdding a New Block Type\n\nAdd function to blocks.R\nAdd @export tag\nUse create_text_block() for consistency\nAdd tests to test-blocks.R\nRun devtools::document()\n\n\n\nModifying the Shiny App\n\nUI changes: story_designer.R (UI section) or story_designer_ui.R\nServer logic: story_designer.R (server section) or relevant module\nDefaults: designer_defaults.R\nCode output: code_generation.R"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#build-check",
+    "href": "vignettes/articles/developer-guide.html#build-check",
+    "title": "Developer Guide",
+    "section": "Build & Check",
+    "text": "Build & Check\ndevtools::document()                    # Regenerate docs\ndevtools::check(remote = TRUE, manual = TRUE)  # Full CRAN check\ndevtools::test()                        # Run tests\ndevtools::install()                     # Install locally"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#release-checklist",
+    "href": "vignettes/articles/developer-guide.html#release-checklist",
+    "title": "Developer Guide",
+    "section": "Release Checklist",
+    "text": "Release Checklist\n\nUpdate version in DESCRIPTION\nRun devtools::check(remote = TRUE, manual = TRUE)\nEnsure 0 errors, 0 warnings\nRun full test suite\nUpdate NEWS.md if exists\nCommit and push to Codeberg\nRebuild documentation site with qrtdown"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#dependencies",
+    "href": "vignettes/articles/developer-guide.html#dependencies",
+    "title": "Developer Guide",
+    "section": "Dependencies",
+    "text": "Dependencies\nImports (required): - cli, ggplot2, grid, patchwork, purrr, rlang, stats, utils\nSuggests (optional): - marquee (required for block functions) - shiny, bslib, base64enc, clipr (required for story_designer) - Palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor, RColorBrewer, scico, viridis, wesanderson - Testing: testthat, knitr, rmarkdown"
+  },
+  {
+    "objectID": "vignettes/articles/developer-guide.html#code-style",
+    "href": "vignettes/articles/developer-guide.html#code-style",
+    "title": "Developer Guide",
+    "section": "Code Style",
+    "text": "Code Style\n\nUse native pipe |&gt; (not %&gt;%)\nUse cli for user-facing messages\nPrefix Shiny functions with shiny:: for CRAN compliance\nUse @noRd for internal functions (no Rd file generated)"
   },
   {
     "objectID": "vignettes/articles/sizing.html",
@@ -294,72 +441,65 @@
     "text": "Summary\n\nDesign your layout in story_designer()\nUse Validate Actual Size to confirm appearance\nCopy the Width, Height, and DPI values\nCopy the generated code from the Code tab\nSet matching fig-width, fig-height, fig-dpi in Quarto chunks\nAdd out-width: \"100%\" for responsive display\n\nFor critical presentations, export as PNG for guaranteed consistency."
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html",
-    "href": "vignettes/articles/swd-recreation.html",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html",
+    "href": "vignettes/articles/stwd-recreation.html",
+    "title": "Recreating the STWD Look",
     "section": "",
     "text": "This article demonstrates how to recreate the “Storytelling with Data” (SWD) style visualization from Albert Rapp’s excellent tutorial using the stwd package.\nThe original visualization shows warehouse order accuracy data with strategic color highlighting to draw attention to problem areas."
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#overview",
-    "href": "vignettes/articles/swd-recreation.html#overview",
-    "title": "Recreating the SWD Look",
-    "section": "",
-    "text": "This article demonstrates how to recreate the “Storytelling with Data” (SWD) style visualization from Albert Rapp’s excellent tutorial using the stwd package.\nThe original visualization shows warehouse order accuracy data with strategic color highlighting to draw attention to problem areas."
-  },
-  {
-    "objectID": "vignettes/articles/swd-recreation.html#the-data",
-    "href": "vignettes/articles/swd-recreation.html#the-data",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#the-data",
+    "href": "vignettes/articles/stwd-recreation.html#the-data",
+    "title": "Recreating the STWD Look",
     "section": "The Data",
     "text": "The Data\nWe’ll use warehouse fulfillment data with accuracy, error, and null rates:\n\nwarehouse_data &lt;- data.frame(\n  id = 1:19,\n  fulfilled = c(803, 865, 795, 683, 566, 586, 510, 436, 418, 364, 379, 372, 374, 278, 286, 327, 225, 222, 200),\n  accuracy = c(0.86, 0.80, 0.84, 0.82, 0.86, 0.80, 0.80, 0.93, 0.88, 0.87, 0.85, 0.85, 0.83, 0.94, 0.86, 0.78, 0.89, 0.88, 0.91),\n  error = c(0.10, 0.14, 0.10, 0.14, 0.10, 0.16, 0.15, 0.06, 0.11, 0.07, 0.12, 0.13, 0.08, 0.04, 0.12, 0.12, 0.07, 0.10, 0.07),\n  null = c(0.04, 0.06, 0.06, 0.04, 0.04, 0.04, 0.05, 0.01, 0.01, 0.06, 0.03, 0.02, 0.09, 0.02, 0.02, 0.10, 0.04, 0.02, 0.02)\n)"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#step-1-prepare-the-data",
-    "href": "vignettes/articles/swd-recreation.html#step-1-prepare-the-data",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#step-1-prepare-the-data",
+    "href": "vignettes/articles/stwd-recreation.html#step-1-prepare-the-data",
+    "title": "Recreating the STWD Look",
     "section": "Step 1: Prepare the Data",
     "text": "Step 1: Prepare the Data\nReshape to long format and add summary row:\n\n# Calculate averages\naverages &lt;- data.frame(\n  id = \"ALL\",\n  accuracy = mean(warehouse_data$accuracy),\n  error = mean(warehouse_data$error),\n  null = mean(warehouse_data$null)\n)\n\n# Combine and reshape\ndat_combined &lt;- warehouse_data |&gt;\n  mutate(id = as.character(id)) |&gt;\n  select(id, accuracy, error, null) |&gt;\n  bind_rows(averages) |&gt;\n  pivot_longer(\n    cols = c(accuracy, null, error),\n    names_to = \"metric\",\n    values_to = \"value\"\n  )\n\n# Order by error rate and set factor levels\nerror_order &lt;- warehouse_data |&gt;\n  arrange(error) |&gt;\n  pull(id) |&gt;\n  as.character()\n\ndat_combined$id &lt;- factor(dat_combined$id, levels = c(error_order, \"ALL\"))\ndat_combined$metric &lt;- factor(dat_combined$metric, levels = c(\"accuracy\", \"null\", \"error\"))\n\n# Add highlight color for high-error warehouses\nhigh_error_ids &lt;- warehouse_data |&gt;\n  filter(error &gt; 0.10) |&gt;\n  pull(id) |&gt;\n  as.character()\n\ndat_combined &lt;- dat_combined |&gt;\n  mutate(\n    highlight = ifelse(id %in% high_error_ids & metric == \"error\", \"highlight\", \"normal\")\n  )"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#step-2-build-the-base-chart",
-    "href": "vignettes/articles/swd-recreation.html#step-2-build-the-base-chart",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#step-2-build-the-base-chart",
+    "href": "vignettes/articles/stwd-recreation.html#step-2-build-the-base-chart",
+    "title": "Recreating the STWD Look",
     "section": "Step 2: Build the Base Chart",
     "text": "Step 2: Build the Base Chart\nCreate the horizontal stacked bar chart with strategic coloring:\n\nbase_chart &lt;- ggplot(dat_combined, aes(x = value, y = id, fill = interaction(metric, highlight))) +\n  geom_col(position = \"stack\", width = 0.7) +\n  scale_fill_manual(\n    values = c(\n      \"accuracy.normal\" = \"#CCCCCC\",\n      \"accuracy.highlight\" = \"#CCCCCC\",\n      \"null.normal\" = \"#E5E5E5\",\n      \"null.highlight\" = \"#E5E5E5\",\n      \"error.normal\" = \"#999999\",\n      \"error.highlight\" = \"#E69F00\"\n    ),\n    guide = \"none\"\n  ) +\n  scale_x_continuous(\n    labels = scales::percent,\n    position = \"top\",\n    expand = c(0, 0)\n  ) +\n  labs(x = NULL, y = NULL) +\n  theme_stwd() +\n  theme(\n    panel.grid.major.y = element_blank(),\n    axis.ticks = element_blank()\n  )\n\nbase_chart"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#step-3-add-the-story-with-stwd",
-    "href": "vignettes/articles/swd-recreation.html#step-3-add-the-story-with-stwd",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#step-3-add-the-story-with-stwd",
+    "href": "vignettes/articles/stwd-recreation.html#step-3-add-the-story-with-stwd",
+    "title": "Recreating the STWD Look",
     "section": "Step 3: Add the Story with stwd",
-    "text": "Step 3: Add the Story with stwd\nNow we compose the full story layout using stwd block functions:\n\n# Define colors for the legend\nlegend_colors &lt;- c(\n  \"ACCURATE\" = \"#CCCCCC\",\n  \"NULL\" = \"#E5E5E5\",\n  \"ERROR\" = \"#E69F00\"\n)\n\n# Compose the story\ntitle_block(\n  \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  title_size = 14\n) /\nsubtitle_block(\n  \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  subtitle_size = 9\n) /\nlegend_block(\n  legend_colors,\n  halign = \"right\",\n  sep = \"\n | \",\n  size = 8\n) /\nbase_chart /\ncaption_block(\n  \"SOURCE: Warehouse Operations Database | Data: Albert Rapp SWD Recreation\",\n  caption_size = 7\n) +\n  plot_layout(heights = c(0.06, 0.04, 0.03, 0.82, 0.05))"
+    "text": "Step 3: Add the Story with stwd\nNow we compose the full story layout using stwd block functions.\nWhilie you can do this manually, where the package benefits truly shines is using the designer() function\n\nstwd::story_designer(base_chart)\n\nThis will create a shiny application that allows to easily add in the various elements that you want to finalize your graph.\nWhen done, simplify copy and paste the code below\n\n\n# Define colors for the legend\nlegend_colors &lt;- c(\n  \"ACCURATE\" = \"#CCCCCC\",\n  \"NULL\" = \"#E5E5E5\",\n  \"ERROR\" = \"#E69F00\"\n)\n\n# Compose the story\ntitle_block(\n  \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  title_size = 10\n) /\nsubtitle_block(\n  \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  subtitle_size = 6\n) /\nlegend_block(\n  legend_colors,\n  halign = \"right\",\n  sep = \"\n | \",\n  size = 5\n) /\nbase_chart /\ncaption_block(\n  \"SOURCE: Warehouse Operations Database | Data: Albert Rapp STWD Recreation\",\n  caption_size = 4\n) +\n  plot_layout(heights = c(0.06, 0.04, 0.03, 0.82, 0.05))"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#step-4-add-a-narrative-panel",
-    "href": "vignettes/articles/swd-recreation.html#step-4-add-a-narrative-panel",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#step-4-add-a-narrative-panel",
+    "href": "vignettes/articles/stwd-recreation.html#step-4-add-a-narrative-panel",
+    "title": "Recreating the STWD Look",
     "section": "Step 4: Add a Narrative Panel",
-    "text": "Step 4: Add a Narrative Panel\nFor a more complete story, add an explanatory narrative:\n\nnarrative &lt;- text_narrative(\n  text = \"**Action Required**\n\n{#E69F00 Five warehouses} have error\nrates exceeding 10%:\n\n• Warehouse 6: **16%**\n• Warehouse 7: **15%**\n• Warehouses 2, 4: **14%**\n\n**Recommendation:**\nPrioritize quality audits\nfor these locations.\",\n  size = 9,\n  halign = \"left\",\n  line_height = 1.3\n)\n\nWarning in (function (mapping = NULL, data = NULL, stat = \"identity\", position\n= \"identity\", : Ignoring unknown parameters: `line_height`\n\n# Chart with narrative side-by-side\ncontent_row &lt;- base_chart + narrative + plot_layout(widths = c(0.72, 0.28))\n\ntitle_block(\n  \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  title_size = 14\n) /\nsubtitle_block(\n  \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  subtitle_size = 9\n) /\nlegend_block(\n  legend_colors,\n  halign = \"right\",\n  sep = \" | \",\n  size = 8\n) /\ncontent_row /\ncaption_block(\n  \"SOURCE: Warehouse Operations Database | Data: Albert Rapp SWD Recreation\",\n  caption_size = 7\n) +\n  plot_layout(heights = c(0.06, 0.04, 0.03, 0.82, 0.05))"
+    "text": "Step 4: Add a Narrative Panel\nFor a more complete story, add an explanatory narrative:\n\nnarrative &lt;- text_narrative(\n  text = \"**Action Required**\n\n{#E69F00 Five warehouses} have error\nrates exceeding 10%:\n\n• Warehouse 6: **16%**\n• Warehouse 7: **15%**\n• Warehouses 2, 4: **14%**\n\n**Recommendation:**\nPrioritize quality audits\nfor these locations.\",\n  size = 6,\n  halign = \"left\",\n  line_height = 1.3\n)\n\n# Chart with narrative side-by-side\ncontent_row &lt;- base_chart + narrative + plot_layout(widths = c(0.72, 0.28))\n\ntitle_block(\n  \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  title_size = 10\n) /\nsubtitle_block(\n  \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  subtitle_size = 6\n) /\nlegend_block(\n  legend_colors,\n  halign = \"right\",\n  sep = \" | \",\n  size = 5\n) /\ncontent_row /\ncaption_block(\n  \"SOURCE: Warehouse Operations Database | Data: Albert Rapp SWD Recreation\",\n  caption_size = 4\n) +\n  plot_layout(heights = c(0.06, 0.04, 0.03, 0.82, 0.05))"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#using-story_designer",
-    "href": "vignettes/articles/swd-recreation.html#using-story_designer",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#using-story_designer",
+    "href": "vignettes/articles/stwd-recreation.html#using-story_designer",
+    "title": "Recreating the STWD Look",
     "section": "Using story_designer()",
     "text": "Using story_designer()\nInstead of manually coding the layout, use the interactive designer:\nstory_designer(\n  plot = base_chart,\n  title = \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  subtitle = \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  narrative = \"**Action Required**\n\n{#E69F00 Five warehouses} have error rates exceeding 10%.\nPrioritize quality audits for these locations.\",\n  caption = \"SOURCE: Warehouse Operations Database\"\n)\nThe designer lets you:\n\nAdjust font sizes and spacing interactively\nFine-tune section heights with sliders\nPreview the layout at different export sizes\nCopy the generated patchwork code"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#key-swd-principles-applied",
-    "href": "vignettes/articles/swd-recreation.html#key-swd-principles-applied",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#key-swd-principles-applied",
+    "href": "vignettes/articles/stwd-recreation.html#key-swd-principles-applied",
+    "title": "Recreating the STWD Look",
     "section": "Key SWD Principles Applied",
     "text": "Key SWD Principles Applied\n\n\n\nPrinciple\nImplementation\n\n\n\n\nStrategic color\nOrange highlights only the problem areas\n\n\nGray baseline\nNon-essential data in muted grays\n\n\nClear hierarchy\nTitle states the insight, not just the topic\n\n\nAction-oriented\nNarrative provides specific recommendations\n\n\nMinimal clutter\nRemoved unnecessary gridlines and legends"
   },
   {
-    "objectID": "vignettes/articles/swd-recreation.html#summary",
-    "href": "vignettes/articles/swd-recreation.html#summary",
-    "title": "Recreating the SWD Look",
+    "objectID": "vignettes/articles/stwd-recreation.html#summary",
+    "href": "vignettes/articles/stwd-recreation.html#summary",
+    "title": "Recreating the STWD Look",
     "section": "Summary",
     "text": "Summary\nThe stwd package simplifies creating SWD-style visualizations by providing:\n\nBlock functions for composing title, subtitle, legend, and caption\ntheme_stwd() for clean, minimal styling\nMarquee syntax for inline colored text\nstory_designer() for interactive layout design\n\nSee the Storytelling Layouts article for more examples."
   }

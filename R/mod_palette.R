@@ -49,7 +49,10 @@ mod_palette_ui <- function(id) {
             value = "Manual Colors",
             icon = shiny::icon("paint-brush"),
 
-            shiny::checkboxInput(ns("manual_enabled"), "Enable manual color assignment", value = FALSE),
+            bslib::tooltip(
+                shiny::checkboxInput(ns("manual_enabled"), "Enable manual color assignment", value = FALSE),
+                "Overrides Color Palette selection above"
+            ),
             shiny::conditionalPanel(
                 condition = paste0("input['", ns("manual_enabled"), "']"),
                 shiny::div(
@@ -86,6 +89,7 @@ mod_palette_server <- function(id, plot_categories) {
         palette_idx <- shiny::reactiveVal(1)
         selected_colors <- shiny::reactiveVal(integer(0))
         manual_color_values <- shiny::reactiveVal(list())
+        manual_trigger <- shiny::reactiveVal(0)
 
         # Available palettes for selected package
         available_palettes <- shiny::reactive({
@@ -257,18 +261,10 @@ mod_palette_server <- function(id, plot_categories) {
                 ))
             }
 
-            palette_colors <- current_palette()
-            if (is.null(palette_colors) || length(palette_colors) == 0) {
-                palette_colors <- default_colors
-            }
-
-            color_choices <- c(
-                c("Default" = "default"),
-                stats::setNames(
-                    palette_colors,
-                    purrr::imap_chr(palette_colors, ~ paste0("#", .y, " (", .x, ")"))
-                )
-            )
+            # Get existing colors from the plot's scale
+            existing_colors <- if (apply_to == "fill") cats$fill_colors
+                               else if (apply_to == "color") cats$color_colors
+                               else cats$fill_colors
 
             assign_mode <- input$assign_mode %||% "number"
 
@@ -282,37 +278,76 @@ mod_palette_server <- function(id, plot_categories) {
                     label_text <- if (nchar(level_name) > 12) paste0(substr(level_name, 1, 10), "..") else level_name
                 }
 
+                # Use existing color from plot, or user's previous input, or empty
+                current_val <- shiny::isolate(input[[paste0("cat_color_", i)]])
+                if (is.null(current_val) || current_val == "") {
+                    # Try to get from existing scale colors
+                    if (!is.null(existing_colors) && level_name %in% names(existing_colors)) {
+                        current_val <- existing_colors[[level_name]]
+                    }
+                }
+
                 shiny::div(
                     class = "d-flex align-items-center gap-2 mb-1",
                     shiny::span(label_text, class = "small", style = "width:70px;display:inline-block;"),
-                    shiny::selectInput(input_id, NULL, width = "100%",
-                        choices = color_choices, selected = "default")
+                    shiny::textInput(input_id, NULL, value = current_val %||% "", width = "100%",
+                        placeholder = "e.g. #E69F00 or red")
                 )
             })
 
             shiny::div(
                 shiny::div(class = "small text-muted mb-2",
-                    paste0(length(levels_to_use), " categories detected")),
+                    paste0(length(levels_to_use), " categories. Enter hex colors or leave blank for default.")),
                 assignment_ui
             )
         })
 
-        # Collect manual color values
+        # Poll for manual color changes when enabled
         shiny::observe({
+            if (!isTRUE(input$manual_enabled)) {
+                manual_color_values(list())
+                return()
+            }
+
+            # Poll every 500ms
+            shiny::invalidateLater(500)
+
             cats <- plot_categories()
             apply_to <- input$manual_apply %||% "fill"
-
             levels_to_use <- get_levels_for_apply(cats, apply_to)
 
-            if (is.null(levels_to_use)) return()
+            if (is.null(levels_to_use) || length(levels_to_use) == 0) {
+                manual_color_values(list())
+                return()
+            }
 
-            color_map <- purrr::imap(levels_to_use, function(level, i) {
+            n <- length(levels_to_use)
+            colors <- purrr::map(seq_len(n), function(i) {
                 val <- input[[paste0("cat_color_", i)]]
-                if (!is.null(val) && val != "default") val else NULL
-            }) |>
-                stats::setNames(levels_to_use) |>
-                purrr::compact()
-            manual_color_values(color_map)
+                if (!is.null(val) && nzchar(trimws(val))) {
+                    val <- trimws(val)
+                    is_hex <- grepl("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$", val)
+                    is_named <- val %in% grDevices::colors()
+                    if (is_hex || is_named) val else NULL
+                } else {
+                    NULL
+                }
+            })
+
+            new_result <- stats::setNames(colors, levels_to_use) |> purrr::compact()
+
+            # Only update if changed (avoid unnecessary invalidations)
+            if (!identical(new_result, manual_color_values())) {
+                manual_color_values(new_result)
+                manual_trigger(manual_trigger() + 1)
+            }
+        })
+
+        # Clear colors when manual is disabled
+        shiny::observeEvent(input$manual_enabled, {
+            if (!isTRUE(input$manual_enabled)) {
+                manual_color_values(list())
+            }
         })
 
         # --- Return Values ---
@@ -332,7 +367,8 @@ mod_palette_server <- function(id, plot_categories) {
 
         list(
             current_palette = current_palette,
-            manual_colors = shiny::reactive(manual_color_values()),
+            manual_colors = manual_color_values,
+            manual_trigger = manual_trigger,
             palette_apply = shiny::reactive(input$palette_apply %||% "fill"),
             palette_scale = shiny::reactive(input$palette_scale %||% "discrete"),
             manual_apply = shiny::reactive(input$manual_apply %||% "fill"),

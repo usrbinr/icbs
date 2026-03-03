@@ -54,13 +54,17 @@ story_designer <- function(plot = NULL,
     })
 
     # Default placeholder plot if none provided
-    user_plot <- plot %||% ggplot2::ggplot(
-        data.frame(x = c("A", "B", "C", "D"), y = c(4, 7, 3, 8)),
-        ggplot2::aes(x = x, y = y)
-    ) +
-        ggplot2::geom_col(fill = "#E69F00") +
-        ggplot2::theme_minimal() +
-        ggplot2::labs(x = NULL, y = NULL, title = NULL)
+    if (is.null(plot)) {
+        user_plot <- ggplot2::ggplot(
+            data.frame(x = c("A", "B", "C", "D"), y = c(4, 7, 3, 8)),
+            ggplot2::aes(x = x, y = y)
+        ) +
+            ggplot2::geom_col(fill = "#E69F00") +
+            ggplot2::theme_minimal() +
+            ggplot2::labs(x = NULL, y = NULL, title = NULL)
+    } else {
+        user_plot <- plot
+    }
 
     # Register CSS resource path
     css_path <- system.file("www", package = "stwd")
@@ -110,7 +114,7 @@ story_designer <- function(plot = NULL,
                 text_panel("title", "Title", "primary", "heading", title,
                     size_min = 6, size_max = 24, size_default = 12),
                 text_panel("subtitle", "Subtitle", "info", "font", subtitle,
-                    size_min = 8, size_max = 16, size_default = 11),
+                    size_min = 4, size_max = 16, size_default = 11),
                 narrative_panel(narrative),
                 text_panel("caption", "Caption", "secondary", "quote-right", caption,
                     rows = 1, show_margin = FALSE, size_min = 7, size_max = 12, size_default = 9),
@@ -269,29 +273,33 @@ story_designer <- function(plot = NULL,
             theme_mods <- build_theme_mods(input)
             p <- user_plot + base_theme + theme_mods
 
-            # Apply palette colors
-            pal_colors <- palette$current_palette()
-            if (!is.null(pal_colors)) {
-                p <- apply_color_scales(p, pal_colors,
-                    palette$palette_apply(), palette$palette_scale())
+            # Apply palette colors (only if user explicitly selected a package)
+            pkg <- palette$palette_package()
+            if (!is.null(pkg) && pkg != "none") {
+                pal_colors <- palette$current_palette()
+                if (!is.null(pal_colors) && length(pal_colors) > 0) {
+                    p <- apply_color_scales(p, pal_colors,
+                        palette$palette_apply(), palette$palette_scale())
+                }
             }
 
             # Apply manual colors if enabled
-            if (palette$manual_enabled()) {
-                color_map <- palette$manual_colors()
-                default_col <- palette$default_color()
-                manual_apply <- palette$manual_apply()
+            # Read these outside the if to ensure reactive dependency
+            manual_enabled <- palette$manual_enabled()
+            color_map <- palette$manual_colors()
+            default_col <- palette$default_color()
+            manual_apply <- palette$manual_apply()
+            palette$manual_trigger()  # Force dependency on Apply button
 
-                if (length(color_map) > 0 || default_col != "#808080") {
-                    cats <- plot_categories()
-                    levels_to_use <- get_levels_for_apply(cats, manual_apply)
+            if (manual_enabled && (length(color_map) > 0 || default_col != "#808080")) {
+                cats <- plot_categories()
+                levels_to_use <- get_levels_for_apply(cats, manual_apply)
 
-                    if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
-                        final_colors <- purrr::map_chr(levels_to_use, function(lvl) {
-                            if (lvl %in% names(color_map)) color_map[[lvl]] else default_col
-                        }) |> stats::setNames(levels_to_use)
-                        p <- apply_color_scales(p, final_colors, manual_apply, "discrete")
-                    }
+                if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
+                    final_colors <- purrr::map_chr(levels_to_use, function(lvl) {
+                        if (lvl %in% names(color_map)) color_map[[lvl]] else default_col
+                    }) |> stats::setNames(levels_to_use)
+                    p <- apply_color_scales(p, final_colors, manual_apply, "discrete")
                 }
             }
 
@@ -415,12 +423,36 @@ story_designer <- function(plot = NULL,
             build_layout()
         }, res = 96, bg = "white") |>
             shiny::bindCache(
+                # Text content
                 title_text_d(), subtitle_text_d(), narrative_text_d(), caption_text_d(),
+                # Text sizes
                 input$title_size, input$subtitle_size, input$narrative_size, input$caption_size,
+                # Layout heights
                 input$title_height, input$subtitle_height, input$caption_height,
                 input$narrative_width, input$narrative_position,
-                input$plot_theme, legend$enabled(), legend$position(),
-                palette$current_palette(), palette$manual_enabled()
+                # Fine tune: alignment, lineheight, wrap, margins
+                input$title_align, input$title_lineheight, input$title_wrap, input$title_margin_bottom,
+                input$subtitle_align, input$subtitle_lineheight, input$subtitle_wrap, input$subtitle_margin_bottom,
+                input$narrative_halign, input$narrative_valign, input$narrative_lineheight,
+                input$narrative_padding, input$narrative_wrap,
+                input$caption_position, input$caption_color, input$caption_wrap,
+                # Plot theme
+                input$plot_theme, input$plot_legend_pos,
+                # Axis titles
+                input$axis_title_x_size, input$axis_title_x_bold, input$axis_title_x_align,
+                input$axis_title_x_angle, input$axis_title_x_color, input$axis_title_x_margin,
+                input$axis_title_y_size, input$axis_title_y_bold, input$axis_title_y_align,
+                input$axis_title_y_angle, input$axis_title_y_color, input$axis_title_y_margin,
+                # Axis text and lines
+                input$axis_text_size, input$axis_text_color,
+                input$show_axis_line, input$show_ticks, input$axis_line_color,
+                # Grid
+                input$grid_remove_all, input$grid_major, input$grid_minor, input$grid_color,
+                # Legend block module
+                legend$enabled(), legend$position(), legend$width(), legend$trigger(),
+                # Palette module
+                palette$current_palette(), palette$manual_enabled(),
+                palette$manual_colors(), palette$manual_trigger()
             )
 
         output$height_diagram <- shiny::renderPlot({

@@ -5,6 +5,6 @@ bibentry(
     person("Alejandro", "Hagan", email = "alejandro.hagan@outlook.com", role = c("aut", "cre"))
   ),
   year     = "2026",
-  note     = "R package version 0.0.0.9000",
+  note     = "R package version 3.2.1",
   url      = "https://codeberg.org/usrbinr/stwd"
 )

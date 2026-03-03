@@ -53,6 +53,8 @@ mod_legend_server <- function(id) {
         ns <- session$ns
 
         default_colors <- default_legend_colors
+        legend_colors_val <- shiny::reactiveVal(NULL)
+        legend_trigger <- shiny::reactiveVal(0)
 
         # Dynamic color inputs based on labels
         output$color_inputs <- shiny::renderUI({
@@ -64,7 +66,7 @@ mod_legend_server <- function(id) {
 
             color_inputs <- purrr::map(seq_len(n), function(i) {
                 input_id <- ns(paste0("color_", i))
-                current_val <- input[[paste0("color_", i)]]
+                current_val <- shiny::isolate(input[[paste0("color_", i)]])
                 default_val <- if (is.null(current_val)) {
                     default_colors[((i - 1) %% length(default_colors)) + 1]
                 } else current_val
@@ -81,20 +83,48 @@ mod_legend_server <- function(id) {
             shiny::tagList(color_inputs)
         })
 
-        # Get legend colors as named vector
-        legend_colors <- shiny::reactive({
-            shiny::req(input$enabled)
+        # Poll for color changes
+        shiny::observe({
+            if (!isTRUE(input$enabled)) {
+                legend_colors_val(NULL)
+                return()
+            }
+
+            # Poll every 500ms
+            shiny::invalidateLater(500)
 
             labels <- trimws(strsplit(input$labels %||% "", ",")[[1]])
             labels <- labels[labels != ""]
             n <- length(labels)
 
-            if (n == 0) return(NULL)
+            if (n == 0) {
+                if (!is.null(legend_colors_val())) {
+                    legend_colors_val(NULL)
+                    legend_trigger(legend_trigger() + 1)
+                }
+                return()
+            }
 
             colors <- purrr::map_chr(seq_len(n), function(i) {
-                input[[paste0("color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
+                val <- input[[paste0("color_", i)]]
+                if (!is.null(val) && nzchar(trimws(val))) {
+                    trimws(val)
+                } else {
+                    default_colors[((i - 1) %% length(default_colors)) + 1]
+                }
             }) |> stats::setNames(labels)
-            colors
+
+            # Only update if changed
+            if (!identical(colors, legend_colors_val())) {
+                legend_colors_val(colors)
+                legend_trigger(legend_trigger() + 1)
+            }
+        })
+
+        # Get legend colors as named vector
+        legend_colors <- shiny::reactive({
+            shiny::req(input$enabled)
+            legend_colors_val()
         })
 
         # Create legend block plot
@@ -129,6 +159,7 @@ mod_legend_server <- function(id) {
             enabled = shiny::reactive(input$enabled %||% FALSE),
             plot = legend_plot,
             colors = legend_colors,
+            trigger = legend_trigger,
             position = shiny::reactive(input$position %||% "above"),
             width = shiny::reactive(input$width %||% 0.12),
             halign = shiny::reactive(input$halign %||% "right"),
