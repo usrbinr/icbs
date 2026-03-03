@@ -2,7 +2,7 @@
 title: "inline_legend"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L179)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/colors.R#L175)
 
 # `inline_legend()`
 
