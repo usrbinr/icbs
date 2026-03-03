@@ -51,7 +51,6 @@ mod_legend_ui <- function(id) {
 mod_legend_server <- function(id) {
     shiny::moduleServer(id, function(input, output, session) {
         ns <- session$ns
-        `%||%` <- function(x, y) if (is.null(x)) y else x
 
         default_colors <- default_legend_colors
 

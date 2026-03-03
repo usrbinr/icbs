@@ -216,7 +216,6 @@ story_designer <- function(plot = NULL,
 
     # ============ SERVER ============
     server <- function(input, output, session) {
-        `%||%` <- function(x, y) if (is.null(x)) y else x
 
         # --- Debounced Text Inputs ---
         title_text_d <- shiny::debounce(shiny::reactive(input$title_text), 500)
@@ -267,7 +266,7 @@ story_designer <- function(plot = NULL,
                 theme_stwd()
             )
 
-            theme_mods <- build_theme_mods(input, `%||%`)
+            theme_mods <- build_theme_mods(input)
             p <- user_plot + base_theme + theme_mods
 
             # Apply palette colors
@@ -529,7 +528,7 @@ story_designer <- function(plot = NULL,
 
             paste0(
                 'library(patchwork)\n\n',
-                generate_theme_code(input, `%||%`),
+                generate_theme_code(input),
                 generate_palette_code(pkg, pal_name, palette$palette_apply(), palette$palette_scale()),
                 '\n\n',
                 generate_block_code("title", input$title_text, input$title_size,

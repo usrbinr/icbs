@@ -3,7 +3,7 @@
 
 #' Generate theme code string
 #' @noRd
-generate_theme_code <- function(input, `%||%`) {
+generate_theme_code <- function(input) {
     theme_name <- input$plot_theme %||% "stwd"
     theme_fn <- switch(theme_name,
         "stwd" = "theme_stwd()",
@@ -33,7 +33,7 @@ generate_theme_code <- function(input, `%||%`) {
     }
 
     # Grid lines
-    grid_code <- generate_grid_code(input, `%||%`)
+    grid_code <- generate_grid_code(input)
 
     paste0(
         'styled_plot <- my_plot +\n',
@@ -61,7 +61,7 @@ generate_theme_code <- function(input, `%||%`) {
 
 #' Generate grid code string
 #' @noRd
-generate_grid_code <- function(input, `%||%`) {
+generate_grid_code <- function(input) {
     if (input$grid_remove_all %||% FALSE) {
         return(',\n        panel.grid.major = element_blank(),\n        panel.grid.minor = element_blank()')
     }

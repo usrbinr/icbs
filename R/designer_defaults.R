@@ -82,7 +82,7 @@ reset_all_inputs <- function(session, defaults = default_input_values) {
 
 #' Build theme modifications from input values
 #' @noRd
-build_theme_mods <- function(input, `%||%`) {
+build_theme_mods <- function(input) {
     is_void <- (input$plot_theme %||% "stwd") == "void"
 
     if (is_void) {

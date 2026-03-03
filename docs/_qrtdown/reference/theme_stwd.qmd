@@ -2,7 +2,7 @@
 title: "theme_stwd"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L237)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/theme.R#L35)
 
 # `theme_stwd()`
 

@@ -74,7 +74,6 @@ mod_export_ui <- function(id) {
 mod_export_server <- function(id, build_layout) {
     shiny::moduleServer(id, function(input, output, session) {
         ns <- session$ns
-        `%||%` <- function(x, y) if (is.null(x)) y else x
 
         # Actual size preview data
         actual_size_data <- shiny::reactiveVal(NULL)

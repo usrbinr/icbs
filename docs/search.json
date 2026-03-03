@@ -137,7 +137,7 @@
     "href": "index.html",
     "title": "stwd",
     "section": "",
-    "text": "Source Code\n\n\n\n\nMIT + file LICENSE\n\n\n\nCiting this package\n\n\n\n\nAlejandro Hagan (author, maintainer)"
+    "text": "Source Code\nReport a Bug\n\n\n\n\nMIT + file LICENSE\n\n\n\nCiting this package\n\n\n\n\nAlejandro Hagan (author, maintainer)"
   },
   {
     "objectID": "index.html#overview",
@@ -193,7 +193,7 @@
     "href": "index.html#function-reference",
     "title": "stwd",
     "section": "Function Reference",
-    "text": "Function Reference\n\n\n\nFunction\nPurpose\n\n\n\n\nstory_designer()\nInteractive Shiny app for layout design\n\n\ntitle_block()\nCreate title plots\n\n\nsubtitle_block()\nCreate subtitle plots\n\n\ntext_narrative()\nCreate narrative text blocks\n\n\ncaption_block()\nCreate caption plots\n\n\nlegend_block()\nCreate inline colored text legend\n\n\nhighlight_colors()\nGray out non-essential categories\n\n\ntheme_stwd()\nClean SWD theme (horizontal grid only)\n\n\ntheme_marquee()\nEnable marquee for all text elements\n\n\nscale_fill_marquee()\nMatch legend text to fill colors"
+    "text": "Function Reference\n\n\n\nFunction\nPurpose\n\n\n\n\nstory_designer()\nInteractive Shiny app for layout design\n\n\ntitle_block()\nCreate title plots\n\n\nsubtitle_block()\nCreate subtitle plots\n\n\ntext_narrative()\nCreate narrative text blocks\n\n\ncaption_block()\nCreate caption plots\n\n\nlegend_block()\nCreate inline colored text legend\n\n\nhighlight_colors()\nGray out non-essential categories\n\n\ntheme_stwd()\nClean SWD theme (horizontal grid only)"
   },
   {
     "objectID": "index.html#license-1",

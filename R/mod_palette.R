@@ -78,7 +78,6 @@ mod_palette_ui <- function(id) {
 mod_palette_server <- function(id, plot_categories) {
     shiny::moduleServer(id, function(input, output, session) {
         ns <- session$ns
-        `%||%` <- function(x, y) if (is.null(x)) y else x
 
         # Default colors
         default_colors <- default_legend_colors

@@ -2,7 +2,7 @@
 title: "story_designer"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L86)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/story_designer.R#L40)
 
 # `story_designer()`
 
@@ -25,7 +25,7 @@ story_designer(
 | Argument | Description |
 |----------|-------------|
 | `plot` | Optional ggplot object to include in the preview. If NULL, a placeholder chart is used. |
-| `title` | Initial title text. Supports marquee formatting: **bold**, *italic*, {#E69F00 colored text. |
+| `title` | Initial title text. Supports marquee formatting. |
 | `subtitle` | Initial subtitle text. |
 | `narrative` | Initial narrative text for the side panel. |
 | `caption` | Initial caption/source text. |
@@ -58,20 +58,10 @@ Text inputs support marquee formatting syntax: **bold** for bold,
 
 ```r
 ## Not run: 
-# Launch with defaults
-story_designer()
-
-# Launch with your plot
 library(ggplot2)
 p <- ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
   geom_col()
-story_designer(
-  plot = p,
-  title = "**Fuel Economy** by {#E69F00 Cylinder Count}",
-  subtitle = "MPG varies significantly across engine sizes",
-  narrative = "**Key finding:** 4-cylinder cars have the best fuel economy.",
-  caption = "SOURCE: mtcars dataset"
-)
+story_designer(plot = p, title = "**Fuel Economy** by {#E69F00 Cylinders}")
 
 ## End(Not run)
 ```

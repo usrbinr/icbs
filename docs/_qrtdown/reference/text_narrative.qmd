@@ -2,7 +2,7 @@
 title: "text_narrative"
 ---
 
-[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/stwd.R#L332)
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/blocks.R#L48)
 
 # `text_narrative()`
 

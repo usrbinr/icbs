@@ -2,8 +2,7 @@
 # These functions generate R code strings for story_designer's Code tab
 
 describe("generate_theme_code", {
-    `%||%` <- function(x, y) if (is.null(x)) y else x
-
+    
     it("generates parseable R code", {
         mock_input <- list(
             plot_theme = "stwd",
@@ -30,7 +29,7 @@ describe("generate_theme_code", {
             grid_color = "#E5E5E5"
         )
 
-        result <- generate_theme_code(mock_input, `%||%`)
+        result <- generate_theme_code(mock_input)
 
         expect_type(result, "character")
         # Should be parseable R code
@@ -39,25 +38,24 @@ describe("generate_theme_code", {
 
     it("includes theme_stwd for stwd theme", {
         mock_input <- list(plot_theme = "stwd")
-        result <- generate_theme_code(mock_input, `%||%`)
+        result <- generate_theme_code(mock_input)
 
         expect_true(grepl("theme_stwd", result))
     })
 
     it("includes theme_void for void theme", {
         mock_input <- list(plot_theme = "void")
-        result <- generate_theme_code(mock_input, `%||%`)
+        result <- generate_theme_code(mock_input)
 
         expect_true(grepl("theme_void", result))
     })
 })
 
 describe("generate_grid_code", {
-    `%||%` <- function(x, y) if (is.null(x)) y else x
-
+    
     it("returns element_blank for remove_all = TRUE", {
         mock_input <- list(grid_remove_all = TRUE)
-        result <- generate_grid_code(mock_input, `%||%`)
+        result <- generate_grid_code(mock_input)
 
         expect_true(grepl("element_blank", result))
     })
@@ -69,7 +67,7 @@ describe("generate_grid_code", {
             grid_minor = "none",
             grid_color = "#E5E5E5"
         )
-        result <- generate_grid_code(mock_input, `%||%`)
+        result <- generate_grid_code(mock_input)
 
         expect_true(grepl("panel.grid.major.y", result))
         expect_true(grepl("panel.grid.major.x = element_blank", result))

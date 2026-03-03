@@ -193,8 +193,7 @@ describe("generate_theme_code", {
             grid_color = "#E5E5E5"
         )
 
-        `%||%` <- function(x, y) if (is.null(x)) y else x
-        result <- generate_theme_code(mock_input, `%||%`)
+        result <- generate_theme_code(mock_input)
 
         expect_type(result, "character")
         expect_true(grepl("theme_stwd", result))
