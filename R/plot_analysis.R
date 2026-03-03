@@ -35,17 +35,25 @@ extract_mapping_levels <- function(plot, mapping_name) {
         if (!is.null(result)) return(result)
     }
 
-    # Try layer mappings
-    for (layer in plot$layers) {
-        # Handle both "colour" and "color" spellings
+    # Try layer mappings - find first layer with valid levels
+    layer_result <- purrr::detect(plot$layers, function(layer) {
         layer_mapping <- layer$mapping[[mapping_name]]
         if (is.null(layer_mapping) && mapping_name == "colour") {
             layer_mapping <- layer$mapping[["color"]]
         }
         if (!is.null(layer_mapping)) {
-            result <- get_levels(get_col_name(layer_mapping))
-            if (!is.null(result)) return(result)
+            lvls <- get_levels(get_col_name(layer_mapping))
+            return(!is.null(lvls))
         }
+        FALSE
+    })
+
+    if (!is.null(layer_result)) {
+        layer_mapping <- layer_result$mapping[[mapping_name]]
+        if (is.null(layer_mapping) && mapping_name == "colour") {
+            layer_mapping <- layer_result$mapping[["color"]]
+        }
+        return(get_levels(get_col_name(layer_mapping)))
     }
 
     NULL

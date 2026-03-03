@@ -68,6 +68,40 @@ get_palette_colors <- function(pkg, name, n = 8) {
 default_legend_colors <- c("#808080", "#B0B0B0", "#E69F00", "#56B4E9", "#009E73",
                            "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
 
+#' Get category levels based on apply_to setting
+#' @param cats List with fill_levels and color_levels
+#' @param apply_to One of "fill", "color", or "both"
+#' @return Character vector of levels or NULL
+#' @noRd
+get_levels_for_apply <- function(cats, apply_to) {
+    if (apply_to == "fill") cats$fill_levels
+    else if (apply_to == "color") cats$color_levels
+    else if (!is.null(cats$fill_levels)) cats$fill_levels
+    else cats$color_levels
+}
+
+#' Get caption horizontal alignment from position
+#' @param position Caption position setting
+#' @return Alignment string ("left", "center", or "right")
+#' @noRd
+get_caption_halign <- function(position) {
+    switch(position %||% "full_left",
+        "full_left" = "left",
+        "full_center" = "center",
+        "full_right" = "right",
+        "under_chart" = "left",
+        "left"
+    )
+}
+
+#' Get legend orientation from position
+#' @param position Legend position ("left", "right", "above", "below")
+#' @return "vertical" or "horizontal"
+#' @noRd
+get_legend_orientation <- function(position) {
+    if (position %in% c("left", "right")) "vertical" else "horizontal"
+}
+
 #' Apply color scales to a plot
 #' @noRd
 apply_color_scales <- function(p, colors, apply_to, scale_type) {

@@ -105,7 +105,7 @@ mod_legend_server <- function(id) {
             if (is.null(colors) || length(colors) == 0) return(NULL)
 
             pos <- input$position %||% "above"
-            orientation <- if (pos %in% c("left", "right")) "vertical" else "horizontal"
+            orientation <- get_legend_orientation(pos)
             h_align <- if (pos == "left") "left"
                        else if (pos == "right") "right"
                        else (input$halign %||% "right")

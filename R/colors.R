@@ -67,9 +67,9 @@ list_colors <- function(pattern = NULL, n = 20) {
     result <- data.frame(name = all_colors, hex = hex_codes, row.names = NULL)
 
     cli::cli_h2("Available Colors")
-    for (i in seq_len(nrow(result))) {
-        cli::cli_text("{.field {result$name[i]}} \u2192 {.val {result$hex[i]}}")
-    }
+    purrr::walk2(result$name, result$hex, function(name, hex) {
+        cli::cli_text("{.field {name}} \u2192 {.val {hex}}")
+    })
 
     if (!is.null(pattern)) {
         cli::cli_text("{.emph Showing {nrow(result)} colors matching '{pattern}'}")

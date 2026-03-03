@@ -44,14 +44,14 @@ story_designer <- function(plot = NULL,
                            caption = "SOURCE: Your data source") {
 
     # Check required packages
-    for (pkg in c("shiny", "bslib", "marquee")) {
+    purrr::walk(c("shiny", "bslib", "marquee"), function(pkg) {
         if (!requireNamespace(pkg, quietly = TRUE)) {
             cli::cli_abort(
                 "Package {.pkg {pkg}} is required for {.fn story_designer}.",
                 "i" = "Install it with: {.code install.packages('{pkg}')}"
             )
         }
-    }
+    })
 
     # Default placeholder plot if none provided
     user_plot <- plot %||% ggplot2::ggplot(
@@ -284,10 +284,7 @@ story_designer <- function(plot = NULL,
 
                 if (length(color_map) > 0 || default_col != "#808080") {
                     cats <- plot_categories()
-                    levels_to_use <- if (manual_apply == "fill") cats$fill_levels
-                        else if (manual_apply == "color") cats$color_levels
-                        else if (!is.null(cats$fill_levels)) cats$fill_levels
-                        else cats$color_levels
+                    levels_to_use <- get_levels_for_apply(cats, manual_apply)
 
                     if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
                         final_colors <- purrr::map_chr(levels_to_use, function(lvl) {
@@ -350,9 +347,7 @@ story_designer <- function(plot = NULL,
                 wrap_width = if ((input$narrative_wrap %||% 0) > 0) input$narrative_wrap else NULL
             )
 
-            caption_halign <- switch(input$caption_position %||% "full_left",
-                "full_left" = "left", "full_center" = "center",
-                "full_right" = "right", "under_chart" = "left", "left")
+            caption_halign <- get_caption_halign(input$caption_position)
 
             caption_plot <- caption_block(
                 caption_txt,
@@ -479,9 +474,7 @@ story_designer <- function(plot = NULL,
         }, res = 96, bg = "white")
 
         output$preview_caption <- shiny::renderPlot({
-            caption_halign <- switch(input$caption_position %||% "full_left",
-                "full_left" = "left", "full_center" = "center",
-                "full_right" = "right", "under_chart" = "left", "left")
+            caption_halign <- get_caption_halign(input$caption_position)
             caption_block(convert_named_colors(caption_text_d()),
                 caption_size = input$caption_size, halign = caption_halign,
                 color = input$caption_color %||% "#808080",
@@ -496,9 +489,7 @@ story_designer <- function(plot = NULL,
         # Code generation
         code_to_copy <- shiny::reactive({
             h <- current_heights()
-            caption_halign <- switch(input$caption_position %||% "full_left",
-                "full_left" = "left", "full_center" = "center",
-                "full_right" = "right", "under_chart" = "left", "left")
+            caption_halign <- get_caption_halign(input$caption_position)
 
             pkg <- palette$palette_package()
             pal_name <- palette$palette_name()
@@ -510,7 +501,7 @@ story_designer <- function(plot = NULL,
                 if (length(labels) > 0) {
                     colors <- legend$colors()
                     legend_pos <- legend$position()
-                    orientation <- if (legend_pos %in% c("left", "right")) "vertical" else "horizontal"
+                    orientation <- get_legend_orientation(legend_pos)
                     h_align <- if (legend_pos == "left") "left"
                         else if (legend_pos == "right") "right"
                         else legend$halign()

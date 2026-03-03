@@ -15,9 +15,8 @@ convert_named_colors <- function(text) {
     matches <- gregexpr(pattern, text, perl = TRUE)
     if (matches[[1]][1] == -1) return(text)
 
-    result <- text
     all_matches <- regmatches(text, matches)[[1]]
-    for (match in all_matches) {
+    purrr::reduce(all_matches, function(result, match) {
         parts <- regmatches(match, regexec(pattern, match, perl = TRUE))[[1]]
         color_name <- parts[2]
         content <- parts[3]
@@ -25,10 +24,9 @@ convert_named_colors <- function(text) {
             rgb_vals <- grDevices::col2rgb(color_name)
             hex_code <- sprintf("#%02X%02X%02X", rgb_vals[1], rgb_vals[2], rgb_vals[3])
             replacement <- paste0("{", hex_code, " ", content, "}")
-            result <- sub(match, replacement, result, fixed = TRUE)
-        }, error = function(e) { })
-    }
-    result
+            sub(match, replacement, result, fixed = TRUE)
+        }, error = function(e) result)
+    }, .init = text)
 }
 
 #' Wrap text at specified width

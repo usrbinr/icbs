@@ -46,38 +46,43 @@ reset_all_inputs <- function(session, defaults = default_input_values) {
     shiny::updateTextInput(session, "caption_text", value = defaults$caption_text)
 
     # Sliders
-    for (id in c("title_size", "subtitle_size", "narrative_size", "caption_size",
-                 "title_margin_bottom", "subtitle_margin_bottom", "narrative_width",
-                 "title_height", "subtitle_height", "caption_height",
-                 "axis_title_x_size", "axis_title_x_margin", "axis_title_y_size",
-                 "axis_title_y_margin", "axis_text_size")) {
-        shiny::updateSliderInput(session, id, value = defaults[[id]])
-    }
+    purrr::walk(
+        c("title_size", "subtitle_size", "narrative_size", "caption_size",
+          "title_margin_bottom", "subtitle_margin_bottom", "narrative_width",
+          "title_height", "subtitle_height", "caption_height",
+          "axis_title_x_size", "axis_title_x_margin", "axis_title_y_size",
+          "axis_title_y_margin", "axis_text_size"),
+        ~ shiny::updateSliderInput(session, .x, value = defaults[[.x]])
+    )
 
     # Numeric inputs
-    for (id in c("title_lineheight", "subtitle_lineheight", "narrative_lineheight", "narrative_padding")) {
-        shiny::updateNumericInput(session, id, value = defaults[[id]])
-    }
+    purrr::walk(
+        c("title_lineheight", "subtitle_lineheight", "narrative_lineheight", "narrative_padding"),
+        ~ shiny::updateNumericInput(session, .x, value = defaults[[.x]])
+    )
 
     # Select inputs
-    for (id in c("narrative_position", "title_align", "subtitle_align", "narrative_halign",
-                 "narrative_valign", "caption_position", "plot_theme", "plot_legend_pos",
-                 "palette_package", "axis_title_x_align", "axis_title_x_angle",
-                 "axis_title_y_align", "axis_title_y_angle", "grid_major", "grid_minor")) {
-        shiny::updateSelectInput(session, id, selected = defaults[[id]])
-    }
+    purrr::walk(
+        c("narrative_position", "title_align", "subtitle_align", "narrative_halign",
+          "narrative_valign", "caption_position", "plot_theme", "plot_legend_pos",
+          "palette_package", "axis_title_x_align", "axis_title_x_angle",
+          "axis_title_y_align", "axis_title_y_angle", "grid_major", "grid_minor"),
+        ~ shiny::updateSelectInput(session, .x, selected = defaults[[.x]])
+    )
 
     # Checkbox inputs
-    for (id in c("axis_title_x_bold", "axis_title_y_bold", "show_axis_line",
-                 "show_ticks", "grid_remove_all")) {
-        shiny::updateCheckboxInput(session, id, value = defaults[[id]])
-    }
+    purrr::walk(
+        c("axis_title_x_bold", "axis_title_y_bold", "show_axis_line",
+          "show_ticks", "grid_remove_all"),
+        ~ shiny::updateCheckboxInput(session, .x, value = defaults[[.x]])
+    )
 
     # Text inputs (colors)
-    for (id in c("caption_color", "axis_title_x_color", "axis_title_y_color",
-                 "axis_text_color", "axis_line_color", "grid_color")) {
-        shiny::updateTextInput(session, id, value = defaults[[id]])
-    }
+    purrr::walk(
+        c("caption_color", "axis_title_x_color", "axis_title_y_color",
+          "axis_text_color", "axis_line_color", "grid_color"),
+        ~ shiny::updateTextInput(session, .x, value = defaults[[.x]])
+    )
 }
 
 #' Build theme modifications from input values

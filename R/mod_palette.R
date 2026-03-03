@@ -248,10 +248,7 @@ mod_palette_server <- function(id, plot_categories) {
             cats <- plot_categories()
             apply_to <- input$manual_apply %||% "fill"
 
-            levels_to_use <- if (apply_to == "fill") cats$fill_levels
-                             else if (apply_to == "color") cats$color_levels
-                             else if (!is.null(cats$fill_levels)) cats$fill_levels
-                             else cats$color_levels
+            levels_to_use <- get_levels_for_apply(cats, apply_to)
 
             if (is.null(levels_to_use) || length(levels_to_use) == 0) {
                 return(shiny::div(
@@ -265,10 +262,13 @@ mod_palette_server <- function(id, plot_categories) {
                 palette_colors <- default_colors
             }
 
-            color_choices <- c("Default" = "default")
-            for (i in seq_along(palette_colors)) {
-                color_choices[paste0("#", i, " (", palette_colors[i], ")")] <- palette_colors[i]
-            }
+            color_choices <- c(
+                c("Default" = "default"),
+                stats::setNames(
+                    palette_colors,
+                    purrr::imap_chr(palette_colors, ~ paste0("#", .y, " (", .x, ")"))
+                )
+            )
 
             assign_mode <- input$assign_mode %||% "number"
 
@@ -302,20 +302,16 @@ mod_palette_server <- function(id, plot_categories) {
             cats <- plot_categories()
             apply_to <- input$manual_apply %||% "fill"
 
-            levels_to_use <- if (apply_to == "fill") cats$fill_levels
-                             else if (apply_to == "color") cats$color_levels
-                             else if (!is.null(cats$fill_levels)) cats$fill_levels
-                             else cats$color_levels
+            levels_to_use <- get_levels_for_apply(cats, apply_to)
 
             if (is.null(levels_to_use)) return()
 
-            color_map <- list()
-            for (i in seq_along(levels_to_use)) {
+            color_map <- purrr::imap(levels_to_use, function(level, i) {
                 val <- input[[paste0("cat_color_", i)]]
-                if (!is.null(val) && val != "default") {
-                    color_map[[levels_to_use[i]]] <- val
-                }
-            }
+                if (!is.null(val) && val != "default") val else NULL
+            }) |>
+                stats::setNames(levels_to_use) |>
+                purrr::compact()
             manual_color_values(color_map)
         })
 

@@ -268,14 +268,8 @@ story_layout <- function(plot,
 
     # Combine all components vertically
     if (length(components) == 1) {
-        result <- components[[1]]
+        components[[1]]
     } else {
-        result <- components[[1]]
-        for (i in 2:length(components)) {
-            result <- result / components[[i]]
-        }
-        result <- result + plot_layout(heights = heights)
+        purrr::reduce(components, `/`) + plot_layout(heights = heights)
     }
-
-    result
 }
