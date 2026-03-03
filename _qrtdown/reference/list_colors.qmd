@@ -1,0 +1,51 @@
+---
+title: "list_colors"
+---
+
+[< Back to Reference](../reference.qmd) | [View source](https://codeberg.org/usrbinr/stwd/src/branch/main/R/colors.R#L52)
+
+# `list_colors()`
+
+List Available R Color Names
+
+## Usage
+
+```r
+list_colors(pattern = NULL, n = 20)
+```
+
+## Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `pattern` | Optional regex pattern to filter color names. |
+| `n` | Maximum number of colors to show. Default: 20. |
+
+## Value
+
+A data frame with color names and hex codes (invisibly).
+
+## Description
+
+Browse named R colors with their hex equivalents.
+
+## Details
+
+Prints a formatted list of color names and hex codes to the console.
+Useful for finding colors to use in story_designer text fields or
+when writing marquee syntax manually. The hex codes can be copied
+directly into color inputs.
+
+## Examples
+
+```r
+# Show common colors
+list_colors()
+
+# Search for blue colors
+list_colors("blue")
+
+# Search for dark colors
+list_colors("dark")
+```
+

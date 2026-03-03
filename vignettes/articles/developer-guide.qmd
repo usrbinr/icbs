@@ -1,0 +1,864 @@
+---
+title: "Developer Guide"
+description: "Architecture, design decisions, and maintenance approach for stwd"
+---
+
+This guide documents the architecture, design decisions, and maintenance approach for the stwd package.
+
+## Package Overview
+
+stwd (Storytelling with Data) provides tools for creating presentation-ready visualizations following SWD principles. The main feature is `story_designer()`, a Shiny app for interactively designing story layouts.
+
+## File Structure
+
+```
+R/
+├── blocks.R              # 448 lines - Exported block functions
+├── block_helpers.R       # 138 lines - Internal helpers for blocks
+├── code_generation.R     # 273 lines - Generate R code strings
+├── colors.R              # 200 lines - Color utilities + package imports
+├── designer_defaults.R   # 160 lines - Default values, reset functions
+├── layout.R              # 275 lines - story_layout, estimate_layout_heights
+├── mod_export.R          # 258 lines - Shiny module: export/download
+├── mod_legend.R          # 175 lines - Shiny module: legend config
+├── mod_palette.R         # 384 lines - Shiny module: palette picker
+├── palette_helpers.R     # 130 lines - Palette lookup functions
+├── plot_analysis.R       # 169 lines - Extract info from ggplot objects
+├── story_designer.R      # 689 lines - Main Shiny app
+├── story_designer_ui.R   # 285 lines - UI builder functions
+├── text_helpers.R        #  76 lines - Text/marquee processing
+├── theme.R               #  80 lines - theme_stwd
+```
+
+## Function Dependency Map
+
+```
+story_designer()
+├── mod_palette_server()
+│   ├── get_palette_names()
+│   ├── get_palette_colors()
+│   ├── get_levels_for_apply()
+│   └── default_legend_colors
+├── mod_legend_server()
+│   ├── legend_block()
+│   │   ├── check_marquee()
+│   │   ├── color_to_hex()
+│   │   └── get_hjust(), get_x_pos(), get_vjust()
+│   └── get_legend_orientation()
+├── mod_export_server()
+│   └── (uses build_layout reactive)
+├── build_layout() [reactive]
+│   ├── convert_named_colors()
+│   ├── title_block() ─────────┐
+│   ├── subtitle_block() ──────┤
+│   ├── text_narrative() ──────┼── All use create_text_block()
+│   ├── caption_block() ───────┤       └── maybe_wrap_text()
+│   └── legend_block() ────────┘
+├── styled_plot() [reactive]
+│   ├── theme_stwd()
+│   ├── build_theme_mods()
+│   ├── apply_color_scales()
+│   └── get_levels_for_apply()
+├── code_to_copy() [reactive]
+│   ├── generate_theme_code()
+│   │   └── generate_grid_code()
+│   ├── generate_palette_code()
+│   ├── generate_block_code()
+│   ├── generate_legend_code()
+│   ├── generate_composition_code()
+│   └── get_caption_halign()
+└── reset_all_inputs()
+    └── default_input_values
+
+story_layout()  [standalone, not used by story_designer]
+├── check_marquee()
+├── estimate_layout_heights()
+│   └── strip_marquee_formatting()
+├── as_block()
+│   ├── title_block()
+│   ├── subtitle_block()
+│   ├── text_narrative()
+│   └── caption_block()
+└── purrr::reduce() for composition
+
+highlight_colors()  [standalone utility]
+inline_legend()     [standalone utility]
+list_colors()       [standalone utility]
+    └── color_to_hex()
+```
+
+### Helper Function Locations
+
+| Helper | File | Used By |
+|--------|------|---------|
+| `get_levels_for_apply()` | palette_helpers.R | mod_palette, story_designer |
+| `get_caption_halign()` | palette_helpers.R | story_designer |
+| `get_legend_orientation()` | palette_helpers.R | mod_legend, story_designer |
+| `check_marquee()` | block_helpers.R | all block functions |
+| `create_text_block()` | block_helpers.R | all block functions |
+| `convert_named_colors()` | text_helpers.R | story_designer |
+| `color_to_hex()` | text_helpers.R | legend_block, list_colors |
+
+## Architecture Principles
+
+### 1. Single Responsibility
+Each file has one purpose. No "utils" dumping grounds.
+
+### 2. Exported vs Internal
+- **Exported functions**: In `blocks.R`, `colors.R`, `layout.R`, `theme.R`
+- **Internal helpers**: In `*_helpers.R` files, all marked `@noRd`
+
+### 3. Shiny Modularization
+The Shiny app uses `moduleServer()` pattern:
+- `mod_palette_server()` - Color palette selection
+- `mod_legend_server()` - Inline legend configuration
+- `mod_export_server()` - Export settings and download
+
+## Core Components
+
+### Block Functions (`blocks.R`)
+
+Block functions create ggplot objects for patchwork composition:
+
+```r
+title_block()     # Large title with marquee formatting
+subtitle_block()  # Supporting context
+caption_block()   # Source attribution (gray by default)
+text_narrative()  # Side panel narrative text
+legend_block()    # Inline colored text legend
+```
+
+All block functions:
+1. Call `check_marquee()` to verify marquee is available
+2. Use `create_text_block()` for consistent rendering
+3. Return a ggplot object compatible with patchwork
+
+**Adding a new block function:**
+```r
+my_block <- function(text, size = 10, ...) {
+    check_marquee("my_block")
+
+    create_text_block(
+        text = text,
+        size = size,
+        halign = "left",
+        y_pos = 0.5,
+        vjust = 0.5,
+        ...
+    )
+}
+```
+
+### Block Helpers (`block_helpers.R`)
+
+Internal functions that support blocks:
+
+| Function | Purpose |
+|----------|---------|
+| `check_marquee()` | Abort if marquee not installed |
+| `get_hjust()` | Convert "left"/"center"/"right" to 0/0.5/1 |
+| `get_x_pos()` | Convert alignment to x coordinate |
+| `get_vjust()` | Convert "top"/"center"/"bottom" to 1/0.5/0 |
+| `get_y_pos()` | Convert alignment to y coordinate |
+| `create_text_block()` | Core function that builds the ggplot |
+| `as_block()` | Convert text or ggplot to block (for story_layout) |
+
+### Text Helpers (`text_helpers.R`)
+
+Functions for processing marquee-formatted text:
+
+| Function | Purpose |
+|----------|---------|
+| `convert_named_colors()` | `{red text}` → `{#FF0000 text}` |
+| `maybe_wrap_text()` | Apply strwrap if wrap_width specified |
+| `strip_marquee_formatting()` | Remove `**` and `{#hex ...}` for char counting |
+| `color_to_hex()` | Convert R color name to hex code |
+
+### Layout Functions (`layout.R`)
+
+**`estimate_layout_heights()`** - Calculates height proportions based on text length:
+- Strips marquee formatting to count actual characters
+- Estimates line wrapping based on font size and output width
+- Returns proportions that sum to 1.0
+
+**`story_layout()`** - Composes a complete story layout:
+1. Converts text to block plots using `as_block()`
+2. Positions narrative (right/left/bottom)
+3. Stacks components with patchwork
+4. Applies height proportions
+
+### Color Functions (`colors.R`)
+
+**`list_colors()`** - Browse R color names with hex equivalents
+
+**`highlight_colors()`** - Create strategic highlighting:
+```r
+# Gray out everything except highlighted categories
+highlight_colors(c("A", "B", "C"), highlight = "B")
+# Returns: A="#D3D3D3", B="#1E90FF", C="#D3D3D3"
+```
+
+**`inline_legend()`** - Create data frame for marquee legend annotation
+
+### Theme (`theme.R`)
+
+**`theme_stwd()`** - Clean SWD-style theme:
+- White background, no border
+- Horizontal grid lines only
+- No axis lines or ticks
+- Legend at top-left
+
+## Shiny App Architecture
+
+The `story_designer()` function is a complete Shiny application for interactively designing story layouts. Understanding its architecture is essential for maintenance.
+
+### Application Structure
+
+```
+story_designer()
+├── UI (bslib::page_sidebar)
+│   ├── Sidebar
+│   │   ├── Output Dimensions (width, height, sidebar width)
+│   │   ├── Accordion Panels
+│   │   │   ├── Title (text_panel)
+│   │   │   ├── Subtitle (text_panel)
+│   │   │   ├── Narrative (narrative_panel)
+│   │   │   ├── Caption (text_panel)
+│   │   │   ├── Legend Block (mod_legend_ui)
+│   │   │   ├── Plot (plot_panel)
+│   │   │   ├── Color Palette (mod_palette_ui)
+│   │   │   └── Axis & Grid (axis_grid_panel)
+│   │   └── Reset Button
+│   └── Main Content (navset_card_tab)
+│       ├── Preview Tab
+│       ├── Sections Tab (height sliders)
+│       ├── Fine Tune Tab (alignment, lineheight)
+│       ├── Validate & Export Tab (mod_export_ui)
+│       ├── Code Tab
+│       └── Components Tab (individual previews)
+└── Server
+    ├── Debounced text inputs
+    ├── Module servers (palette, legend, export)
+    ├── Core reactives (styled_plot, build_layout)
+    ├── Output renderers
+    └── Event handlers
+```
+
+### Data Flow
+
+```
+User Input → Debounce → Module Processing → styled_plot() → build_layout() → Preview
+                                                                    ↓
+                                                              code_to_copy()
+```
+
+**Key reactives and their purposes:**
+
+| Reactive | Purpose | Depends On |
+|----------|---------|------------|
+| `title_text_d()` | Debounced title text (500ms) | `input$title_text` |
+| `plot_categories()` | Detected fill/color levels from user's plot | `user_plot` |
+| `styled_plot()` | User plot + theme + palette colors | `input$plot_theme`, `palette$*` |
+| `current_heights()` | Layout proportions | Height sliders, `legend$enabled()` |
+| `build_layout()` | Complete patchwork composition | All text, `styled_plot()`, `legend$plot()` |
+| `code_to_copy()` | Generated R code string | All inputs |
+
+### Module Communication Pattern
+
+Modules return named lists of reactives. The main server accesses these:
+
+```r
+# Initialize modules
+palette <- mod_palette_server("palette", plot_categories)
+legend <- mod_legend_server("legend")
+export <- mod_export_server("export", build_layout)
+
+# Access module values
+if (palette$manual_enabled()) {
+    colors <- palette$manual_colors()
+}
+
+legend_plot <- legend$plot()  # Returns ggplot or NULL
+```
+
+**Important**: Always call module reactives as functions: `palette$manual_enabled()` not `palette$manual_enabled`.
+
+---
+
+## Module: Palette (`mod_palette.R`)
+
+The palette module handles two distinct color systems: **Color Palette** (package-based) and **Manual Colors** (per-category assignment).
+
+### UI Structure
+
+```
+Color Palette Panel
+├── Package dropdown (ggsci, MetBrewer, viridis, etc.)
+├── Palette dropdown (dynamic based on package)
+├── Navigation buttons (prev, next, random)
+├── Swatch preview (clickable for selection)
+├── Warning (if categories > colors)
+└── Apply to / Scale dropdowns
+
+Manual Colors Panel
+├── Enable checkbox (with tooltip)
+├── Default color input
+├── Apply to dropdown
+├── Assign mode toggle (# or Name)
+└── Category assignment inputs (dynamic)
+```
+
+### Internal State
+
+```r
+palette_idx <- shiny::reactiveVal(1)           # Current palette index
+selected_colors <- shiny::reactiveVal(integer(0))  # Clicked swatch indices
+manual_color_values <- shiny::reactiveVal(list())  # Category → color map
+manual_trigger <- shiny::reactiveVal(0)        # Cache invalidation counter
+```
+
+### Return Interface
+
+```r
+list(
+    current_palette = reactive(...)   # Vector of hex colors (selected or all)
+    manual_colors = manual_color_values  # reactiveVal (NOT wrapped in reactive!)
+    manual_trigger = manual_trigger      # reactiveVal counter
+    palette_apply = reactive(...)     # "fill", "color", or "both"
+    palette_scale = reactive(...)     # "discrete" or "continuous"
+    manual_apply = reactive(...)      # "fill", "color", or "both"
+    manual_enabled = reactive(...)    # TRUE/FALSE
+    default_color = reactive(...)     # Hex color for unassigned categories
+    palette_package = reactive(...)   # Package name or "none"
+    palette_name = reactive(...)      # Selected palette name
+)
+```
+
+**Note**: `manual_colors` and `manual_trigger` are passed as `reactiveVal` directly, not wrapped in `reactive()`. This is intentional for the polling pattern.
+
+### Color Palette Flow
+
+```
+Package Selection → get_palette_names() → Palette Dropdown
+                                              ↓
+                        palette_idx ← Navigation Buttons
+                                              ↓
+                        get_palette_colors() → Swatch Preview
+                                              ↓
+                        Swatch Click → selected_colors update
+                                              ↓
+                        current_palette() returns selected or all colors
+```
+
+### Manual Colors Flow (Polling Pattern)
+
+Manual colors uses dynamic inputs created by `renderUI()`. These don't create automatic dependencies, so we poll:
+
+```r
+shiny::observe({
+    if (!isTRUE(input$manual_enabled)) {
+        manual_color_values(list())
+        return()
+    }
+
+    shiny::invalidateLater(500)  # Poll every 500ms
+
+    # Read dynamic inputs
+    colors <- purrr::map(seq_len(n), function(i) {
+        val <- input[[paste0("cat_color_", i)]]
+        # Validate hex or named color
+        if (is_valid_color(val)) val else NULL
+    })
+
+    new_result <- stats::setNames(colors, levels_to_use) |> purrr::compact()
+
+    # Only update if changed
+    if (!identical(new_result, manual_color_values())) {
+        manual_color_values(new_result)
+        manual_trigger(manual_trigger() + 1)  # Trigger cache invalidation
+    }
+})
+```
+
+### When Updating This Module
+
+1. **Adding a new palette package**: Update `get_palette_names()` and `get_palette_colors()` in `palette_helpers.R`
+2. **Changing return values**: Update all consumers in `story_designer.R` AND update `bindCache()` keys
+3. **Adding new inputs**: If static, no special handling. If dynamic (`renderUI`), use polling pattern
+4. **Cache issues**: Ensure new reactives are in `bindCache()` keys in `story_designer.R`
+
+---
+
+## Module: Legend (`mod_legend.R`)
+
+The legend module creates inline text legends using `legend_block()`.
+
+### UI Structure
+
+```
+Legend Block Panel
+├── Enable checkbox
+├── Labels input (comma-separated)
+├── Color inputs (dynamic per label)
+├── Position dropdown
+├── Align dropdown
+├── Separator dropdown
+├── Size/Width sliders
+├── Bold/Uppercase checkboxes
+├── Line height (for vertical)
+└── Wrap width slider
+```
+
+### Internal State
+
+```r
+legend_colors_val <- shiny::reactiveVal(NULL)  # Named color vector
+legend_trigger <- shiny::reactiveVal(0)        # Cache invalidation counter
+```
+
+### Return Interface
+
+```r
+list(
+    enabled = reactive(...)    # TRUE/FALSE
+    plot = reactive(...)       # legend_block() output or NULL
+    colors = reactive(...)     # Named vector: c("Label" = "#hex", ...)
+    trigger = legend_trigger   # reactiveVal counter for cache
+    position = reactive(...)   # "above", "below", "left", "right"
+    width = reactive(...)      # Width proportion for left/right position
+    halign = reactive(...)     # "left", "center", "right"
+    sep = reactive(...)        # Separator string
+    size = reactive(...)       # Font size
+    bold = reactive(...)       # TRUE/FALSE
+    uppercase = reactive(...)  # TRUE/FALSE
+    lineheight = reactive(...) # For vertical orientation
+    wrap = reactive(...)       # Wrap width (0 = off)
+    labels = reactive(...)     # Raw comma-separated string
+)
+```
+
+### Color Input Pattern
+
+Legend uses the same polling pattern as mod_palette for consistency:
+
+```r
+shiny::observe({
+    if (!isTRUE(input$enabled)) {
+        legend_colors_val(NULL)
+        return()
+    }
+
+    shiny::invalidateLater(500)  # Poll every 500ms
+
+    colors <- purrr::map_chr(seq_len(n), function(i) {
+        input[[paste0("color_", i)]] %||% default
+    }) |> stats::setNames(labels)
+
+    if (!identical(colors, legend_colors_val())) {
+        legend_colors_val(colors)
+        legend_trigger(legend_trigger() + 1)
+    }
+})
+```
+
+### When Updating This Module
+
+1. **Adding styling options**: Add input to UI, add to return list, update `legend_block()` call in `legend_plot` reactive
+2. **Changing color handling**: Follow the polling pattern; ensure trigger is incremented on changes
+3. **Position changes**: May affect `compose_layout()` in `story_designer.R`
+4. **New return values**: Add to `bindCache()` keys in `story_designer.R`
+
+---
+
+## Module: Export (`mod_export.R`)
+
+The export module handles validation preview and file download.
+
+### UI Structure
+
+```
+Export Panel
+├── Format/Width/Height/DPI inputs
+├── Validate/Popout/Download buttons
+├── Info display (calculated pixels)
+├── Quarto chunk options (with copy button)
+└── Actual size preview area
+```
+
+### Internal State
+
+```r
+actual_size_data <- shiny::reactiveVal(NULL)  # Base64 image + dimensions
+```
+
+### Key Feature: Actual Size Validation
+
+This renders the plot at true export dimensions so users can verify text sizes:
+
+```r
+shiny::observeEvent(input$validate, {
+    temp_file <- tempfile(fileext = ".png")
+    ggplot2::ggsave(temp_file, build_layout(),
+        width = w, height = h, dpi = dpi, bg = "white")
+    img_data <- base64enc::base64encode(temp_file)
+    actual_size_data(list(data = img_data, px_width = w * dpi, px_height = h * dpi))
+})
+```
+
+### Return Interface
+
+```r
+list(
+    width = reactive(...)   # Export width in inches
+    height = reactive(...)  # Export height in inches
+    dpi = reactive(...)     # DPI setting
+    format = reactive(...)  # "png", "pdf", "svg"
+)
+```
+
+### When Updating This Module
+
+1. **Adding export formats**: Update `downloadHandler()` format handling
+2. **Changing validation**: The base64 approach works; consider memory for very large images
+3. **Dependencies**: This module receives `build_layout` reactive as parameter; no direct input dependencies outside the module
+
+---
+
+## Critical: `bindCache()` and Cache Invalidation
+
+The preview plot uses caching for performance. **This is the #1 source of bugs**.
+
+### Current Cache Keys
+
+The cache keys are organized by category:
+
+```r
+shiny::bindCache(
+    # Text content (debounced)
+    title_text_d(), subtitle_text_d(), narrative_text_d(), caption_text_d(),
+    # Text sizes
+    input$title_size, input$subtitle_size, input$narrative_size, input$caption_size,
+    # Layout heights
+    input$title_height, input$subtitle_height, input$caption_height,
+    input$narrative_width, input$narrative_position,
+    # Fine tune: alignment, lineheight, wrap, margins
+    input$title_align, input$title_lineheight, input$title_wrap, input$title_margin_bottom,
+    input$subtitle_align, input$subtitle_lineheight, input$subtitle_wrap, input$subtitle_margin_bottom,
+    input$narrative_halign, input$narrative_valign, input$narrative_lineheight,
+    input$narrative_padding, input$narrative_wrap,
+    input$caption_position, input$caption_color, input$caption_wrap,
+    # Plot theme
+    input$plot_theme, input$plot_legend_pos,
+    # Axis titles (x and y)
+    input$axis_title_x_size, input$axis_title_x_bold, input$axis_title_x_align,
+    input$axis_title_x_angle, input$axis_title_x_color, input$axis_title_x_margin,
+    input$axis_title_y_size, input$axis_title_y_bold, input$axis_title_y_align,
+    input$axis_title_y_angle, input$axis_title_y_color, input$axis_title_y_margin,
+    # Axis text and lines
+    input$axis_text_size, input$axis_text_color,
+    input$show_axis_line, input$show_ticks, input$axis_line_color,
+    # Grid
+    input$grid_remove_all, input$grid_major, input$grid_minor, input$grid_color,
+    # Legend block module
+    legend$enabled(), legend$position(), legend$width(), legend$trigger(),
+    # Palette module
+    palette$current_palette(), palette$manual_enabled(),
+    palette$manual_colors(), palette$manual_trigger()
+)
+```
+
+### Rules for Cache Keys
+
+1. **Every reactive that affects output MUST be a cache key**
+2. Missing keys = stale cache = plot doesn't update
+3. No error is thrown - it silently serves old content
+
+### Debugging Cache Issues
+
+**Symptom**: Feature works under some conditions but not others.
+
+**Example**: Manual colors work when a palette is selected, but not when palette is "none".
+
+**Debug process**:
+1. Identify what's different between working/non-working states
+2. Check if the differing reactive is in cache keys
+3. Add missing reactive to `bindCache()` keys
+
+### The `manual_trigger` Pattern
+
+For `reactiveVal` objects containing complex data (lists, vectors), the cache may not detect changes properly. Solution:
+
+```r
+manual_trigger <- shiny::reactiveVal(0)
+
+# When data changes
+if (!identical(new_data, my_reactive_val())) {
+    my_reactive_val(new_data)
+    manual_trigger(manual_trigger() + 1)  # Force cache invalidation
+}
+
+# In bindCache
+shiny::bindCache(..., my_reactive_val(), manual_trigger())
+```
+
+---
+
+## Dynamic Inputs Pattern
+
+### The Problem
+
+Inputs created by `renderUI()` don't exist when reactives first evaluate:
+
+```r
+output$dynamic_inputs <- shiny::renderUI({
+    # Creates input$item_1, input$item_2, etc.
+    purrr::map(1:n, ~textInput(ns(paste0("item_", .x)), ...))
+})
+
+# This WON'T work - inputs don't exist yet
+my_reactive <- shiny::reactive({
+    input$item_1  # NULL, and no dependency created
+})
+```
+
+### Solution: Polling (used in mod_palette and mod_legend)
+
+```r
+shiny::observe({
+    shiny::invalidateLater(500)  # Check every 500ms
+
+    values <- purrr::map(1:n, ~input[[paste0("item_", .x)]])
+
+    if (!identical(values, stored_values())) {
+        stored_values(values)
+        trigger(trigger() + 1)  # For cache invalidation
+    }
+})
+```
+
+**Characteristics**:
+- 500ms polling interval (responsive enough, not wasteful)
+- Requires a `trigger` counter for `bindCache()` invalidation
+- Provides consistent "live" user experience across all dynamic inputs
+
+---
+
+## UI Helpers (`story_designer_ui.R`)
+
+Functions that reduce boilerplate in UI construction.
+
+### `text_panel()`
+
+Creates a standardized text input accordion panel:
+
+```r
+text_panel(
+    id = "title",           # Input prefix (creates title_text, title_size, etc.)
+    label = "Title",        # Accordion header
+    badge_color = "primary",
+    icon_name = "heading",
+    default_text = "...",
+    rows = 2,               # 1 = textInput, >1 = textAreaInput
+    size_min/max/default,
+    show_margin = TRUE      # Include margin_bottom slider
+)
+```
+
+### `narrative_panel()`
+
+Special panel with position/width controls for narrative placement.
+
+### `plot_panel()`
+
+Theme and legend position controls.
+
+### `axis_grid_panel()`
+
+Comprehensive axis and grid customization. This is the most complex panel with:
+- X/Y axis title controls (size, bold, align, angle, color, margin)
+- Axis text controls
+- Axis line and tick controls
+- Grid line controls (major/minor, horizontal/vertical)
+
+### When Adding New Panels
+
+1. Create helper function in `story_designer_ui.R`
+2. Use consistent input ID patterns: `{section}_{property}`
+3. Add to accordion in `story_designer.R`
+4. Add defaults to `designer_defaults.R`
+5. Add reset logic to `reset_all_inputs()`
+
+---
+
+## State Management (`designer_defaults.R`)
+
+### `default_input_values`
+
+Named list of all default values. Used by `reset_all_inputs()` and for documentation.
+
+**Sections**:
+- Text content (title_text, subtitle_text, etc.)
+- Sizes (title_size, subtitle_size, etc.)
+- Margins
+- Layout (narrative_width, heights)
+- Alignment
+- Line heights
+- Plot settings
+- Axis settings (x and y)
+- Grid settings
+
+### `reset_all_inputs()`
+
+Resets all inputs to defaults. Groups inputs by type for batch updates:
+
+```r
+# Sliders
+purrr::walk(slider_ids, ~shiny::updateSliderInput(session, .x, value = defaults[[.x]]))
+
+# Numeric inputs
+purrr::walk(numeric_ids, ~shiny::updateNumericInput(session, .x, value = defaults[[.x]]))
+
+# Select inputs
+purrr::walk(select_ids, ~shiny::updateSelectInput(session, .x, selected = defaults[[.x]]))
+```
+
+### `build_theme_mods()`
+
+Converts input values to a `ggplot2::theme()` object. Handles:
+- Void theme special case
+- Axis title styling (size, bold, align, angle, color, margin)
+- Axis text styling
+- Axis lines and ticks
+- Grid lines (major/minor, horizontal/vertical)
+
+### When Adding New Inputs
+
+1. Add to `default_input_values`
+2. Add to appropriate section in `reset_all_inputs()`
+3. If it affects the plot, add to `build_theme_mods()` or `styled_plot()`
+4. Add to `bindCache()` keys if it affects preview
+
+---
+
+## Code Generation (`code_generation.R`)
+
+Functions that generate R code strings for the Code tab:
+
+| Function | Generates |
+|----------|-----------|
+| `generate_theme_code()` | `styled_plot <- my_plot + theme_stwd() + theme(...)` |
+| `generate_grid_code()` | Grid line theme modifications |
+| `generate_palette_code()` | `scale_fill_manual(values = ...)` |
+| `generate_block_code()` | `title_plot <- title_block(...)` |
+| `generate_legend_code()` | `legend_plot <- legend_block(...)` |
+| `generate_composition_code()` | Final patchwork composition |
+
+**Important**: These generate strings, not code objects. All output should be parseable R code.
+
+---
+
+## Testing Approach
+
+### Test Files
+
+```
+tests/testthat/
+├── test-blocks.R          # Block functions and theme
+├── test-code-generation.R # Code generation functions
+├── test-colors.R          # highlight_colors, inline_legend, list_colors
+├── test-layout.R          # story_layout, estimate_layout_heights
+├── test-modules.R         # Module helper functions
+```
+
+### Testing Strategy
+
+1. **Exported functions** - Test all public API
+2. **Code generation** - Verify output is parseable R code
+3. **Helper functions** - Test edge cases (NULL, empty, etc.)
+4. **Skip Shiny reactives** - No shinytest2 (complex setup)
+
+### Running Tests
+
+```r
+devtools::test()           # Run all tests
+devtools::test_active_file() # Run current file
+```
+
+### Adding Tests
+
+Use `describe()`/`it()` pattern:
+```r
+describe("my_function", {
+    it("handles normal input", {
+        result <- my_function("test")
+        expect_equal(result, "expected")
+    })
+
+    it("handles NULL gracefully", {
+        result <- my_function(NULL)
+        expect_null(result)
+    })
+})
+```
+
+## Common Maintenance Tasks
+
+### Adding a New Palette Package
+
+1. Add to `Suggests` in DESCRIPTION
+2. Update `get_palette_names()` in `palette_helpers.R`
+3. Update `get_palette_colors()` in `palette_helpers.R`
+4. Update `generate_palette_code()` in `code_generation.R`
+5. Add tests
+
+### Adding a New Block Type
+
+1. Add function to `blocks.R`
+2. Add `@export` tag
+3. Use `create_text_block()` for consistency
+4. Add tests to `test-blocks.R`
+5. Run `devtools::document()`
+
+### Modifying the Shiny App
+
+1. UI changes: `story_designer.R` (UI section) or `story_designer_ui.R`
+2. Server logic: `story_designer.R` (server section) or relevant module
+3. Defaults: `designer_defaults.R`
+4. Code output: `code_generation.R`
+
+## Build & Check
+
+```r
+devtools::document()                    # Regenerate docs
+devtools::check(remote = TRUE, manual = TRUE)  # Full CRAN check
+devtools::test()                        # Run tests
+devtools::install()                     # Install locally
+```
+
+## Release Checklist
+
+1. Update version in DESCRIPTION
+2. Run `devtools::check(remote = TRUE, manual = TRUE)`
+3. Ensure 0 errors, 0 warnings
+4. Run full test suite
+5. Update NEWS.md if exists
+6. Commit and push to Codeberg
+7. Rebuild documentation site with qrtdown
+
+## Dependencies
+
+**Imports** (required):
+- cli, ggplot2, grid, patchwork, purrr, rlang, stats, utils
+
+**Suggests** (optional):
+- marquee (required for block functions)
+- shiny, bslib, base64enc, clipr (required for story_designer)
+- Palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor, RColorBrewer, scico, viridis, wesanderson
+- Testing: testthat, knitr, rmarkdown
+
+## Code Style
+
+- Use native pipe `|>` (not `%>%`)
+- Use `cli` for user-facing messages
+- Prefix Shiny functions with `shiny::` for CRAN compliance
+- Use `@noRd` for internal functions (no Rd file generated)

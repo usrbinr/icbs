@@ -481,26 +481,5 @@
     "title": "Recreating the STWD Look",
     "section": "Step 4: Add a Narrative Panel",
     "text": "Step 4: Add a Narrative Panel\nFor a more complete story, add an explanatory narrative:\n\nnarrative &lt;- text_narrative(\n  text = \"**Action Required**\n\n{#E69F00 Five warehouses} have error\nrates exceeding 10%:\n\n• Warehouse 6: **16%**\n• Warehouse 7: **15%**\n• Warehouses 2, 4: **14%**\n\n**Recommendation:**\nPrioritize quality audits\nfor these locations.\",\n  size = 6,\n  halign = \"left\",\n  line_height = 1.3\n)\n\n# Chart with narrative side-by-side\ncontent_row &lt;- base_chart + narrative + plot_layout(widths = c(0.72, 0.28))\n\ntitle_block(\n  \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  title_size = 10\n) /\nsubtitle_block(\n  \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  subtitle_size = 6\n) /\nlegend_block(\n  legend_colors,\n  halign = \"right\",\n  sep = \" | \",\n  size = 5\n) /\ncontent_row /\ncaption_block(\n  \"SOURCE: Warehouse Operations Database | Data: Albert Rapp SWD Recreation\",\n  caption_size = 4\n) +\n  plot_layout(heights = c(0.06, 0.04, 0.03, 0.82, 0.05))"
-  },
-  {
-    "objectID": "vignettes/articles/stwd-recreation.html#using-story_designer",
-    "href": "vignettes/articles/stwd-recreation.html#using-story_designer",
-    "title": "Recreating the STWD Look",
-    "section": "Using story_designer()",
-    "text": "Using story_designer()\nInstead of manually coding the layout, use the interactive designer:\nstory_designer(\n  plot = base_chart,\n  title = \"**5 warehouses exceed** {#E69F00 10% error threshold}\",\n  subtitle = \"Order accuracy breakdown by warehouse, sorted by error rate\",\n  narrative = \"**Action Required**\n\n{#E69F00 Five warehouses} have error rates exceeding 10%.\nPrioritize quality audits for these locations.\",\n  caption = \"SOURCE: Warehouse Operations Database\"\n)\nThe designer lets you:\n\nAdjust font sizes and spacing interactively\nFine-tune section heights with sliders\nPreview the layout at different export sizes\nCopy the generated patchwork code"
-  },
-  {
-    "objectID": "vignettes/articles/stwd-recreation.html#key-swd-principles-applied",
-    "href": "vignettes/articles/stwd-recreation.html#key-swd-principles-applied",
-    "title": "Recreating the STWD Look",
-    "section": "Key SWD Principles Applied",
-    "text": "Key SWD Principles Applied\n\n\n\nPrinciple\nImplementation\n\n\n\n\nStrategic color\nOrange highlights only the problem areas\n\n\nGray baseline\nNon-essential data in muted grays\n\n\nClear hierarchy\nTitle states the insight, not just the topic\n\n\nAction-oriented\nNarrative provides specific recommendations\n\n\nMinimal clutter\nRemoved unnecessary gridlines and legends"
-  },
-  {
-    "objectID": "vignettes/articles/stwd-recreation.html#summary",
-    "href": "vignettes/articles/stwd-recreation.html#summary",
-    "title": "Recreating the STWD Look",
-    "section": "Summary",
-    "text": "Summary\nThe stwd package simplifies creating SWD-style visualizations by providing:\n\nBlock functions for composing title, subtitle, legend, and caption\ntheme_stwd() for clean, minimal styling\nMarquee syntax for inline colored text\nstory_designer() for interactive layout design\n\nSee the Storytelling Layouts article for more examples."
   }
 ]

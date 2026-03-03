@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Architecture, design decisions, and maintenance approach for stwd">
+
+<title>Developer Guide – stwd</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5acddea9ec7addd5e9532e878e20728d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-e3345c6ef29c45a7958e8df45469d16f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5acddea9ec7addd5e9532e878e20728d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c85bf800f77521da5fb58a3d41a41409.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-95b7c47c30a34e4c5c1b5ad6043067cf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-c85bf800f77521da5fb58a3d41a41409.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../_qrtdown-styles.css">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../man/figures/logo.png" alt="" class="navbar-logo light-content">
+    <img src="../../man/figures/logo.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">stwd 3.2.1</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../vignettes/articles/developer-guide.html" aria-current="page"> 
+<span class="menu-text">Get started</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../_qrtdown/reference.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-articles" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Articles</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/introduction.html">
+ <span class="dropdown-text">Introduction to stwd</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/sizing.html">
+ <span class="dropdown-text">Sizing Story Layouts for Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/storytelling.html">
+ <span class="dropdown-text">Storytelling with Data Layouts</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../vignettes/articles/stwd-recreation.html">
+ <span class="dropdown-text">Recreating the STWD Look</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../_qrtdown/citation.html"> 
+<span class="menu-text">Citation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../NEWS.html"> 
+<span class="menu-text">Changelog</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://codeberg.org/usrbinr/stwd"> <i class="bi bi-code-square" role="img" aria-label="Source code">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#package-overview" id="toc-package-overview" class="nav-link active" data-scroll-target="#package-overview">Package Overview</a></li>
+  <li><a href="#file-structure" id="toc-file-structure" class="nav-link" data-scroll-target="#file-structure">File Structure</a></li>
+  <li><a href="#function-dependency-map" id="toc-function-dependency-map" class="nav-link" data-scroll-target="#function-dependency-map">Function Dependency Map</a>
+  <ul class="collapse">
+  <li><a href="#helper-function-locations" id="toc-helper-function-locations" class="nav-link" data-scroll-target="#helper-function-locations">Helper Function Locations</a></li>
+  </ul></li>
+  <li><a href="#architecture-principles" id="toc-architecture-principles" class="nav-link" data-scroll-target="#architecture-principles">Architecture Principles</a>
+  <ul class="collapse">
+  <li><a href="#single-responsibility" id="toc-single-responsibility" class="nav-link" data-scroll-target="#single-responsibility">1. Single Responsibility</a></li>
+  <li><a href="#exported-vs-internal" id="toc-exported-vs-internal" class="nav-link" data-scroll-target="#exported-vs-internal">2. Exported vs Internal</a></li>
+  <li><a href="#shiny-modularization" id="toc-shiny-modularization" class="nav-link" data-scroll-target="#shiny-modularization">3. Shiny Modularization</a></li>
+  </ul></li>
+  <li><a href="#core-components" id="toc-core-components" class="nav-link" data-scroll-target="#core-components">Core Components</a>
+  <ul class="collapse">
+  <li><a href="#block-functions-blocks.r" id="toc-block-functions-blocks.r" class="nav-link" data-scroll-target="#block-functions-blocks.r">Block Functions (<code>blocks.R</code>)</a></li>
+  <li><a href="#block-helpers-block_helpers.r" id="toc-block-helpers-block_helpers.r" class="nav-link" data-scroll-target="#block-helpers-block_helpers.r">Block Helpers (<code>block_helpers.R</code>)</a></li>
+  <li><a href="#text-helpers-text_helpers.r" id="toc-text-helpers-text_helpers.r" class="nav-link" data-scroll-target="#text-helpers-text_helpers.r">Text Helpers (<code>text_helpers.R</code>)</a></li>
+  <li><a href="#layout-functions-layout.r" id="toc-layout-functions-layout.r" class="nav-link" data-scroll-target="#layout-functions-layout.r">Layout Functions (<code>layout.R</code>)</a></li>
+  <li><a href="#color-functions-colors.r" id="toc-color-functions-colors.r" class="nav-link" data-scroll-target="#color-functions-colors.r">Color Functions (<code>colors.R</code>)</a></li>
+  <li><a href="#theme-theme.r" id="toc-theme-theme.r" class="nav-link" data-scroll-target="#theme-theme.r">Theme (<code>theme.R</code>)</a></li>
+  </ul></li>
+  <li><a href="#shiny-app-architecture" id="toc-shiny-app-architecture" class="nav-link" data-scroll-target="#shiny-app-architecture">Shiny App Architecture</a>
+  <ul class="collapse">
+  <li><a href="#application-structure" id="toc-application-structure" class="nav-link" data-scroll-target="#application-structure">Application Structure</a></li>
+  <li><a href="#data-flow" id="toc-data-flow" class="nav-link" data-scroll-target="#data-flow">Data Flow</a></li>
+  <li><a href="#module-communication-pattern" id="toc-module-communication-pattern" class="nav-link" data-scroll-target="#module-communication-pattern">Module Communication Pattern</a></li>
+  </ul></li>
+  <li><a href="#module-palette-mod_palette.r" id="toc-module-palette-mod_palette.r" class="nav-link" data-scroll-target="#module-palette-mod_palette.r">Module: Palette (<code>mod_palette.R</code>)</a>
+  <ul class="collapse">
+  <li><a href="#ui-structure" id="toc-ui-structure" class="nav-link" data-scroll-target="#ui-structure">UI Structure</a></li>
+  <li><a href="#internal-state" id="toc-internal-state" class="nav-link" data-scroll-target="#internal-state">Internal State</a></li>
+  <li><a href="#return-interface" id="toc-return-interface" class="nav-link" data-scroll-target="#return-interface">Return Interface</a></li>
+  <li><a href="#color-palette-flow" id="toc-color-palette-flow" class="nav-link" data-scroll-target="#color-palette-flow">Color Palette Flow</a></li>
+  <li><a href="#manual-colors-flow-polling-pattern" id="toc-manual-colors-flow-polling-pattern" class="nav-link" data-scroll-target="#manual-colors-flow-polling-pattern">Manual Colors Flow (Polling Pattern)</a></li>
+  <li><a href="#when-updating-this-module" id="toc-when-updating-this-module" class="nav-link" data-scroll-target="#when-updating-this-module">When Updating This Module</a></li>
+  </ul></li>
+  <li><a href="#module-legend-mod_legend.r" id="toc-module-legend-mod_legend.r" class="nav-link" data-scroll-target="#module-legend-mod_legend.r">Module: Legend (<code>mod_legend.R</code>)</a>
+  <ul class="collapse">
+  <li><a href="#ui-structure-1" id="toc-ui-structure-1" class="nav-link" data-scroll-target="#ui-structure-1">UI Structure</a></li>
+  <li><a href="#internal-state-1" id="toc-internal-state-1" class="nav-link" data-scroll-target="#internal-state-1">Internal State</a></li>
+  <li><a href="#return-interface-1" id="toc-return-interface-1" class="nav-link" data-scroll-target="#return-interface-1">Return Interface</a></li>
+  <li><a href="#color-input-pattern" id="toc-color-input-pattern" class="nav-link" data-scroll-target="#color-input-pattern">Color Input Pattern</a></li>
+  <li><a href="#when-updating-this-module-1" id="toc-when-updating-this-module-1" class="nav-link" data-scroll-target="#when-updating-this-module-1">When Updating This Module</a></li>
+  </ul></li>
+  <li><a href="#module-export-mod_export.r" id="toc-module-export-mod_export.r" class="nav-link" data-scroll-target="#module-export-mod_export.r">Module: Export (<code>mod_export.R</code>)</a>
+  <ul class="collapse">
+  <li><a href="#ui-structure-2" id="toc-ui-structure-2" class="nav-link" data-scroll-target="#ui-structure-2">UI Structure</a></li>
+  <li><a href="#internal-state-2" id="toc-internal-state-2" class="nav-link" data-scroll-target="#internal-state-2">Internal State</a></li>
+  <li><a href="#key-feature-actual-size-validation" id="toc-key-feature-actual-size-validation" class="nav-link" data-scroll-target="#key-feature-actual-size-validation">Key Feature: Actual Size Validation</a></li>
+  <li><a href="#return-interface-2" id="toc-return-interface-2" class="nav-link" data-scroll-target="#return-interface-2">Return Interface</a></li>
+  <li><a href="#when-updating-this-module-2" id="toc-when-updating-this-module-2" class="nav-link" data-scroll-target="#when-updating-this-module-2">When Updating This Module</a></li>
+  </ul></li>
+  <li><a href="#critical-bindcache-and-cache-invalidation" id="toc-critical-bindcache-and-cache-invalidation" class="nav-link" data-scroll-target="#critical-bindcache-and-cache-invalidation">Critical: <code>bindCache()</code> and Cache Invalidation</a>
+  <ul class="collapse">
+  <li><a href="#current-cache-keys" id="toc-current-cache-keys" class="nav-link" data-scroll-target="#current-cache-keys">Current Cache Keys</a></li>
+  <li><a href="#rules-for-cache-keys" id="toc-rules-for-cache-keys" class="nav-link" data-scroll-target="#rules-for-cache-keys">Rules for Cache Keys</a></li>
+  <li><a href="#debugging-cache-issues" id="toc-debugging-cache-issues" class="nav-link" data-scroll-target="#debugging-cache-issues">Debugging Cache Issues</a></li>
+  <li><a href="#the-manual_trigger-pattern" id="toc-the-manual_trigger-pattern" class="nav-link" data-scroll-target="#the-manual_trigger-pattern">The <code>manual_trigger</code> Pattern</a></li>
+  </ul></li>
+  <li><a href="#dynamic-inputs-pattern" id="toc-dynamic-inputs-pattern" class="nav-link" data-scroll-target="#dynamic-inputs-pattern">Dynamic Inputs Pattern</a>
+  <ul class="collapse">
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
+  <li><a href="#solution-polling-used-in-mod_palette-and-mod_legend" id="toc-solution-polling-used-in-mod_palette-and-mod_legend" class="nav-link" data-scroll-target="#solution-polling-used-in-mod_palette-and-mod_legend">Solution: Polling (used in mod_palette and mod_legend)</a></li>
+  </ul></li>
+  <li><a href="#ui-helpers-story_designer_ui.r" id="toc-ui-helpers-story_designer_ui.r" class="nav-link" data-scroll-target="#ui-helpers-story_designer_ui.r">UI Helpers (<code>story_designer_ui.R</code>)</a>
+  <ul class="collapse">
+  <li><a href="#text_panel" id="toc-text_panel" class="nav-link" data-scroll-target="#text_panel"><code>text_panel()</code></a></li>
+  <li><a href="#narrative_panel" id="toc-narrative_panel" class="nav-link" data-scroll-target="#narrative_panel"><code>narrative_panel()</code></a></li>
+  <li><a href="#plot_panel" id="toc-plot_panel" class="nav-link" data-scroll-target="#plot_panel"><code>plot_panel()</code></a></li>
+  <li><a href="#axis_grid_panel" id="toc-axis_grid_panel" class="nav-link" data-scroll-target="#axis_grid_panel"><code>axis_grid_panel()</code></a></li>
+  <li><a href="#when-adding-new-panels" id="toc-when-adding-new-panels" class="nav-link" data-scroll-target="#when-adding-new-panels">When Adding New Panels</a></li>
+  </ul></li>
+  <li><a href="#state-management-designer_defaults.r" id="toc-state-management-designer_defaults.r" class="nav-link" data-scroll-target="#state-management-designer_defaults.r">State Management (<code>designer_defaults.R</code>)</a>
+  <ul class="collapse">
+  <li><a href="#default_input_values" id="toc-default_input_values" class="nav-link" data-scroll-target="#default_input_values"><code>default_input_values</code></a></li>
+  <li><a href="#reset_all_inputs" id="toc-reset_all_inputs" class="nav-link" data-scroll-target="#reset_all_inputs"><code>reset_all_inputs()</code></a></li>
+  <li><a href="#build_theme_mods" id="toc-build_theme_mods" class="nav-link" data-scroll-target="#build_theme_mods"><code>build_theme_mods()</code></a></li>
+  <li><a href="#when-adding-new-inputs" id="toc-when-adding-new-inputs" class="nav-link" data-scroll-target="#when-adding-new-inputs">When Adding New Inputs</a></li>
+  </ul></li>
+  <li><a href="#code-generation-code_generation.r" id="toc-code-generation-code_generation.r" class="nav-link" data-scroll-target="#code-generation-code_generation.r">Code Generation (<code>code_generation.R</code>)</a></li>
+  <li><a href="#testing-approach" id="toc-testing-approach" class="nav-link" data-scroll-target="#testing-approach">Testing Approach</a>
+  <ul class="collapse">
+  <li><a href="#test-files" id="toc-test-files" class="nav-link" data-scroll-target="#test-files">Test Files</a></li>
+  <li><a href="#testing-strategy" id="toc-testing-strategy" class="nav-link" data-scroll-target="#testing-strategy">Testing Strategy</a></li>
+  <li><a href="#running-tests" id="toc-running-tests" class="nav-link" data-scroll-target="#running-tests">Running Tests</a></li>
+  <li><a href="#adding-tests" id="toc-adding-tests" class="nav-link" data-scroll-target="#adding-tests">Adding Tests</a></li>
+  </ul></li>
+  <li><a href="#common-maintenance-tasks" id="toc-common-maintenance-tasks" class="nav-link" data-scroll-target="#common-maintenance-tasks">Common Maintenance Tasks</a>
+  <ul class="collapse">
+  <li><a href="#adding-a-new-palette-package" id="toc-adding-a-new-palette-package" class="nav-link" data-scroll-target="#adding-a-new-palette-package">Adding a New Palette Package</a></li>
+  <li><a href="#adding-a-new-block-type" id="toc-adding-a-new-block-type" class="nav-link" data-scroll-target="#adding-a-new-block-type">Adding a New Block Type</a></li>
+  <li><a href="#modifying-the-shiny-app" id="toc-modifying-the-shiny-app" class="nav-link" data-scroll-target="#modifying-the-shiny-app">Modifying the Shiny App</a></li>
+  </ul></li>
+  <li><a href="#build-check" id="toc-build-check" class="nav-link" data-scroll-target="#build-check">Build &amp; Check</a></li>
+  <li><a href="#release-checklist" id="toc-release-checklist" class="nav-link" data-scroll-target="#release-checklist">Release Checklist</a></li>
+  <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
+  <li><a href="#code-style" id="toc-code-style" class="nav-link" data-scroll-target="#code-style">Code Style</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Developer Guide</h1>
+</div>
+
+<div>
+  <div class="description">
+    Architecture, design decisions, and maintenance approach for stwd
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This guide documents the architecture, design decisions, and maintenance approach for the stwd package.</p>
+<section id="package-overview" class="level2">
+<h2 class="anchored" data-anchor-id="package-overview">Package Overview</h2>
+<p>stwd (Storytelling with Data) provides tools for creating presentation-ready visualizations following SWD principles. The main feature is <code>story_designer()</code>, a Shiny app for interactively designing story layouts.</p>
+</section>
+<section id="file-structure" class="level2">
+<h2 class="anchored" data-anchor-id="file-structure">File Structure</h2>
+<pre><code>R/
+├── blocks.R              # 448 lines - Exported block functions
+├── block_helpers.R       # 138 lines - Internal helpers for blocks
+├── code_generation.R     # 273 lines - Generate R code strings
+├── colors.R              # 200 lines - Color utilities + package imports
+├── designer_defaults.R   # 160 lines - Default values, reset functions
+├── layout.R              # 275 lines - story_layout, estimate_layout_heights
+├── mod_export.R          # 258 lines - Shiny module: export/download
+├── mod_legend.R          # 175 lines - Shiny module: legend config
+├── mod_palette.R         # 384 lines - Shiny module: palette picker
+├── palette_helpers.R     # 130 lines - Palette lookup functions
+├── plot_analysis.R       # 169 lines - Extract info from ggplot objects
+├── story_designer.R      # 689 lines - Main Shiny app
+├── story_designer_ui.R   # 285 lines - UI builder functions
+├── text_helpers.R        #  76 lines - Text/marquee processing
+├── theme.R               #  80 lines - theme_stwd</code></pre>
+</section>
+<section id="function-dependency-map" class="level2">
+<h2 class="anchored" data-anchor-id="function-dependency-map">Function Dependency Map</h2>
+<pre><code>story_designer()
+├── mod_palette_server()
+│   ├── get_palette_names()
+│   ├── get_palette_colors()
+│   ├── get_levels_for_apply()
+│   └── default_legend_colors
+├── mod_legend_server()
+│   ├── legend_block()
+│   │   ├── check_marquee()
+│   │   ├── color_to_hex()
+│   │   └── get_hjust(), get_x_pos(), get_vjust()
+│   └── get_legend_orientation()
+├── mod_export_server()
+│   └── (uses build_layout reactive)
+├── build_layout() [reactive]
+│   ├── convert_named_colors()
+│   ├── title_block() ─────────┐
+│   ├── subtitle_block() ──────┤
+│   ├── text_narrative() ──────┼── All use create_text_block()
+│   ├── caption_block() ───────┤       └── maybe_wrap_text()
+│   └── legend_block() ────────┘
+├── styled_plot() [reactive]
+│   ├── theme_stwd()
+│   ├── build_theme_mods()
+│   ├── apply_color_scales()
+│   └── get_levels_for_apply()
+├── code_to_copy() [reactive]
+│   ├── generate_theme_code()
+│   │   └── generate_grid_code()
+│   ├── generate_palette_code()
+│   ├── generate_block_code()
+│   ├── generate_legend_code()
+│   ├── generate_composition_code()
+│   └── get_caption_halign()
+└── reset_all_inputs()
+    └── default_input_values
+
+story_layout()  [standalone, not used by story_designer]
+├── check_marquee()
+├── estimate_layout_heights()
+│   └── strip_marquee_formatting()
+├── as_block()
+│   ├── title_block()
+│   ├── subtitle_block()
+│   ├── text_narrative()
+│   └── caption_block()
+└── purrr::reduce() for composition
+
+highlight_colors()  [standalone utility]
+inline_legend()     [standalone utility]
+list_colors()       [standalone utility]
+    └── color_to_hex()</code></pre>
+<section id="helper-function-locations" class="level3">
+<h3 class="anchored" data-anchor-id="helper-function-locations">Helper Function Locations</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 26%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Helper</th>
+<th>File</th>
+<th>Used By</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>get_levels_for_apply()</code></td>
+<td>palette_helpers.R</td>
+<td>mod_palette, story_designer</td>
+</tr>
+<tr class="even">
+<td><code>get_caption_halign()</code></td>
+<td>palette_helpers.R</td>
+<td>story_designer</td>
+</tr>
+<tr class="odd">
+<td><code>get_legend_orientation()</code></td>
+<td>palette_helpers.R</td>
+<td>mod_legend, story_designer</td>
+</tr>
+<tr class="even">
+<td><code>check_marquee()</code></td>
+<td>block_helpers.R</td>
+<td>all block functions</td>
+</tr>
+<tr class="odd">
+<td><code>create_text_block()</code></td>
+<td>block_helpers.R</td>
+<td>all block functions</td>
+</tr>
+<tr class="even">
+<td><code>convert_named_colors()</code></td>
+<td>text_helpers.R</td>
+<td>story_designer</td>
+</tr>
+<tr class="odd">
+<td><code>color_to_hex()</code></td>
+<td>text_helpers.R</td>
+<td>legend_block, list_colors</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="architecture-principles" class="level2">
+<h2 class="anchored" data-anchor-id="architecture-principles">Architecture Principles</h2>
+<section id="single-responsibility" class="level3">
+<h3 class="anchored" data-anchor-id="single-responsibility">1. Single Responsibility</h3>
+<p>Each file has one purpose. No “utils” dumping grounds.</p>
+</section>
+<section id="exported-vs-internal" class="level3">
+<h3 class="anchored" data-anchor-id="exported-vs-internal">2. Exported vs Internal</h3>
+<ul>
+<li><strong>Exported functions</strong>: In <code>blocks.R</code>, <code>colors.R</code>, <code>layout.R</code>, <code>theme.R</code></li>
+<li><strong>Internal helpers</strong>: In <code>*_helpers.R</code> files, all marked <code>@noRd</code></li>
+</ul>
+</section>
+<section id="shiny-modularization" class="level3">
+<h3 class="anchored" data-anchor-id="shiny-modularization">3. Shiny Modularization</h3>
+<p>The Shiny app uses <code>moduleServer()</code> pattern: - <code>mod_palette_server()</code> - Color palette selection - <code>mod_legend_server()</code> - Inline legend configuration - <code>mod_export_server()</code> - Export settings and download</p>
+</section>
+</section>
+<section id="core-components" class="level2">
+<h2 class="anchored" data-anchor-id="core-components">Core Components</h2>
+<section id="block-functions-blocks.r" class="level3">
+<h3 class="anchored" data-anchor-id="block-functions-blocks.r">Block Functions (<code>blocks.R</code>)</h3>
+<p>Block functions create ggplot objects for patchwork composition:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title_block</span>()     <span class="co"># Large title with marquee formatting</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">subtitle_block</span>()  <span class="co"># Supporting context</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">caption_block</span>()   <span class="co"># Source attribution (gray by default)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">text_narrative</span>()  <span class="co"># Side panel narrative text</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend_block</span>()    <span class="co"># Inline colored text legend</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>All block functions: 1. Call <code>check_marquee()</code> to verify marquee is available 2. Use <code>create_text_block()</code> for consistent rendering 3. Return a ggplot object compatible with patchwork</p>
+<p><strong>Adding a new block function:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>my_block <span class="ot">&lt;-</span> <span class="cf">function</span>(text, <span class="at">size =</span> <span class="dv">10</span>, ...) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">check_marquee</span>(<span class="st">"my_block"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_text_block</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> text,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> size,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">halign =</span> <span class="st">"left"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">y_pos =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="block-helpers-block_helpers.r" class="level3">
+<h3 class="anchored" data-anchor-id="block-helpers-block_helpers.r">Block Helpers (<code>block_helpers.R</code>)</h3>
+<p>Internal functions that support blocks:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>check_marquee()</code></td>
+<td>Abort if marquee not installed</td>
+</tr>
+<tr class="even">
+<td><code>get_hjust()</code></td>
+<td>Convert “left”/“center”/“right” to 0/0.5/1</td>
+</tr>
+<tr class="odd">
+<td><code>get_x_pos()</code></td>
+<td>Convert alignment to x coordinate</td>
+</tr>
+<tr class="even">
+<td><code>get_vjust()</code></td>
+<td>Convert “top”/“center”/“bottom” to 1/0.5/0</td>
+</tr>
+<tr class="odd">
+<td><code>get_y_pos()</code></td>
+<td>Convert alignment to y coordinate</td>
+</tr>
+<tr class="even">
+<td><code>create_text_block()</code></td>
+<td>Core function that builds the ggplot</td>
+</tr>
+<tr class="odd">
+<td><code>as_block()</code></td>
+<td>Convert text or ggplot to block (for story_layout)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="text-helpers-text_helpers.r" class="level3">
+<h3 class="anchored" data-anchor-id="text-helpers-text_helpers.r">Text Helpers (<code>text_helpers.R</code>)</h3>
+<p>Functions for processing marquee-formatted text:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 52%">
+<col style="width: 47%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>convert_named_colors()</code></td>
+<td><code>{red text}</code> → <code>{#FF0000 text}</code></td>
+</tr>
+<tr class="even">
+<td><code>maybe_wrap_text()</code></td>
+<td>Apply strwrap if wrap_width specified</td>
+</tr>
+<tr class="odd">
+<td><code>strip_marquee_formatting()</code></td>
+<td>Remove <code>**</code> and <code>{#hex ...}</code> for char counting</td>
+</tr>
+<tr class="even">
+<td><code>color_to_hex()</code></td>
+<td>Convert R color name to hex code</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="layout-functions-layout.r" class="level3">
+<h3 class="anchored" data-anchor-id="layout-functions-layout.r">Layout Functions (<code>layout.R</code>)</h3>
+<p><strong><code>estimate_layout_heights()</code></strong> - Calculates height proportions based on text length: - Strips marquee formatting to count actual characters - Estimates line wrapping based on font size and output width - Returns proportions that sum to 1.0</p>
+<p><strong><code>story_layout()</code></strong> - Composes a complete story layout: 1. Converts text to block plots using <code>as_block()</code> 2. Positions narrative (right/left/bottom) 3. Stacks components with patchwork 4. Applies height proportions</p>
+</section>
+<section id="color-functions-colors.r" class="level3">
+<h3 class="anchored" data-anchor-id="color-functions-colors.r">Color Functions (<code>colors.R</code>)</h3>
+<p><strong><code>list_colors()</code></strong> - Browse R color names with hex equivalents</p>
+<p><strong><code>highlight_colors()</code></strong> - Create strategic highlighting:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gray out everything except highlighted categories</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">highlight_colors</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>), <span class="at">highlight =</span> <span class="st">"B"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: A="#D3D3D3", B="#1E90FF", C="#D3D3D3"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>inline_legend()</code></strong> - Create data frame for marquee legend annotation</p>
+</section>
+<section id="theme-theme.r" class="level3">
+<h3 class="anchored" data-anchor-id="theme-theme.r">Theme (<code>theme.R</code>)</h3>
+<p><strong><code>theme_stwd()</code></strong> - Clean SWD-style theme: - White background, no border - Horizontal grid lines only - No axis lines or ticks - Legend at top-left</p>
+</section>
+</section>
+<section id="shiny-app-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="shiny-app-architecture">Shiny App Architecture</h2>
+<p>The <code>story_designer()</code> function is a complete Shiny application for interactively designing story layouts. Understanding its architecture is essential for maintenance.</p>
+<section id="application-structure" class="level3">
+<h3 class="anchored" data-anchor-id="application-structure">Application Structure</h3>
+<pre><code>story_designer()
+├── UI (bslib::page_sidebar)
+│   ├── Sidebar
+│   │   ├── Output Dimensions (width, height, sidebar width)
+│   │   ├── Accordion Panels
+│   │   │   ├── Title (text_panel)
+│   │   │   ├── Subtitle (text_panel)
+│   │   │   ├── Narrative (narrative_panel)
+│   │   │   ├── Caption (text_panel)
+│   │   │   ├── Legend Block (mod_legend_ui)
+│   │   │   ├── Plot (plot_panel)
+│   │   │   ├── Color Palette (mod_palette_ui)
+│   │   │   └── Axis &amp; Grid (axis_grid_panel)
+│   │   └── Reset Button
+│   └── Main Content (navset_card_tab)
+│       ├── Preview Tab
+│       ├── Sections Tab (height sliders)
+│       ├── Fine Tune Tab (alignment, lineheight)
+│       ├── Validate &amp; Export Tab (mod_export_ui)
+│       ├── Code Tab
+│       └── Components Tab (individual previews)
+└── Server
+    ├── Debounced text inputs
+    ├── Module servers (palette, legend, export)
+    ├── Core reactives (styled_plot, build_layout)
+    ├── Output renderers
+    └── Event handlers</code></pre>
+</section>
+<section id="data-flow" class="level3">
+<h3 class="anchored" data-anchor-id="data-flow">Data Flow</h3>
+<pre><code>User Input → Debounce → Module Processing → styled_plot() → build_layout() → Preview
+                                                                    ↓
+                                                              code_to_copy()</code></pre>
+<p><strong>Key reactives and their purposes:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 29%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Reactive</th>
+<th>Purpose</th>
+<th>Depends On</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>title_text_d()</code></td>
+<td>Debounced title text (500ms)</td>
+<td><code>input$title_text</code></td>
+</tr>
+<tr class="even">
+<td><code>plot_categories()</code></td>
+<td>Detected fill/color levels from user’s plot</td>
+<td><code>user_plot</code></td>
+</tr>
+<tr class="odd">
+<td><code>styled_plot()</code></td>
+<td>User plot + theme + palette colors</td>
+<td><code>input$plot_theme</code>, <code>palette$*</code></td>
+</tr>
+<tr class="even">
+<td><code>current_heights()</code></td>
+<td>Layout proportions</td>
+<td>Height sliders, <code>legend$enabled()</code></td>
+</tr>
+<tr class="odd">
+<td><code>build_layout()</code></td>
+<td>Complete patchwork composition</td>
+<td>All text, <code>styled_plot()</code>, <code>legend$plot()</code></td>
+</tr>
+<tr class="even">
+<td><code>code_to_copy()</code></td>
+<td>Generated R code string</td>
+<td>All inputs</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-communication-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="module-communication-pattern">Module Communication Pattern</h3>
+<p>Modules return named lists of reactives. The main server accesses these:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize modules</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>palette <span class="ot">&lt;-</span> <span class="fu">mod_palette_server</span>(<span class="st">"palette"</span>, plot_categories)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>legend <span class="ot">&lt;-</span> <span class="fu">mod_legend_server</span>(<span class="st">"legend"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>export <span class="ot">&lt;-</span> <span class="fu">mod_export_server</span>(<span class="st">"export"</span>, build_layout)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Access module values</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (palette<span class="sc">$</span><span class="fu">manual_enabled</span>()) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    colors <span class="ot">&lt;-</span> palette<span class="sc">$</span><span class="fu">manual_colors</span>()</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>legend_plot <span class="ot">&lt;-</span> legend<span class="sc">$</span><span class="fu">plot</span>()  <span class="co"># Returns ggplot or NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Important</strong>: Always call module reactives as functions: <code>palette$manual_enabled()</code> not <code>palette$manual_enabled</code>.</p>
+<hr>
+</section>
+</section>
+<section id="module-palette-mod_palette.r" class="level2">
+<h2 class="anchored" data-anchor-id="module-palette-mod_palette.r">Module: Palette (<code>mod_palette.R</code>)</h2>
+<p>The palette module handles two distinct color systems: <strong>Color Palette</strong> (package-based) and <strong>Manual Colors</strong> (per-category assignment).</p>
+<section id="ui-structure" class="level3">
+<h3 class="anchored" data-anchor-id="ui-structure">UI Structure</h3>
+<pre><code>Color Palette Panel
+├── Package dropdown (ggsci, MetBrewer, viridis, etc.)
+├── Palette dropdown (dynamic based on package)
+├── Navigation buttons (prev, next, random)
+├── Swatch preview (clickable for selection)
+├── Warning (if categories &gt; colors)
+└── Apply to / Scale dropdowns
+
+Manual Colors Panel
+├── Enable checkbox (with tooltip)
+├── Default color input
+├── Apply to dropdown
+├── Assign mode toggle (# or Name)
+└── Category assignment inputs (dynamic)</code></pre>
+</section>
+<section id="internal-state" class="level3">
+<h3 class="anchored" data-anchor-id="internal-state">Internal State</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>palette_idx <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="dv">1</span>)           <span class="co"># Current palette index</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>selected_colors <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="fu">integer</span>(<span class="dv">0</span>))  <span class="co"># Clicked swatch indices</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>manual_color_values <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="fu">list</span>())  <span class="co"># Category → color map</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>manual_trigger <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="dv">0</span>)        <span class="co"># Cache invalidation counter</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="return-interface" class="level3">
+<h3 class="anchored" data-anchor-id="return-interface">Return Interface</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">current_palette =</span> <span class="fu">reactive</span>(...)   <span class="co"># Vector of hex colors (selected or all)</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">manual_colors =</span> manual_color_values  <span class="co"># reactiveVal (NOT wrapped in reactive!)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">manual_trigger =</span> manual_trigger      <span class="co"># reactiveVal counter</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette_apply =</span> <span class="fu">reactive</span>(...)     <span class="co"># "fill", "color", or "both"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette_scale =</span> <span class="fu">reactive</span>(...)     <span class="co"># "discrete" or "continuous"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">manual_apply =</span> <span class="fu">reactive</span>(...)      <span class="co"># "fill", "color", or "both"</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">manual_enabled =</span> <span class="fu">reactive</span>(...)    <span class="co"># TRUE/FALSE</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">default_color =</span> <span class="fu">reactive</span>(...)     <span class="co"># Hex color for unassigned categories</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette_package =</span> <span class="fu">reactive</span>(...)   <span class="co"># Package name or "none"</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette_name =</span> <span class="fu">reactive</span>(...)      <span class="co"># Selected palette name</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Note</strong>: <code>manual_colors</code> and <code>manual_trigger</code> are passed as <code>reactiveVal</code> directly, not wrapped in <code>reactive()</code>. This is intentional for the polling pattern.</p>
+</section>
+<section id="color-palette-flow" class="level3">
+<h3 class="anchored" data-anchor-id="color-palette-flow">Color Palette Flow</h3>
+<pre><code>Package Selection → get_palette_names() → Palette Dropdown
+                                              ↓
+                        palette_idx ← Navigation Buttons
+                                              ↓
+                        get_palette_colors() → Swatch Preview
+                                              ↓
+                        Swatch Click → selected_colors update
+                                              ↓
+                        current_palette() returns selected or all colors</code></pre>
+</section>
+<section id="manual-colors-flow-polling-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="manual-colors-flow-polling-pattern">Manual Colors Flow (Polling Pattern)</h3>
+<p>Manual colors uses dynamic inputs created by <code>renderUI()</code>. These don’t create automatic dependencies, so we poll:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">observe</span>({</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">isTRUE</span>(input<span class="sc">$</span>manual_enabled)) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">manual_color_values</span>(<span class="fu">list</span>())</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">invalidateLater</span>(<span class="dv">500</span>)  <span class="co"># Poll every 500ms</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Read dynamic inputs</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    colors <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(<span class="fu">seq_len</span>(n), <span class="cf">function</span>(i) {</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        val <span class="ot">&lt;-</span> input[[<span class="fu">paste0</span>(<span class="st">"cat_color_"</span>, i)]]</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Validate hex or named color</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">is_valid_color</span>(val)) val <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    new_result <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">setNames</span>(colors, levels_to_use) <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">compact</span>()</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Only update if changed</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">identical</span>(new_result, <span class="fu">manual_color_values</span>())) {</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">manual_color_values</span>(new_result)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">manual_trigger</span>(<span class="fu">manual_trigger</span>() <span class="sc">+</span> <span class="dv">1</span>)  <span class="co"># Trigger cache invalidation</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="when-updating-this-module" class="level3">
+<h3 class="anchored" data-anchor-id="when-updating-this-module">When Updating This Module</h3>
+<ol type="1">
+<li><strong>Adding a new palette package</strong>: Update <code>get_palette_names()</code> and <code>get_palette_colors()</code> in <code>palette_helpers.R</code></li>
+<li><strong>Changing return values</strong>: Update all consumers in <code>story_designer.R</code> AND update <code>bindCache()</code> keys</li>
+<li><strong>Adding new inputs</strong>: If static, no special handling. If dynamic (<code>renderUI</code>), use polling pattern</li>
+<li><strong>Cache issues</strong>: Ensure new reactives are in <code>bindCache()</code> keys in <code>story_designer.R</code></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="module-legend-mod_legend.r" class="level2">
+<h2 class="anchored" data-anchor-id="module-legend-mod_legend.r">Module: Legend (<code>mod_legend.R</code>)</h2>
+<p>The legend module creates inline text legends using <code>legend_block()</code>.</p>
+<section id="ui-structure-1" class="level3">
+<h3 class="anchored" data-anchor-id="ui-structure-1">UI Structure</h3>
+<pre><code>Legend Block Panel
+├── Enable checkbox
+├── Labels input (comma-separated)
+├── Color inputs (dynamic per label)
+├── Position dropdown
+├── Align dropdown
+├── Separator dropdown
+├── Size/Width sliders
+├── Bold/Uppercase checkboxes
+├── Line height (for vertical)
+└── Wrap width slider</code></pre>
+</section>
+<section id="internal-state-1" class="level3">
+<h3 class="anchored" data-anchor-id="internal-state-1">Internal State</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>legend_colors_val <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="cn">NULL</span>)  <span class="co"># Named color vector</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>legend_trigger <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="dv">0</span>)        <span class="co"># Cache invalidation counter</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="return-interface-1" class="level3">
+<h3 class="anchored" data-anchor-id="return-interface-1">Return Interface</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">enabled =</span> <span class="fu">reactive</span>(...)    <span class="co"># TRUE/FALSE</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot =</span> <span class="fu">reactive</span>(...)       <span class="co"># legend_block() output or NULL</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">reactive</span>(...)     <span class="co"># Named vector: c("Label" = "#hex", ...)</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trigger =</span> legend_trigger   <span class="co"># reactiveVal counter for cache</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">reactive</span>(...)   <span class="co"># "above", "below", "left", "right"</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">width =</span> <span class="fu">reactive</span>(...)      <span class="co"># Width proportion for left/right position</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">halign =</span> <span class="fu">reactive</span>(...)     <span class="co"># "left", "center", "right"</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="fu">reactive</span>(...)        <span class="co"># Separator string</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fu">reactive</span>(...)       <span class="co"># Font size</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">bold =</span> <span class="fu">reactive</span>(...)       <span class="co"># TRUE/FALSE</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">uppercase =</span> <span class="fu">reactive</span>(...)  <span class="co"># TRUE/FALSE</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">lineheight =</span> <span class="fu">reactive</span>(...) <span class="co"># For vertical orientation</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">wrap =</span> <span class="fu">reactive</span>(...)       <span class="co"># Wrap width (0 = off)</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">reactive</span>(...)     <span class="co"># Raw comma-separated string</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="color-input-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="color-input-pattern">Color Input Pattern</h3>
+<p>Legend uses the same polling pattern as mod_palette for consistency:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">observe</span>({</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">isTRUE</span>(input<span class="sc">$</span>enabled)) {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">legend_colors_val</span>(<span class="cn">NULL</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>()</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">invalidateLater</span>(<span class="dv">500</span>)  <span class="co"># Poll every 500ms</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    colors <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_chr</span>(<span class="fu">seq_len</span>(n), <span class="cf">function</span>(i) {</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        input[[<span class="fu">paste0</span>(<span class="st">"color_"</span>, i)]] <span class="sc">%||%</span> default</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">|&gt;</span> stats<span class="sc">::</span><span class="fu">setNames</span>(labels)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">identical</span>(colors, <span class="fu">legend_colors_val</span>())) {</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">legend_colors_val</span>(colors)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">legend_trigger</span>(<span class="fu">legend_trigger</span>() <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="when-updating-this-module-1" class="level3">
+<h3 class="anchored" data-anchor-id="when-updating-this-module-1">When Updating This Module</h3>
+<ol type="1">
+<li><strong>Adding styling options</strong>: Add input to UI, add to return list, update <code>legend_block()</code> call in <code>legend_plot</code> reactive</li>
+<li><strong>Changing color handling</strong>: Follow the polling pattern; ensure trigger is incremented on changes</li>
+<li><strong>Position changes</strong>: May affect <code>compose_layout()</code> in <code>story_designer.R</code></li>
+<li><strong>New return values</strong>: Add to <code>bindCache()</code> keys in <code>story_designer.R</code></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="module-export-mod_export.r" class="level2">
+<h2 class="anchored" data-anchor-id="module-export-mod_export.r">Module: Export (<code>mod_export.R</code>)</h2>
+<p>The export module handles validation preview and file download.</p>
+<section id="ui-structure-2" class="level3">
+<h3 class="anchored" data-anchor-id="ui-structure-2">UI Structure</h3>
+<pre><code>Export Panel
+├── Format/Width/Height/DPI inputs
+├── Validate/Popout/Download buttons
+├── Info display (calculated pixels)
+├── Quarto chunk options (with copy button)
+└── Actual size preview area</code></pre>
+</section>
+<section id="internal-state-2" class="level3">
+<h3 class="anchored" data-anchor-id="internal-state-2">Internal State</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>actual_size_data <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="cn">NULL</span>)  <span class="co"># Base64 image + dimensions</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="key-feature-actual-size-validation" class="level3">
+<h3 class="anchored" data-anchor-id="key-feature-actual-size-validation">Key Feature: Actual Size Validation</h3>
+<p>This renders the plot at true export dimensions so users can verify text sizes:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">observeEvent</span>(input<span class="sc">$</span>validate, {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    temp_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".png"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">ggsave</span>(temp_file, <span class="fu">build_layout</span>(),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">width =</span> w, <span class="at">height =</span> h, <span class="at">dpi =</span> dpi, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    img_data <span class="ot">&lt;-</span> base64enc<span class="sc">::</span><span class="fu">base64encode</span>(temp_file)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">actual_size_data</span>(<span class="fu">list</span>(<span class="at">data =</span> img_data, <span class="at">px_width =</span> w <span class="sc">*</span> dpi, <span class="at">px_height =</span> h <span class="sc">*</span> dpi))</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="return-interface-2" class="level3">
+<h3 class="anchored" data-anchor-id="return-interface-2">Return Interface</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">width =</span> <span class="fu">reactive</span>(...)   <span class="co"># Export width in inches</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> <span class="fu">reactive</span>(...)  <span class="co"># Export height in inches</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">dpi =</span> <span class="fu">reactive</span>(...)     <span class="co"># DPI setting</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">format =</span> <span class="fu">reactive</span>(...)  <span class="co"># "png", "pdf", "svg"</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="when-updating-this-module-2" class="level3">
+<h3 class="anchored" data-anchor-id="when-updating-this-module-2">When Updating This Module</h3>
+<ol type="1">
+<li><strong>Adding export formats</strong>: Update <code>downloadHandler()</code> format handling</li>
+<li><strong>Changing validation</strong>: The base64 approach works; consider memory for very large images</li>
+<li><strong>Dependencies</strong>: This module receives <code>build_layout</code> reactive as parameter; no direct input dependencies outside the module</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="critical-bindcache-and-cache-invalidation" class="level2">
+<h2 class="anchored" data-anchor-id="critical-bindcache-and-cache-invalidation">Critical: <code>bindCache()</code> and Cache Invalidation</h2>
+<p>The preview plot uses caching for performance. <strong>This is the #1 source of bugs</strong>.</p>
+<section id="current-cache-keys" class="level3">
+<h3 class="anchored" data-anchor-id="current-cache-keys">Current Cache Keys</h3>
+<p>The cache keys are organized by category:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">bindCache</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Text content (debounced)</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">title_text_d</span>(), <span class="fu">subtitle_text_d</span>(), <span class="fu">narrative_text_d</span>(), <span class="fu">caption_text_d</span>(),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Text sizes</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>title_size, input<span class="sc">$</span>subtitle_size, input<span class="sc">$</span>narrative_size, input<span class="sc">$</span>caption_size,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Layout heights</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>title_height, input<span class="sc">$</span>subtitle_height, input<span class="sc">$</span>caption_height,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>narrative_width, input<span class="sc">$</span>narrative_position,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fine tune: alignment, lineheight, wrap, margins</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>title_align, input<span class="sc">$</span>title_lineheight, input<span class="sc">$</span>title_wrap, input<span class="sc">$</span>title_margin_bottom,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>subtitle_align, input<span class="sc">$</span>subtitle_lineheight, input<span class="sc">$</span>subtitle_wrap, input<span class="sc">$</span>subtitle_margin_bottom,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>narrative_halign, input<span class="sc">$</span>narrative_valign, input<span class="sc">$</span>narrative_lineheight,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>narrative_padding, input<span class="sc">$</span>narrative_wrap,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>caption_position, input<span class="sc">$</span>caption_color, input<span class="sc">$</span>caption_wrap,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot theme</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>plot_theme, input<span class="sc">$</span>plot_legend_pos,</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Axis titles (x and y)</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>axis_title_x_size, input<span class="sc">$</span>axis_title_x_bold, input<span class="sc">$</span>axis_title_x_align,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>axis_title_x_angle, input<span class="sc">$</span>axis_title_x_color, input<span class="sc">$</span>axis_title_x_margin,</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>axis_title_y_size, input<span class="sc">$</span>axis_title_y_bold, input<span class="sc">$</span>axis_title_y_align,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>axis_title_y_angle, input<span class="sc">$</span>axis_title_y_color, input<span class="sc">$</span>axis_title_y_margin,</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Axis text and lines</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>axis_text_size, input<span class="sc">$</span>axis_text_color,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>show_axis_line, input<span class="sc">$</span>show_ticks, input<span class="sc">$</span>axis_line_color,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Grid</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>grid_remove_all, input<span class="sc">$</span>grid_major, input<span class="sc">$</span>grid_minor, input<span class="sc">$</span>grid_color,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Legend block module</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    legend<span class="sc">$</span><span class="fu">enabled</span>(), legend<span class="sc">$</span><span class="fu">position</span>(), legend<span class="sc">$</span><span class="fu">width</span>(), legend<span class="sc">$</span><span class="fu">trigger</span>(),</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Palette module</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    palette<span class="sc">$</span><span class="fu">current_palette</span>(), palette<span class="sc">$</span><span class="fu">manual_enabled</span>(),</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    palette<span class="sc">$</span><span class="fu">manual_colors</span>(), palette<span class="sc">$</span><span class="fu">manual_trigger</span>()</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="rules-for-cache-keys" class="level3">
+<h3 class="anchored" data-anchor-id="rules-for-cache-keys">Rules for Cache Keys</h3>
+<ol type="1">
+<li><strong>Every reactive that affects output MUST be a cache key</strong></li>
+<li>Missing keys = stale cache = plot doesn’t update</li>
+<li>No error is thrown - it silently serves old content</li>
+</ol>
+</section>
+<section id="debugging-cache-issues" class="level3">
+<h3 class="anchored" data-anchor-id="debugging-cache-issues">Debugging Cache Issues</h3>
+<p><strong>Symptom</strong>: Feature works under some conditions but not others.</p>
+<p><strong>Example</strong>: Manual colors work when a palette is selected, but not when palette is “none”.</p>
+<p><strong>Debug process</strong>: 1. Identify what’s different between working/non-working states 2. Check if the differing reactive is in cache keys 3. Add missing reactive to <code>bindCache()</code> keys</p>
+</section>
+<section id="the-manual_trigger-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="the-manual_trigger-pattern">The <code>manual_trigger</code> Pattern</h3>
+<p>For <code>reactiveVal</code> objects containing complex data (lists, vectors), the cache may not detect changes properly. Solution:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>manual_trigger <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="dv">0</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># When data changes</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">identical</span>(new_data, <span class="fu">my_reactive_val</span>())) {</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">my_reactive_val</span>(new_data)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">manual_trigger</span>(<span class="fu">manual_trigger</span>() <span class="sc">+</span> <span class="dv">1</span>)  <span class="co"># Force cache invalidation</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># In bindCache</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">bindCache</span>(..., <span class="fu">my_reactive_val</span>(), <span class="fu">manual_trigger</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="dynamic-inputs-pattern" class="level2">
+<h2 class="anchored" data-anchor-id="dynamic-inputs-pattern">Dynamic Inputs Pattern</h2>
+<section id="the-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-problem">The Problem</h3>
+<p>Inputs created by <code>renderUI()</code> don’t exist when reactives first evaluate:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>output<span class="sc">$</span>dynamic_inputs <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">renderUI</span>({</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Creates input$item_1, input$item_2, etc.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">map</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="sc">~</span><span class="fu">textInput</span>(<span class="fu">ns</span>(<span class="fu">paste0</span>(<span class="st">"item_"</span>, .x)), ...))</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># This WON'T work - inputs don't exist yet</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>my_reactive <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactive</span>({</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    input<span class="sc">$</span>item_1  <span class="co"># NULL, and no dependency created</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="solution-polling-used-in-mod_palette-and-mod_legend" class="level3">
+<h3 class="anchored" data-anchor-id="solution-polling-used-in-mod_palette-and-mod_legend">Solution: Polling (used in mod_palette and mod_legend)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">observe</span>({</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">invalidateLater</span>(<span class="dv">500</span>)  <span class="co"># Check every 500ms</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    values <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="sc">~</span>input[[<span class="fu">paste0</span>(<span class="st">"item_"</span>, .x)]])</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">identical</span>(values, <span class="fu">stored_values</span>())) {</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stored_values</span>(values)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">trigger</span>(<span class="fu">trigger</span>() <span class="sc">+</span> <span class="dv">1</span>)  <span class="co"># For cache invalidation</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Characteristics</strong>: - 500ms polling interval (responsive enough, not wasteful) - Requires a <code>trigger</code> counter for <code>bindCache()</code> invalidation - Provides consistent “live” user experience across all dynamic inputs</p>
+<hr>
+</section>
+</section>
+<section id="ui-helpers-story_designer_ui.r" class="level2">
+<h2 class="anchored" data-anchor-id="ui-helpers-story_designer_ui.r">UI Helpers (<code>story_designer_ui.R</code>)</h2>
+<p>Functions that reduce boilerplate in UI construction.</p>
+<section id="text_panel" class="level3">
+<h3 class="anchored" data-anchor-id="text_panel"><code>text_panel()</code></h3>
+<p>Creates a standardized text input accordion panel:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">text_panel</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="st">"title"</span>,           <span class="co"># Input prefix (creates title_text, title_size, etc.)</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Title"</span>,        <span class="co"># Accordion header</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">badge_color =</span> <span class="st">"primary"</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">icon_name =</span> <span class="st">"heading"</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">default_text =</span> <span class="st">"..."</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="dv">2</span>,               <span class="co"># 1 = textInput, &gt;1 = textAreaInput</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    size_min<span class="sc">/</span>max<span class="sc">/</span>default,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">show_margin =</span> <span class="cn">TRUE</span>      <span class="co"># Include margin_bottom slider</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="narrative_panel" class="level3">
+<h3 class="anchored" data-anchor-id="narrative_panel"><code>narrative_panel()</code></h3>
+<p>Special panel with position/width controls for narrative placement.</p>
+</section>
+<section id="plot_panel" class="level3">
+<h3 class="anchored" data-anchor-id="plot_panel"><code>plot_panel()</code></h3>
+<p>Theme and legend position controls.</p>
+</section>
+<section id="axis_grid_panel" class="level3">
+<h3 class="anchored" data-anchor-id="axis_grid_panel"><code>axis_grid_panel()</code></h3>
+<p>Comprehensive axis and grid customization. This is the most complex panel with: - X/Y axis title controls (size, bold, align, angle, color, margin) - Axis text controls - Axis line and tick controls - Grid line controls (major/minor, horizontal/vertical)</p>
+</section>
+<section id="when-adding-new-panels" class="level3">
+<h3 class="anchored" data-anchor-id="when-adding-new-panels">When Adding New Panels</h3>
+<ol type="1">
+<li>Create helper function in <code>story_designer_ui.R</code></li>
+<li>Use consistent input ID patterns: <code>{section}_{property}</code></li>
+<li>Add to accordion in <code>story_designer.R</code></li>
+<li>Add defaults to <code>designer_defaults.R</code></li>
+<li>Add reset logic to <code>reset_all_inputs()</code></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="state-management-designer_defaults.r" class="level2">
+<h2 class="anchored" data-anchor-id="state-management-designer_defaults.r">State Management (<code>designer_defaults.R</code>)</h2>
+<section id="default_input_values" class="level3">
+<h3 class="anchored" data-anchor-id="default_input_values"><code>default_input_values</code></h3>
+<p>Named list of all default values. Used by <code>reset_all_inputs()</code> and for documentation.</p>
+<p><strong>Sections</strong>: - Text content (title_text, subtitle_text, etc.) - Sizes (title_size, subtitle_size, etc.) - Margins - Layout (narrative_width, heights) - Alignment - Line heights - Plot settings - Axis settings (x and y) - Grid settings</p>
+</section>
+<section id="reset_all_inputs" class="level3">
+<h3 class="anchored" data-anchor-id="reset_all_inputs"><code>reset_all_inputs()</code></h3>
+<p>Resets all inputs to defaults. Groups inputs by type for batch updates:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sliders</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">walk</span>(slider_ids, <span class="sc">~</span>shiny<span class="sc">::</span><span class="fu">updateSliderInput</span>(session, .x, <span class="at">value =</span> defaults[[.x]]))</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Numeric inputs</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">walk</span>(numeric_ids, <span class="sc">~</span>shiny<span class="sc">::</span><span class="fu">updateNumericInput</span>(session, .x, <span class="at">value =</span> defaults[[.x]]))</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Select inputs</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">walk</span>(select_ids, <span class="sc">~</span>shiny<span class="sc">::</span><span class="fu">updateSelectInput</span>(session, .x, <span class="at">selected =</span> defaults[[.x]]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="build_theme_mods" class="level3">
+<h3 class="anchored" data-anchor-id="build_theme_mods"><code>build_theme_mods()</code></h3>
+<p>Converts input values to a <code>ggplot2::theme()</code> object. Handles: - Void theme special case - Axis title styling (size, bold, align, angle, color, margin) - Axis text styling - Axis lines and ticks - Grid lines (major/minor, horizontal/vertical)</p>
+</section>
+<section id="when-adding-new-inputs" class="level3">
+<h3 class="anchored" data-anchor-id="when-adding-new-inputs">When Adding New Inputs</h3>
+<ol type="1">
+<li>Add to <code>default_input_values</code></li>
+<li>Add to appropriate section in <code>reset_all_inputs()</code></li>
+<li>If it affects the plot, add to <code>build_theme_mods()</code> or <code>styled_plot()</code></li>
+<li>Add to <code>bindCache()</code> keys if it affects preview</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="code-generation-code_generation.r" class="level2">
+<h2 class="anchored" data-anchor-id="code-generation-code_generation.r">Code Generation (<code>code_generation.R</code>)</h2>
+<p>Functions that generate R code strings for the Code tab:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Generates</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>generate_theme_code()</code></td>
+<td><code>styled_plot &lt;- my_plot + theme_stwd() + theme(...)</code></td>
+</tr>
+<tr class="even">
+<td><code>generate_grid_code()</code></td>
+<td>Grid line theme modifications</td>
+</tr>
+<tr class="odd">
+<td><code>generate_palette_code()</code></td>
+<td><code>scale_fill_manual(values = ...)</code></td>
+</tr>
+<tr class="even">
+<td><code>generate_block_code()</code></td>
+<td><code>title_plot &lt;- title_block(...)</code></td>
+</tr>
+<tr class="odd">
+<td><code>generate_legend_code()</code></td>
+<td><code>legend_plot &lt;- legend_block(...)</code></td>
+</tr>
+<tr class="even">
+<td><code>generate_composition_code()</code></td>
+<td>Final patchwork composition</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Important</strong>: These generate strings, not code objects. All output should be parseable R code.</p>
+<hr>
+</section>
+<section id="testing-approach" class="level2">
+<h2 class="anchored" data-anchor-id="testing-approach">Testing Approach</h2>
+<section id="test-files" class="level3">
+<h3 class="anchored" data-anchor-id="test-files">Test Files</h3>
+<pre><code>tests/testthat/
+├── test-blocks.R          # Block functions and theme
+├── test-code-generation.R # Code generation functions
+├── test-colors.R          # highlight_colors, inline_legend, list_colors
+├── test-layout.R          # story_layout, estimate_layout_heights
+├── test-modules.R         # Module helper functions</code></pre>
+</section>
+<section id="testing-strategy" class="level3">
+<h3 class="anchored" data-anchor-id="testing-strategy">Testing Strategy</h3>
+<ol type="1">
+<li><strong>Exported functions</strong> - Test all public API</li>
+<li><strong>Code generation</strong> - Verify output is parseable R code</li>
+<li><strong>Helper functions</strong> - Test edge cases (NULL, empty, etc.)</li>
+<li><strong>Skip Shiny reactives</strong> - No shinytest2 (complex setup)</li>
+</ol>
+</section>
+<section id="running-tests" class="level3">
+<h3 class="anchored" data-anchor-id="running-tests">Running Tests</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">test</span>()           <span class="co"># Run all tests</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">test_active_file</span>() <span class="co"># Run current file</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="adding-tests" class="level3">
+<h3 class="anchored" data-anchor-id="adding-tests">Adding Tests</h3>
+<p>Use <code>describe()</code>/<code>it()</code> pattern:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">"my_function"</span>, {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">"handles normal input"</span>, {</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        result <span class="ot">&lt;-</span> <span class="fu">my_function</span>(<span class="st">"test"</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">expect_equal</span>(result, <span class="st">"expected"</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">it</span>(<span class="st">"handles NULL gracefully"</span>, {</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        result <span class="ot">&lt;-</span> <span class="fu">my_function</span>(<span class="cn">NULL</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">expect_null</span>(result)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="common-maintenance-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="common-maintenance-tasks">Common Maintenance Tasks</h2>
+<section id="adding-a-new-palette-package" class="level3">
+<h3 class="anchored" data-anchor-id="adding-a-new-palette-package">Adding a New Palette Package</h3>
+<ol type="1">
+<li>Add to <code>Suggests</code> in DESCRIPTION</li>
+<li>Update <code>get_palette_names()</code> in <code>palette_helpers.R</code></li>
+<li>Update <code>get_palette_colors()</code> in <code>palette_helpers.R</code></li>
+<li>Update <code>generate_palette_code()</code> in <code>code_generation.R</code></li>
+<li>Add tests</li>
+</ol>
+</section>
+<section id="adding-a-new-block-type" class="level3">
+<h3 class="anchored" data-anchor-id="adding-a-new-block-type">Adding a New Block Type</h3>
+<ol type="1">
+<li>Add function to <code>blocks.R</code></li>
+<li>Add <code>@export</code> tag</li>
+<li>Use <code>create_text_block()</code> for consistency</li>
+<li>Add tests to <code>test-blocks.R</code></li>
+<li>Run <code>devtools::document()</code></li>
+</ol>
+</section>
+<section id="modifying-the-shiny-app" class="level3">
+<h3 class="anchored" data-anchor-id="modifying-the-shiny-app">Modifying the Shiny App</h3>
+<ol type="1">
+<li>UI changes: <code>story_designer.R</code> (UI section) or <code>story_designer_ui.R</code></li>
+<li>Server logic: <code>story_designer.R</code> (server section) or relevant module</li>
+<li>Defaults: <code>designer_defaults.R</code></li>
+<li>Code output: <code>code_generation.R</code></li>
+</ol>
+</section>
+</section>
+<section id="build-check" class="level2">
+<h2 class="anchored" data-anchor-id="build-check">Build &amp; Check</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">document</span>()                    <span class="co"># Regenerate docs</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">check</span>(<span class="at">remote =</span> <span class="cn">TRUE</span>, <span class="at">manual =</span> <span class="cn">TRUE</span>)  <span class="co"># Full CRAN check</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">test</span>()                        <span class="co"># Run tests</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install</span>()                     <span class="co"># Install locally</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="release-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="release-checklist">Release Checklist</h2>
+<ol type="1">
+<li>Update version in DESCRIPTION</li>
+<li>Run <code>devtools::check(remote = TRUE, manual = TRUE)</code></li>
+<li>Ensure 0 errors, 0 warnings</li>
+<li>Run full test suite</li>
+<li>Update NEWS.md if exists</li>
+<li>Commit and push to Codeberg</li>
+<li>Rebuild documentation site with qrtdown</li>
+</ol>
+</section>
+<section id="dependencies" class="level2">
+<h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
+<p><strong>Imports</strong> (required): - cli, ggplot2, grid, patchwork, purrr, rlang, stats, utils</p>
+<p><strong>Suggests</strong> (optional): - marquee (required for block functions) - shiny, bslib, base64enc, clipr (required for story_designer) - Palette packages: ggsci, MetBrewer, nord, PNWColors, rcartocolor, RColorBrewer, scico, viridis, wesanderson - Testing: testthat, knitr, rmarkdown</p>
+</section>
+<section id="code-style" class="level2">
+<h2 class="anchored" data-anchor-id="code-style">Code Style</h2>
+<ul>
+<li>Use native pipe <code>|&gt;</code> (not <code>%&gt;%</code>)</li>
+<li>Use <code>cli</code> for user-facing messages</li>
+<li>Prefix Shiny functions with <code>shiny::</code> for CRAN compliance</li>
+<li>Use <code>@noRd</code> for internal functions (no Rd file generated)</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Built with <a href="https://quarto.org/">Quarto</a> and <a href="https://codeberg.org/usrbinr/qrtdown">qrtdown</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>stwd 3.2.1</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
