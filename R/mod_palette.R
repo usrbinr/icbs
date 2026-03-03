@@ -175,7 +175,7 @@ mod_palette_server <- function(id, plot_categories) {
             colors <- get_palette_colors(pkg, palettes[idx], 8)
             sel <- selected_colors()
 
-            swatches <- lapply(seq_along(colors), function(i) {
+            swatches <- purrr::map(seq_along(colors), function(i) {
                 col <- colors[i]
                 is_selected <- i %in% sel
                 badge <- if (is_selected) {
@@ -272,7 +272,7 @@ mod_palette_server <- function(id, plot_categories) {
 
             assign_mode <- input$assign_mode %||% "number"
 
-            assignment_ui <- lapply(seq_along(levels_to_use), function(i) {
+            assignment_ui <- purrr::map(seq_along(levels_to_use), function(i) {
                 level_name <- levels_to_use[i]
                 input_id <- ns(paste0("cat_color_", i))
 

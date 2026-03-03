@@ -385,20 +385,20 @@ legend_block <- function(colors,
 
     # Wrap labels if wrap_width specified
     if (!is.null(wrap_width) && wrap_width > 0) {
-        labels <- sapply(labels, function(lbl) {
+        labels <- purrr::map_chr(labels, function(lbl) {
             paste(strwrap(lbl, width = wrap_width), collapse = "\n")
-        }, USE.NAMES = FALSE)
+        })
     }
 
     # Format each label with its color using marquee syntax
-    formatted <- mapply(function(label, color) {
+    formatted <- purrr::map2_chr(labels, colors, function(label, color) {
         color <- color_to_hex(color)
         if (bold) {
             paste0("**{", color, " ", label, "}**")
         } else {
             paste0("{", color, " ", label, "}")
         }
-    }, labels, colors, SIMPLIFY = TRUE, USE.NAMES = FALSE)
+    })
 
     # Position settings (default to right alignment for legend)
     hjust <- get_hjust(halign, default = 1)

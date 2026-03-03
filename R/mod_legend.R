@@ -62,7 +62,7 @@ mod_legend_server <- function(id) {
 
             if (n == 0) return(NULL)
 
-            color_inputs <- lapply(seq_len(n), function(i) {
+            color_inputs <- purrr::map(seq_len(n), function(i) {
                 input_id <- ns(paste0("color_", i))
                 current_val <- input[[paste0("color_", i)]]
                 default_val <- if (is.null(current_val)) {
@@ -91,10 +91,9 @@ mod_legend_server <- function(id) {
 
             if (n == 0) return(NULL)
 
-            colors <- sapply(seq_len(n), function(i) {
+            colors <- purrr::map_chr(seq_len(n), function(i) {
                 input[[paste0("color_", i)]] %||% default_colors[((i - 1) %% length(default_colors)) + 1]
-            })
-            names(colors) <- labels
+            }) |> stats::setNames(labels)
             colors
         })
 

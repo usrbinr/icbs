@@ -15,6 +15,7 @@ Imports:
     ggplot2,
     grid,
     patchwork,
+    purrr,
     rlang,
     stats,
     utils

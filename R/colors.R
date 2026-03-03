@@ -63,7 +63,7 @@ list_colors <- function(pattern = NULL, n = 20) {
         return(invisible(data.frame(name = character(), hex = character())))
     }
 
-    hex_codes <- sapply(all_colors, color_to_hex)
+    hex_codes <- purrr::map_chr(all_colors, color_to_hex)
     result <- data.frame(name = all_colors, hex = hex_codes, row.names = NULL)
 
     cli::cli_h2("Available Colors")
@@ -181,10 +181,10 @@ inline_legend <- function(colors,
     # Format labels with marquee color syntax
     labels <- names(colors)
     cols <- unname(colors)
-    formatted <- mapply(function(label, color) {
+    formatted <- purrr::map2_chr(labels, cols, function(label, color) {
         text <- if (bold) paste0("**", label, "**") else label
         paste0("{", color, " ", text, "}")
-    }, labels, cols, USE.NAMES = FALSE)
+    })
 
     if (orientation == "horizontal") {
         label <- paste(formatted, collapse = sep)

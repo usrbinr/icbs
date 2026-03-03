@@ -290,10 +290,9 @@ story_designer <- function(plot = NULL,
                         else cats$color_levels
 
                     if (!is.null(levels_to_use) && length(levels_to_use) > 0) {
-                        final_colors <- sapply(levels_to_use, function(lvl) {
+                        final_colors <- purrr::map_chr(levels_to_use, function(lvl) {
                             if (lvl %in% names(color_map)) color_map[[lvl]] else default_col
-                        })
-                        names(final_colors) <- levels_to_use
+                        }) |> stats::setNames(levels_to_use)
                         p <- apply_color_scales(p, final_colors, manual_apply, "discrete")
                     }
                 }
