@@ -27,6 +27,75 @@ R/
 ├── theme.R               #  80 lines - theme_stwd
 ```
 
+## Function Dependency Map
+
+```
+story_designer()
+├── mod_palette_server()
+│   ├── get_palette_names()
+│   ├── get_palette_colors()
+│   ├── get_levels_for_apply()
+│   └── default_legend_colors
+├── mod_legend_server()
+│   ├── legend_block()
+│   │   ├── check_marquee()
+│   │   ├── color_to_hex()
+│   │   └── get_hjust(), get_x_pos(), get_vjust()
+│   └── get_legend_orientation()
+├── mod_export_server()
+│   └── (uses build_layout reactive)
+├── build_layout() [reactive]
+│   ├── convert_named_colors()
+│   ├── title_block() ─────────┐
+│   ├── subtitle_block() ──────┤
+│   ├── text_narrative() ──────┼── All use create_text_block()
+│   ├── caption_block() ───────┤       └── maybe_wrap_text()
+│   └── legend_block() ────────┘
+├── styled_plot() [reactive]
+│   ├── theme_stwd()
+│   ├── build_theme_mods()
+│   ├── apply_color_scales()
+│   └── get_levels_for_apply()
+├── code_to_copy() [reactive]
+│   ├── generate_theme_code()
+│   │   └── generate_grid_code()
+│   ├── generate_palette_code()
+│   ├── generate_block_code()
+│   ├── generate_legend_code()
+│   ├── generate_composition_code()
+│   └── get_caption_halign()
+└── reset_all_inputs()
+    └── default_input_values
+
+story_layout()  [standalone, not used by story_designer]
+├── check_marquee()
+├── estimate_layout_heights()
+│   └── strip_marquee_formatting()
+├── as_block()
+│   ├── title_block()
+│   ├── subtitle_block()
+│   ├── text_narrative()
+│   └── caption_block()
+└── purrr::reduce() for composition
+
+highlight_colors()  [standalone utility]
+inline_legend()     [standalone utility]
+list_colors()       [standalone utility]
+    └── color_to_hex()
+```
+
+### Helper Function Locations
+
+| Helper | File | Used By |
+|--------|------|---------|
+| `get_levels_for_apply()` | palette_helpers.R | mod_palette, story_designer |
+| `get_caption_halign()` | palette_helpers.R | story_designer |
+| `get_legend_orientation()` | palette_helpers.R | mod_legend, story_designer |
+| `check_marquee()` | block_helpers.R | all block functions |
+| `create_text_block()` | block_helpers.R | all block functions |
+| `convert_named_colors()` | text_helpers.R | story_designer |
+| `color_to_hex()` | text_helpers.R | legend_block, list_colors |
+
 ## Architecture Principles
 
 ### 1. Single Responsibility
